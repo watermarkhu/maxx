@@ -1,0 +1,79 @@
+[project]
+name = "malt"
+version = "0.1.0"
+description = "Signatures for MATLAB projects"
+readme = "README.md"
+authors = [
+    { name = "Mark Hu", email = "watermarkhu@gmail.com" }
+]
+license = "GPL-3.0"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Documentation",
+    "Topic :: Software Development",
+    "Topic :: Software Development :: Documentation",
+    "Topic :: Utilities",
+    "Typing :: Typed",
+]
+requires-python = ">=3.10"
+dependencies = [
+    "charset-normalizer~=3.4",
+    "griffe~=1.7.2",
+    "tree-sitter~=0.24",
+    "tree-sitter-matlab~=1.0",
+    "typing-extensions>=4.0; python_version < '3.11'",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.11.7",
+    "mypy>=1.15.0",
+    "pytest>=8.3.5",
+]
+reference = [
+    "beautifulsoup4>=4.13.3",
+    "playwright>=1.51.0",
+]
+
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/malt"]
+
+[tool.uv]
+managed = true
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+indent-width = 4
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.mypy]
+python_version = "3.10"
+packages = ["malt"]
+plugins = []
+
+[tool.pyright]
+include = ["src"]
+typeCheckingMode = "standard"
+reportIncompatibleVariableOverride = false
+reportIncompatibleMethodOverride = false
