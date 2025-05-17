@@ -44,11 +44,11 @@ class DelMembersMixin:
         if len(parts) == 1:
             name = parts[0]
             try:
-                del self.members[name] # type: ignore[attr-defined]
+                del self.members[name]  # type: ignore[attr-defined]
             except KeyError:
-                del self.inherited_members[name] # type: ignore[attr-defined]
+                del self.inherited_members[name]  # type: ignore[attr-defined]
         else:
-            del self.all_members[parts[0]][parts[1:]] # type: ignore[attr-defined]
+            del self.all_members[parts[0]][parts[1:]]  # type: ignore[attr-defined]
 
     def del_member(self, key: str | Sequence[str]) -> None:
         """Delete a member with its name or path.
@@ -61,9 +61,9 @@ class DelMembersMixin:
         parts = _get_parts(key)
         if len(parts) == 1:
             name = parts[0]
-            del self.members[name] # type: ignore[attr-defined]
+            del self.members[name]  # type: ignore[attr-defined]
         else:
-            self.members[parts[0]].del_member(parts[1:]) # type: ignore[attr-defined]
+            self.members[parts[0]].del_member(parts[1:])  # type: ignore[attr-defined]
 
 
 class GetMembersMixin:
@@ -85,8 +85,8 @@ class GetMembersMixin:
         """
         parts = _get_parts(key)
         if len(parts) == 1:
-            return self.all_members[parts[0]] # type: ignore[attr-defined]
-        return self.all_members[parts[0]][parts[1:]] # type: ignore[attr-defined]
+            return self.all_members[parts[0]]  # type: ignore[attr-defined]
+        return self.all_members[parts[0]][parts[1:]]  # type: ignore[attr-defined]
 
     def get_member(self, key: str | Sequence[str]) -> Any:
         """Get a member with its name or path.
@@ -98,8 +98,8 @@ class GetMembersMixin:
         """
         parts = _get_parts(key)
         if len(parts) == 1:
-            return self.members[parts[0]] # type: ignore[attr-defined]
-        return self.members[parts[0]].get_member(parts[1:]) # type: ignore[attr-defined]
+            return self.members[parts[0]]  # type: ignore[attr-defined]
+        return self.members[parts[0]].get_member(parts[1:])  # type: ignore[attr-defined]
 
 
 class SetMembersMixin:
@@ -120,10 +120,10 @@ class SetMembersMixin:
         parts = _get_parts(key)
         if len(parts) == 1:
             name = parts[0]
-            self.members[name] = value # type: ignore[attr-defined]
-            value.parent = self # type: ignore[attr-defined]
+            self.members[name] = value  # type: ignore[attr-defined]
+            value.parent = self  # type: ignore[attr-defined]
         else:
-            self.members[parts[0]][parts[1:]] = value # type: ignore[attr-defined]
+            self.members[parts[0]][parts[1:]] = value  # type: ignore[attr-defined]
 
     def set_member(self, key: str | Sequence[str], value: ObjectAliasMixin) -> None:
         """Set a member with its name or path.
@@ -144,10 +144,10 @@ class SetMembersMixin:
         parts = _get_parts(key)
         if len(parts) == 1:
             name = parts[0]
-            self.members[name] = value # type: ignore[attr-defined]
-            value.parent = self # type: ignore[attr-defined]
+            self.members[name] = value  # type: ignore[attr-defined]
+            value.parent = self  # type: ignore[attr-defined]
         else:
-            self.members[parts[0]].set_member(parts[1:], value) # type: ignore[attr-defined]
+            self.members[parts[0]].set_member(parts[1:], value)  # type: ignore[attr-defined]
 
 
 class PathMixin:
@@ -163,11 +163,11 @@ class PathMixin:
         self._filepath: Path | None = filepath
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}({self.name})" # type: ignore[attr-defined]
+        return f"{self.__class__.__name__}({self.name})"  # type: ignore[attr-defined]
 
     @property
     def is_internal(self) -> bool:
-        return any(part == "+internal" for part in self.filepath.parts) if self.filepath else False # type: ignore[attr-defined]
+        return any(part == "+internal" for part in self.filepath.parts) if self.filepath else False  # type: ignore[attr-defined]
 
     @property
     def is_hidden(self) -> bool:
@@ -197,33 +197,33 @@ class ObjectAliasMixin(GetMembersMixin, SetMembersMixin, DelMembersMixin):
     def all_members(self) -> dict[str, ObjectAliasMixin]:
         """All members (declared and inherited)."""
         if self.is_class:  # type: ignore[attr-defined]
-            return {**self.inherited_members, **self.members} # type: ignore[attr-defined]
-        return self.members # type: ignore[attr-defined]
+            return {**self.inherited_members, **self.members}  # type: ignore[attr-defined]
+        return self.members  # type: ignore[attr-defined]
 
     @property
     def folders(self) -> "dict[str, Folder]":
         """Thefolder members."""
         return {
             name: member  # type: ignore[misc]
-            for name, member in self.all_members.items() 
-            if member.kind is Kind.FOLDER # type: ignore[attr-defined]
+            for name, member in self.all_members.items()
+            if member.kind is Kind.FOLDER  # type: ignore[attr-defined]
         }
 
     @property
     def namespaces(self) -> "dict[str, Namespace]":
         """The namespace members."""
         return {
-            name: member # type: ignore[misc]
+            name: member  # type: ignore[misc]
             for name, member in self.all_members.items()
-            if member.kind is Kind.NAMESPACE # type: ignore[attr-defined]
+            if member.kind is Kind.NAMESPACE  # type: ignore[attr-defined]
         }
 
     @property
     def scripts(self) -> "dict[str, Script]":
         """The script members."""
         return {
-            name: member 
-            for name, member in self.members.items() # type: ignore[attr-defined]
+            name: member
+            for name, member in self.members.items()  # type: ignore[attr-defined]
             if member.kind is Kind.SCRIPT
         }
 
@@ -231,24 +231,24 @@ class ObjectAliasMixin(GetMembersMixin, SetMembersMixin, DelMembersMixin):
     def classes(self) -> "dict[str, Class]":
         """The class members."""
         return {
-            name: member # type: ignore[misc]
-            for name, member in self.all_members.items() 
-            if member.kind is Kind.CLASS # type: ignore[attr-defined]
+            name: member  # type: ignore[misc]
+            for name, member in self.all_members.items()
+            if member.kind is Kind.CLASS  # type: ignore[attr-defined]
         }
 
     @property
     def functions(self) -> "dict[str, Function]":
         """The function members."""
         return {
-            name: member # type: ignore[misc]
+            name: member  # type: ignore[misc]
             for name, member in self.all_members.items()
-            if member.kind is Kind.FUNCTION # type: ignore[attr-defined]
+            if member.kind is Kind.FUNCTION  # type: ignore[attr-defined]
         }
 
     @property
     def properties(self) -> "dict[str, Property]":
         return {
-            name: member # type: ignore[misc]
+            name: member  # type: ignore[misc]
             for name, member in self.all_members.items()
-            if member.kind is Kind.PROPERTY # type: ignore[attr-defined]
+            if member.kind is Kind.PROPERTY  # type: ignore[attr-defined]
         }

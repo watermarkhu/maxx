@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 from maxx.collection import PathsCollection
-from maxx.objects import Class, Function, Script, Namespace, Folder
+from maxx.objects import Class, Function, Script
 
 
 # Base directory for test files
@@ -23,7 +23,7 @@ class TestPathsCollection:
         assert "TestClass" in self.paths_collection.members
         assert "test_function" in self.paths_collection.members
         assert "test_script" in self.paths_collection.members
-        
+
         # Store references for easier access in tests
         self.test_class = self.paths_collection.get_member("TestClass")
         self.test_function = self.paths_collection.get_member("test_function")
@@ -38,14 +38,14 @@ class TestPathsCollection:
         assert isinstance(self.test_function, Function)
         assert self.test_script is not None
         assert isinstance(self.test_script, Script)
-        
+
         # TODO: Add more specific tests for path resolution
         # 1. Test resolution by full path
         # 2. Test resolution by relative path
         # 3. Test resolution of nested members (e.g., Class methods)
         # 4. Test shadowing behavior (when multiple files with same name exist)
         # 5. Test addpath and rm_path functionality
-        
+
     def test_member_access(self):
         """Test that members and their properties can be accessed correctly."""
         # TODO: Add specific tests for member access
@@ -53,7 +53,7 @@ class TestPathsCollection:
         # 2. Test accessing function arguments
         # 3. Test accessing nested namespace members if applicable
         # 4. Test that docstrings are properly attached to members
-        
+
     def test_collection_operations(self):
         """Test operations on the collection itself."""
         # TODO: Add tests for collection operations
@@ -61,7 +61,7 @@ class TestPathsCollection:
         # 2. Test removing paths
         # 3. Test how changes to the collection affect resolution
         # 4. Test how the collection handles changes to the filesystem
-        
+
     def test_lines_collection(self):
         """Test the lines_collection property of PathsCollection."""
         # TODO: Add tests for the lines_collection

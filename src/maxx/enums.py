@@ -21,11 +21,11 @@ class Kind(str, Enum):
     """Functions and methods."""
     SCRIPT = "script"
     """Scripts."""
-    PROPERTY= "property"
+    PROPERTY = "property"
     """Class properties."""
     ALIAS = "alias"
     """Aliases (imported objects)."""
-    BUILTIN= "builtin"
+    BUILTIN = "builtin"
     """Built-in objects."""
 
 
@@ -60,4 +60,4 @@ class AccessKind(str, Enum):
     public = "public"
     protected = "protected"
     private = "private"
-    immutable= "immutable"
+    immutable = "immutable"

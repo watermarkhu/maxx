@@ -42,12 +42,7 @@ class _PathGlobber:
 
     def _glob(self, path: Path, recursive: bool = False):
         for member in path.iterdir():
-            if (
-                member.is_dir()
-                and recursive
-                and member.stem[0] not in FOLDER_PREFIXES
-                and member.stem != PRIVATE_FOLDER
-            ):
+            if member.is_dir() and recursive and member.stem != PRIVATE_FOLDER:
                 self._glob(member, recursive=True)
             elif member.is_dir() and member.stem[0] in FOLDER_PREFIXES:
                 self._paths.append(member)
@@ -154,9 +149,8 @@ class _PathResolver:
             if isinstance(parent, Namespace):
                 self._object.parent = parent
             else:
-                ValueError('Parent must be a namespace')
+                ValueError("Parent must be a namespace")
         return self._object
-
 
     def _collect_path(self, path: Path, **kwargs: Any) -> Object:
         file = FileParser(path, paths_collection=self._paths_collection)
@@ -352,10 +346,7 @@ class PathsCollection:
 
     @property
     def members(self) -> dict[str, Any]:
-        return {
-            identifier: self._objects[paths[0]]
-            for identifier, paths in self._mapping.items()
-        }
+        return {identifier: self._objects[paths[0]] for identifier, paths in self._mapping.items()}
 
     def get_member(self, identifier: str) -> Any:
         return self[identifier]
@@ -453,7 +444,7 @@ class PathsCollection:
             self._mapping[object.name].append(member)
             self._members[path].append((object.name, member))
 
-            if object.is_folder:
+            if object.is_folder and member.parent not in self._folders:
                 self._folders[member.parent] = Alias(
                     str(member.parent), target=_PathResolver(member.parent, self)
                 )
@@ -504,4 +495,3 @@ def _is_subdirectory(parent_path: Path, child_path: Path) -> bool:
         return False
     else:
         return True
-

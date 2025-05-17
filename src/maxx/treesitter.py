@@ -394,14 +394,14 @@ class FileParser(object):
                     # Remove self from first method capture_argument
                     method.arguments._args = method.arguments._args[1:]
                 if method.is_getter and method.name in object.members:
-                    prop = object.members[method.name] # type: ignore[assignment]
+                    prop = object.members[method.name]  # type: ignore[assignment]
                     if isinstance(prop, Property):
                         prop.getter = method
                     else:
                         # This can be either an error or that it is a getter in an inherited class
                         pass
                 elif method.is_setter and method.name in object.members:
-                    prop = object.members[method.name] # type: ignore[assignment]
+                    prop = object.members[method.name]  # type: ignore[assignment]
                     if isinstance(prop, Property):
                         prop.setter = method
                     else:
@@ -429,7 +429,7 @@ class FileParser(object):
 
         key = self._first_from_capture(captures, "name")
         if TYPE_CHECKING:
-            value: bool | str = ''
+            value: bool | str = ""
         if "value" not in captures:
             value = True
         elif captures["value"][0].type == "boolean":

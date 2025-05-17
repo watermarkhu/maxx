@@ -31,6 +31,7 @@ class Validatable:
         default: Expr | str | None = None,
         docstring: Docstring | None = None,
         validators: Expr | str | None = None,
+        parent: Object | None = None,
         paths_collection: "PathsCollection | None" = None,
     ) -> None:
         """Initialize the validatable.
@@ -54,11 +55,13 @@ class Validatable:
         """The validatable default value."""
         self.docstring: Docstring | None = docstring
         """The validatable docstring."""
+        self.parent: Object | None = parent
+        """The parent of the validatable (none if top module)."""
         self._paths_collection: "PathsCollection | None" = paths_collection
 
         # Attach the docstring to this object.
         if self.docstring is not None:
-            self.docstring.parent = self # type: ignore[assignment]
+            self.docstring.parent = self  # type: ignore[assignment]
 
     @property
     def has_docstring(self) -> bool:
@@ -78,7 +81,7 @@ class Validatable:
         return (
             self.name == value.name
             and self.type == value.type
-            and self.kind == value.kind # type: ignore[attr-defined]
+            and self.kind == value.kind  # type: ignore[attr-defined]
             and self.default == value.default
         )
 
@@ -86,13 +89,11 @@ class Validatable:
 class Argument(Validatable):
     """This class represent a function argument."""
 
-    def __init__(self, *args, kind: ArgumentKind | None = None, parent: Function | None = None, **kwargs) -> None:
+    def __init__(self, *args, kind: ArgumentKind | None = None, **kwargs) -> None:
         """Initialize the argument."""
         super().__init__(*args, **kwargs)
         self.kind = kind
         """The argument kind."""
-        self.parent = parent
-        
 
     def __repr__(self) -> str:
         return f"Argument(name={self.name!r}, type={self.type!r}, kind={self.kind!r}, default={self.default!r})"
@@ -213,7 +214,7 @@ class Object(ObjectAliasMixin):
         lineno: int | None = None,
         endlineno: int | None = None,
         docstring: Docstring | None = None,
-        parent: Namespace | Class | None = None,
+        parent: Object | None = None,
         paths_collection: "PathsCollection | None" = None,
     ) -> None:
         """Initialize the object.
@@ -240,7 +241,7 @@ class Object(ObjectAliasMixin):
         self.docstring: Docstring | None = docstring
         """The object docstring."""
 
-        self.parent: Namespace | Class | None = parent
+        self.parent: Object | None = parent
         """The parent of the object (none if top module)."""
 
         self.members: dict[str, Object | Alias] = {}
@@ -260,7 +261,7 @@ class Object(ObjectAliasMixin):
 
         # Attach the docstring to this object.
         if docstring:
-            docstring.parent = self # type: ignore[assignment]
+            docstring.parent = self  # type: ignore[assignment]
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({self.name!r}, {self.lineno!r}, {self.endlineno!r})"
