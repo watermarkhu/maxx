@@ -5,10 +5,10 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Sequence
 from pathlib import Path
 
-from malt.enums import Kind
+from maxx.enums import Kind
 
 if TYPE_CHECKING:
-    from malt.objects import Namespace, Folder, Class, Function, Property, Script
+    from maxx.objects import Namespace, Folder, Class, Function, Property, Script
 
 
 def _get_parts(key: str | Sequence[str]) -> Sequence[str]:

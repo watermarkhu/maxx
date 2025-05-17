@@ -46,7 +46,7 @@ if __name__ == "__main__":
         sorted_links = {k: links[k] for k in sorted(links.keys())}
 
         output_dir = os.path.join(
-            os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "src", "malt"
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "src", "maxx"
         )
         os.makedirs(output_dir, exist_ok=True)
         output_file = os.path.join(output_dir, "matlab_builtins.json")

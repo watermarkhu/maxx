@@ -9,14 +9,14 @@ from pathlib import Path
 from _griffe.c3linear import c3linear_merge
 from griffe import Docstring
 
-from malt.enums import AccessKind, Kind, ArgumentKind
-from malt.expressions import Expr
-from malt.exceptions import CyclicAliasError, FilePathError, NameResolutionError
-from malt.logger import logger
-from malt.mixins import ObjectAliasMixin, PathMixin
+from maxx.enums import AccessKind, Kind, ArgumentKind
+from maxx.expressions import Expr
+from maxx.exceptions import CyclicAliasError, FilePathError, NameResolutionError
+from maxx.logger import logger
+from maxx.mixins import ObjectAliasMixin, PathMixin
 
 if TYPE_CHECKING:
-    from malt.collection import LinesCollection, PathsCollection
+    from maxx.collection import LinesCollection, PathsCollection
 
 
 class Validatable:
@@ -343,7 +343,7 @@ class Object(ObjectAliasMixin):
     def has_attributes(self, *attributes: str) -> bool:
         """Tell if this object has all the given attributes.
 
-        See also: [`labels`][malt.objects.Object.labels].
+        See also: [`labels`][maxx.objects.Object.labels].
 
         Parameters:
             *attributes: Attributes that must be present.
@@ -358,7 +358,7 @@ class Object(ObjectAliasMixin):
     ) -> dict[str, Object | Alias]:
         """Filter and return members based on predicates.
 
-        See also: [`members`][malt.objects.Object.members].
+        See also: [`members`][maxx.objects.Object.members].
 
         Parameters:
             *predicates: A list of predicates, i.e. callables accepting a member as argument and returning a boolean.
@@ -379,7 +379,7 @@ class Object(ObjectAliasMixin):
     def namespace(self) -> Namespace:
         """The parent namespace of this object.
 
-        See also: [`namespace`][malt.objects.Namepace].
+        See also: [`namespace`][maxx.objects.Namepace].
 
         Raises:
             ValueError: When the object is not a namespace and does not have a parent.
@@ -396,7 +396,7 @@ class Object(ObjectAliasMixin):
 
         On regular objects (not aliases), the path is the canonical path.
 
-        See also: [`canonical_path`][malt.objects.Object.canonical_path].
+        See also: [`canonical_path`][maxx.objects.Object.canonical_path].
         """
         return self.canonical_path
 
@@ -406,7 +406,7 @@ class Object(ObjectAliasMixin):
 
         The canonical path is the path where the object was defined (not imported).
 
-        See also: [`path`][malt.objects.Object.path].
+        See also: [`path`][maxx.objects.Object.path].
         """
         if self.parent is None:
             return self.name
@@ -429,8 +429,8 @@ class Object(ObjectAliasMixin):
     def lines_collection(self) -> "LinesCollection":
         """The lines collection attached to this object or its parents.
 
-        See also: [`lines`][malt.objects.Object.lines],
-        [`source`][malt.objects.Object.source].
+        See also: [`lines`][maxx.objects.Object.lines],
+        [`source`][maxx.objects.Object.source].
 
         Raises:
             ValueError: When no modules collection can be found in the object or its parents.
@@ -456,8 +456,8 @@ class Object(ObjectAliasMixin):
     def lines(self) -> list[str]:
         """The lines containing the source of this object.
 
-        See also: [`lines_collection`][malt.objects.Object.lines_collection],
-        [`source`][malt.objects.Object.source].
+        See also: [`lines_collection`][maxx.objects.Object.lines_collection],
+        [`source`][maxx.objects.Object.source].
         """
 
         try:
@@ -474,8 +474,8 @@ class Object(ObjectAliasMixin):
     def source(self) -> str:
         """The source code of this object.
 
-        See also: [`lines`][malt.objects.Object.lines],
-        [`lines_collection`][malt.objects.Object.lines_collection].
+        See also: [`lines`][maxx.objects.Object.lines],
+        [`lines_collection`][maxx.objects.Object.lines_collection].
         """
         return dedent("\n".join(self.lines))
 

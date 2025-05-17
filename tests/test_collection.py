@@ -4,8 +4,8 @@ from pathlib import Path
 
 import pytest
 
-from malt.collection import PathsCollection
-from malt.objects import Class, Function, Script, Namespace, Folder
+from maxx.collection import PathsCollection
+from maxx.objects import Class, Function, Script, Namespace, Folder
 
 
 # Base directory for test files

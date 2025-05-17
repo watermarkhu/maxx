@@ -1,1 +1,1 @@
-"""Test package for malt."""
+"""Test package for maxx."""

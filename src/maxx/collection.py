@@ -6,7 +6,7 @@ from collections import defaultdict, deque
 from pathlib import Path
 from typing import Any, Sequence, TypeVar, ItemsView, KeysView, ValuesView
 
-from malt.objects import (
+from maxx.objects import (
     Alias,
     Class,
     Docstring,
@@ -14,7 +14,7 @@ from malt.objects import (
     Object,
     Namespace,
 )
-from malt.treesitter import FileParser
+from maxx.treesitter import FileParser
 
 
 MFILE_SUFFIX = ".m"

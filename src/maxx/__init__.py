@@ -7,7 +7,7 @@ import logging
 from _griffe.docstrings import google, numpy
 from _griffe.enumerations import DocstringSectionKind
 
-from malt import collection, objects, treesitter
+from maxx import collection, objects, treesitter
 
 __all__: list = [
     "collection",

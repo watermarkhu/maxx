@@ -4,9 +4,9 @@ from pathlib import Path
 
 import pytest
 
-from malt.enums import AccessKind, ArgumentKind
-from malt.treesitter import FileParser
-from malt.objects import Class, Function, Script
+from maxx.enums import AccessKind, ArgumentKind
+from maxx.treesitter import FileParser
+from maxx.objects import Class, Function, Script
 
 
 class TestClassParser:

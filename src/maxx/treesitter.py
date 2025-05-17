@@ -11,9 +11,9 @@ import charset_normalizer
 import tree_sitter_matlab as tsmatlab
 from tree_sitter import Language, Node, Tree, TreeCursor, Parser
 
-from malt.enums import AccessKind, ArgumentKind
-from malt.expressions import Expr
-from malt.objects import (
+from maxx.enums import AccessKind, ArgumentKind
+from maxx.expressions import Expr
+from maxx.objects import (
     Argument,
     Arguments,
     Class,
@@ -24,7 +24,7 @@ from malt.objects import (
 )
 
 if TYPE_CHECKING:
-    from malt.collection import PathsCollection
+    from maxx.collection import PathsCollection
 
 
 __all__ = ["FileParser"]
