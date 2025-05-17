@@ -44,11 +44,11 @@ class DelMembersMixin:
         if len(parts) == 1:
             name = parts[0]
             try:
-                del self.members[name]
+                del self.members[name] # type: ignore[attr-defined]
             except KeyError:
-                del self.inherited_members[name]
+                del self.inherited_members[name] # type: ignore[attr-defined]
         else:
-            del self.all_members[parts[0]][parts[1:]]
+            del self.all_members[parts[0]][parts[1:]] # type: ignore[attr-defined]
 
     def del_member(self, key: str | Sequence[str]) -> None:
         """Delete a member with its name or path.
@@ -61,9 +61,9 @@ class DelMembersMixin:
         parts = _get_parts(key)
         if len(parts) == 1:
             name = parts[0]
-            del self.members[name]
+            del self.members[name] # type: ignore[attr-defined]
         else:
-            self.members[parts[0]].del_member(parts[1:])
+            self.members[parts[0]].del_member(parts[1:]) # type: ignore[attr-defined]
 
 
 class GetMembersMixin:
@@ -85,8 +85,8 @@ class GetMembersMixin:
         """
         parts = _get_parts(key)
         if len(parts) == 1:
-            return self.all_members[parts[0]]
-        return self.all_members[parts[0]][parts[1:]]
+            return self.all_members[parts[0]] # type: ignore[attr-defined]
+        return self.all_members[parts[0]][parts[1:]] # type: ignore[attr-defined]
 
     def get_member(self, key: str | Sequence[str]) -> Any:
         """Get a member with its name or path.
@@ -98,8 +98,8 @@ class GetMembersMixin:
         """
         parts = _get_parts(key)
         if len(parts) == 1:
-            return self.members[parts[0]]
-        return self.members[parts[0]].get_member(parts[1:])
+            return self.members[parts[0]] # type: ignore[attr-defined]
+        return self.members[parts[0]].get_member(parts[1:]) # type: ignore[attr-defined]
 
 
 class SetMembersMixin:
@@ -120,10 +120,10 @@ class SetMembersMixin:
         parts = _get_parts(key)
         if len(parts) == 1:
             name = parts[0]
-            self.members[name] = value
-            value.parent = self
+            self.members[name] = value # type: ignore[attr-defined]
+            value.parent = self # type: ignore[attr-defined]
         else:
-            self.members[parts[0]][parts[1:]] = value
+            self.members[parts[0]][parts[1:]] = value # type: ignore[attr-defined]
 
     def set_member(self, key: str | Sequence[str], value: ObjectAliasMixin) -> None:
         """Set a member with its name or path.
@@ -144,10 +144,10 @@ class SetMembersMixin:
         parts = _get_parts(key)
         if len(parts) == 1:
             name = parts[0]
-            self.members[name] = value
-            value.parent = self
+            self.members[name] = value # type: ignore[attr-defined]
+            value.parent = self # type: ignore[attr-defined]
         else:
-            self.members[parts[0]].set_member(parts[1:], value)
+            self.members[parts[0]].set_member(parts[1:], value) # type: ignore[attr-defined]
 
 
 class PathMixin:
@@ -163,11 +163,11 @@ class PathMixin:
         self._filepath: Path | None = filepath
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}({self.name})"
+        return f"{self.__class__.__name__}({self.name})" # type: ignore[attr-defined]
 
     @property
     def is_internal(self) -> bool:
-        return any(part == "+internal" for part in self.filepath.parts) if self.filepath else False
+        return any(part == "+internal" for part in self.filepath.parts) if self.filepath else False # type: ignore[attr-defined]
 
     @property
     def is_hidden(self) -> bool:
@@ -196,159 +196,59 @@ class ObjectAliasMixin(GetMembersMixin, SetMembersMixin, DelMembersMixin):
     @property
     def all_members(self) -> dict[str, ObjectAliasMixin]:
         """All members (declared and inherited)."""
-        if self.is_class:
-            return {**self.inherited_members, **self.members}
-        return self.members
+        if self.is_class:  # type: ignore[attr-defined]
+            return {**self.inherited_members, **self.members} # type: ignore[attr-defined]
+        return self.members # type: ignore[attr-defined]
 
     @property
     def folders(self) -> "dict[str, Folder]":
         """Thefolder members."""
         return {
-            name: member for name, member in self.all_members.items() if member.kind is Kind.FOLDER
+            name: member  # type: ignore[misc]
+            for name, member in self.all_members.items() 
+            if member.kind is Kind.FOLDER # type: ignore[attr-defined]
         }
 
     @property
     def namespaces(self) -> "dict[str, Namespace]":
         """The namespace members."""
         return {
-            name: member
+            name: member # type: ignore[misc]
             for name, member in self.all_members.items()
-            if member.kind is Kind.NAMESPACE
+            if member.kind is Kind.NAMESPACE # type: ignore[attr-defined]
         }
 
     @property
     def scripts(self) -> "dict[str, Script]":
         """The script members."""
-        return {name: member for name, member in self.members.items() if member.kind is Kind.SCRIPT}
+        return {
+            name: member 
+            for name, member in self.members.items() # type: ignore[attr-defined]
+            if member.kind is Kind.SCRIPT
+        }
 
     @property
     def classes(self) -> "dict[str, Class]":
         """The class members."""
         return {
-            name: member for name, member in self.all_members.items() if member.kind is Kind.CLASS
+            name: member # type: ignore[misc]
+            for name, member in self.all_members.items() 
+            if member.kind is Kind.CLASS # type: ignore[attr-defined]
         }
 
     @property
     def functions(self) -> "dict[str, Function]":
         """The function members."""
         return {
-            name: member
+            name: member # type: ignore[misc]
             for name, member in self.all_members.items()
-            if member.kind is Kind.FUNCTION
+            if member.kind is Kind.FUNCTION # type: ignore[attr-defined]
         }
 
     @property
     def properties(self) -> "dict[str, Property]":
         return {
-            name: member
+            name: member # type: ignore[misc]
             for name, member in self.all_members.items()
-            if member.kind is Kind.PROPERTY
+            if member.kind is Kind.PROPERTY # type: ignore[attr-defined]
         }
-
-    # @property
-    # def is_private(self) -> bool:
-    #     """Whether this object/alias is private (starts with `_`) but not special."""
-    #     return self.name.startswith("_") and not self.is_special
-
-    # @property
-    # def is_special(self) -> bool:
-    #     """Whether this object/alias is special ("dunder" attribute/method, starts and end with `__`)."""
-    #     return self.name.startswith("__") and self.name.endswith("__")
-
-    # @property
-    # def is_class_private(self) -> bool:
-    #     """Whether this object/alias is class-private (starts with `__` and is a class member)."""
-    #     return self.parent and self.parent.is_class and self.name.startswith("__") and not self.name.endswith("__")
-
-    # @property
-    # def is_imported(self) -> bool:
-    #     """Whether this object/alias was imported from another module."""
-    #     return self.parent and self.name in self.parent.imports
-
-    # @property
-    # def is_exported(self) -> bool:
-    #     """Whether this object/alias is exported (listed in `__all__`)."""
-    #     return self.parent.is_module and bool(self.parent.exports and self.name in self.parent.exports)
-
-    # @property
-    # def is_wildcard_exposed(self) -> bool:
-    #     """Whether this object/alias is exposed to wildcard imports.
-
-    #     To be exposed to wildcard imports, an object/alias must:
-
-    #     - be available at runtime
-    #     - have a module as parent
-    #     - be listed in `__all__` if `__all__` is defined
-    #     - or not be private (having a name starting with an underscore)
-
-    #     Special case for Griffe trees: a submodule is only exposed if its parent imports it.
-
-    #     Returns:
-    #         True or False.
-    #     """
-    #     # If the object is not available at runtime or is not defined at the module level, it is not exposed.
-    #     if not self.runtime or not self.parent.is_module:
-    #         return False
-
-    #     # If the parent module defines `__all__`, the object is exposed if it is listed in it.
-    #     if self.parent.exports is not None:
-    #         return self.name in self.parent.exports
-
-    #     # If the object's name starts with an underscore, it is not exposed.
-    #     # We don't use `is_private` or `is_special` here to avoid redundant string checks.
-    #     if self.name.startswith("_"):
-    #         return False
-
-    #     # Special case for Griffe trees: a submodule is only exposed if its parent imports it.
-    #     return self.is_alias or not self.is_module or self.is_imported
-
-    # @property
-    # def is_public(self) -> bool:
-    #     """Whether this object is considered public.
-
-    #     In modules, developers can mark objects as public thanks to the `__all__` variable.
-    #     In classes however, there is no convention or standard to do so.
-
-    #     Therefore, to decide whether an object is public, we follow this algorithm:
-
-    #     - If the object's `public` attribute is set (boolean), return its value.
-    #     - If the object is listed in its parent's (a module) `__all__` attribute, it is public.
-    #     - If the parent (module) defines `__all__` and the object is not listed in, it is private.
-    #     - If the object has a private name, it is private.
-    #     - If the object was imported from another module, it is private.
-    #     - Otherwise, the object is public.
-    #     """
-    #     # Give priority to the `public` attribute if it is set.
-    #     if self.public is not None:
-    #         return self.public
-
-    #     # If the object is a module and its name does not start with an underscore, it is public.
-    #     # Modules are not subject to the `__all__` convention, only the underscore prefix one.
-    #     if not self.is_alias and self.is_module and not self.name.startswith("_"):
-    #         return True
-
-    #     # If the object is defined at the module-level and is listed in `__all__`, it is public.
-    #     # If the parent module defines `__all__` but does not list the object, it is private.
-    #     if self.parent and self.parent.is_module and bool(self.parent.exports):
-    #         return self.name in self.parent.exports
-
-    #     # Special objects are always considered public.
-    #     # Even if we don't access them directly, they are used through different *public* means
-    #     # like instantiating classes (`__init__`), using operators (`__eq__`), etc..
-    #     if self.is_private:
-    #         return False
-
-    #     # TODO: In a future version, we will support two conventions regarding imports:
-    #     # - `from a import x as x` marks `x` as public.
-    #     # - `from a import *` marks all wildcard imported objects as public.
-    #     if self.is_imported:  # noqa: SIM103
-    #         return False
-
-    #     # If we reached this point, the object is public.
-    #     return True
-
-    # @property
-    # def is_deprecated(self) -> bool:
-    #     """Whether this object is deprecated."""
-    #     # NOTE: We might want to add more ways to detect deprecations in the future.
-    #     return bool(self.deprecated)

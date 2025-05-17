@@ -16,7 +16,7 @@ from malt.logger import logger
 from malt.mixins import ObjectAliasMixin, PathMixin
 
 if TYPE_CHECKING:
-    from malt.collect import LinesCollection, PathsCollection
+    from malt.collection import LinesCollection, PathsCollection
 
 
 class Validatable:
@@ -29,7 +29,6 @@ class Validatable:
         type: Expr | str | None = None,
         dimensions: list[str] | None = None,
         default: Expr | str | None = None,
-        parent: Function | Class | None = None,
         docstring: Docstring | None = None,
         validators: Expr | str | None = None,
         paths_collection: "PathsCollection | None" = None,
@@ -55,13 +54,11 @@ class Validatable:
         """The validatable default value."""
         self.docstring: Docstring | None = docstring
         """The validatable docstring."""
-        self.parent: Function | Class | None = parent
-        """The parent function of the argument."""
         self._paths_collection: "PathsCollection | None" = paths_collection
 
         # Attach the docstring to this object.
         if self.docstring is not None:
-            self.docstring.parent = self
+            self.docstring.parent = self # type: ignore[assignment]
 
     @property
     def has_docstring(self) -> bool:
@@ -70,7 +67,7 @@ class Validatable:
 
     def __str__(self) -> str:
         arg = f"{self.name}: {self.type} = {self.default}"
-        if self.kind:
+        if hasattr(self, "kind") and self.kind is not None:
             return f"[{self.kind.value}] {arg}"
         return arg
 
@@ -81,7 +78,7 @@ class Validatable:
         return (
             self.name == value.name
             and self.type == value.type
-            and self.kind == value.kind
+            and self.kind == value.kind # type: ignore[attr-defined]
             and self.default == value.default
         )
 
@@ -89,11 +86,13 @@ class Validatable:
 class Argument(Validatable):
     """This class represent a function argument."""
 
-    def __init__(self, *args, kind: ArgumentKind | None = None, **kwargs) -> None:
+    def __init__(self, *args, kind: ArgumentKind | None = None, parent: Function | None = None, **kwargs) -> None:
         """Initialize the argument."""
         super().__init__(*args, **kwargs)
-        self.kind: ArgumentKind | None = kind
+        self.kind = kind
         """The argument kind."""
+        self.parent = parent
+        
 
     def __repr__(self) -> str:
         return f"Argument(name={self.name!r}, type={self.type!r}, kind={self.kind!r}, default={self.default!r})"
@@ -261,7 +260,7 @@ class Object(ObjectAliasMixin):
 
         # Attach the docstring to this object.
         if docstring:
-            docstring.parent = self
+            docstring.parent = self # type: ignore[assignment]
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({self.name!r}, {self.lineno!r}, {self.endlineno!r})"
@@ -296,11 +295,11 @@ class Object(ObjectAliasMixin):
                 raise ValueError("kind must not be an empty set")
             return self.kind in (knd if isinstance(knd, Kind) else Kind(knd) for knd in kind)
         if isinstance(kind, str):
-            kind: Kind = Kind(kind)
+            kind = Kind(kind)
         return self.kind is kind
 
     @property
-    def inherited_members(self) -> dict[str, Object]:
+    def inherited_members(self) -> dict[str, Alias]:
         """Retrieve a dictionary of inherited members from base classes.
 
         This method iterates over the base classes in reverse order, resolves their models,
@@ -446,7 +445,9 @@ class Object(ObjectAliasMixin):
     def filepath(self) -> Path:
         """The file path where this object was defined."""
         if isinstance(self, PathMixin):
-            return self._filepath
+            filepath = self._filepath
+            if filepath is not None:
+                return filepath
         if self.parent is not None:
             return self.parent.filepath
         raise FilePathError(self.name)
@@ -463,7 +464,7 @@ class Object(ObjectAliasMixin):
             lines = self.lines_collection[self.filepath]
         except KeyError:
             return []
-        if self.is_module:
+        if self.is_namespace:
             return lines
         if self.lineno is None or self.endlineno is None:
             return []
@@ -493,9 +494,10 @@ class Object(ObjectAliasMixin):
 
         # Name is a member this object.
         if name in self.members:
-            if self.members[name].is_alias:
-                return self.members[name].target_path
-            return self.members[name].path
+            member = self.members[name]
+            if isinstance(member, Alias):
+                return member.target_path
+            return member.path
 
         # Name unknown and no more parent scope, could be a built-in.
         if self.parent is None or not self.parent.is_namespace or not self.parent.is_folder:
@@ -562,7 +564,7 @@ class Alias(ObjectAliasMixin):
         self.target_path: str
         """The path of this alias' target."""
 
-        if isinstance(target, Callable):
+        if callable(target):
             self._target: Object | Alias | None = None
             self._constructor: Callable = target
             self._lock = threading.Lock()
@@ -574,7 +576,7 @@ class Alias(ObjectAliasMixin):
 
     def _update_target_aliases(self) -> None:
         with suppress(AttributeError, CyclicAliasError):
-            self._target.aliases[self.path] = self
+            self.target.aliases[self.path] = self
 
     @property
     def resolved(self) -> bool:
@@ -588,14 +590,16 @@ class Alias(ObjectAliasMixin):
                 if not self.resolved:
                     self._target = self._constructor()
                 paths_seen: dict[str, None] = {}
-        target: Alias | Object = self._target
+        target = self._target
+        if target is None:
+            raise ValueError(f"target of {self.name} is None")
         # Using a dict as an ordered set.
-        paths_seen: dict[str, None] = {}
-        while target.is_alias:
+        paths_seen = {}
+        while isinstance(target, Alias):
             if target.path in paths_seen:
                 raise CyclicAliasError([*paths_seen, target.path])
             paths_seen[target.path] = None
-            target: Alias | Object = target.target
+            target = target.target
         return cast(Object, target)
 
     @property
@@ -750,22 +754,22 @@ class Class(PathMixin, Object):
         """
         for item in self._mro():
             if self.name in item.members:
-                return item.members[self.name]
-        else:
-            return None
+                constructor = item.members[self.name]
+                if isinstance(constructor, Function):
+                    return constructor
+        return None
 
     @property
     def resolved_bases(self) -> list[Object]:
         resolved_bases: list[Object] = []
         for base in self.bases:
-            base_path: str = base.canonical_path
             try:
-                resolved_base: ObjectAliasMixin = self.paths_collection.get_member(base_path)
-                if resolved_base.is_alias:
+                resolved_base = self.paths_collection.get_member(base)
+                if isinstance(resolved_base, Alias):
                     resolved_base = resolved_base.target
             except (CyclicAliasError, KeyError):
                 logger.debug(
-                    "Base class %s is not loaded, or not static, it cannot be resolved", base_path
+                    "Base class %s is not loaded, or not static, it cannot be resolved", base
                 )
             else:
                 resolved_bases.append(resolved_base)
@@ -773,7 +777,7 @@ class Class(PathMixin, Object):
 
     def _mro(self, seen: tuple[str, ...] = ()) -> list[Class]:
         seen = (*seen, self.path)
-        bases: list[Class] = [base for base in self.resolved_bases if base.is_class]
+        bases: list[Class] = [base for base in self.resolved_bases if isinstance(base, Class)]
         if not bases:
             return [self]
         for base in bases:
@@ -789,7 +793,7 @@ class Class(PathMixin, Object):
         return self._mro()[1:]  # Remove self.
 
     @property
-    def inherited_members(self) -> dict[str, Object]:
+    def inherited_members(self) -> dict[str, Alias]:
         """Retrieve a dictionary of inherited members from base classes.
 
         This method iterates over the base classes in reverse order, resolves their models,
@@ -801,7 +805,7 @@ class Class(PathMixin, Object):
         if self._inherited_members is not False:
             return self._inherited_members
 
-        inherited_members: dict[str, Object] = {}
+        inherited_members: dict[str, Alias] = {}
         for model in reversed(self.mro()):
             for name, member in model.all_members.items():
                 if name not in self.members:
@@ -877,7 +881,7 @@ class Function(PathMixin, Object):
     @property
     def is_constructor_method(self) -> bool:
         """Whether this function is a constructor method."""
-        return self.is_method and self.name == self.parent.name
+        return self.is_method and self.parent is not None and self.name == self.parent.name
 
     @property
     def attributes(self) -> set[str]:
@@ -949,6 +953,8 @@ class Property(Validatable, Object):
         self.getter: Function | None = None
 
     def __repr__(self) -> str:
+        if self.parent is None:
+            return f"Property(name={self.name!r})"
         return f"Property(name={self.name!r}, class={self.parent.name!r})"
 
     @property

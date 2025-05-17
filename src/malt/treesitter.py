@@ -19,13 +19,12 @@ from malt.objects import (
     Class,
     Docstring,
     Function,
-    Object,
     Property,
     Script,
 )
 
 if TYPE_CHECKING:
-    from malt.collect import PathsCollection
+    from malt.collection import PathsCollection
 
 
 __all__ = ["FileParser"]
@@ -224,7 +223,7 @@ class FileParser(object):
         """
         return self._content.decode(self.encoding)
 
-    def parse(self, **kwargs: Any) -> Object:
+    def parse(self, **kwargs: Any) -> Function | Class | Script:
         """
         Parse the content of the file and return a Object.
 
@@ -249,19 +248,22 @@ class FileParser(object):
             if node is None:
                 raise ValueError(f"The file {self.filepath} could not be parsed.")
             captures = FILE_QUERY.captures(node)
-            if "function" in captures:
-                model = self._parse_function(captures["function"][0], **kwargs)
-            elif "type" in captures:
-                model = self._parse_class(captures["type"][0], **kwargs)
-            else:
-                model = Script(self.filepath.stem, filepath=self.filepath, **kwargs)
 
-            if not model.docstring:
-                model.docstring = self._comment_docstring(
-                    captures.get("header", None), parent=model
+            if TYPE_CHECKING:
+                object: Function | Class | Script | None = None
+            if "function" in captures:
+                object = self._parse_function(captures["function"][0], **kwargs)
+            elif "type" in captures:
+                object = self._parse_class(captures["type"][0], **kwargs)
+            else:
+                object = Script(self.filepath.stem, filepath=self.filepath, **kwargs)
+
+            if not object.docstring:
+                object.docstring = self._comment_docstring(
+                    captures.get("header", None), parent=object
                 )
 
-            return model
+            return object
 
         except Exception as ex:
             syntax_error = SyntaxError("Error parsing Matlab file")
@@ -278,18 +280,18 @@ class FileParser(object):
 
     def _parse_class(self, node: Node, **kwargs: Any) -> Class:
         """
-        Parse a class node and return a Class or Class model.
+        Parse a class node and return a Class or Class object.
 
         This method processes a class node captured by the CLASS_QUERY and extracts
         its bases, docstring, attributes, properties, and methods. It constructs
-        and returns a Class or Class model based on the parsed information.
+        and returns a Class or Class object based on the parsed information.
 
         Args:
             node (Node): The class node to parse.
-            **kwargs: Additional keyword arguments to pass to the Class or Class model.
+            **kwargs: Additional keyword arguments to pass to the Class or Class object.
 
         Returns:
-            Class: The parsed Class or Class model.
+            Class: The parsed Class or Class object.
         """
         self._node = node
         saved_kwargs = {key: value for key, value in kwargs.items()}
@@ -303,7 +305,7 @@ class FileParser(object):
             if key in ["Sealed", "Abstract", "Hidden"]:
                 kwargs[key] = value
 
-        model = Class(
+        object = Class(
             self.filepath.stem,
             lineno=node.range.start_point.row + 1,
             endlineno=node.range.end_point.row + 1,
@@ -357,12 +359,12 @@ class FileParser(object):
                     if "default" in property_captures
                     else None,
                     docstring=self._comment_docstring(
-                        property_captures.get("comment", None), parent=model
+                        property_captures.get("comment", None), parent=object
                     ),
-                    parent=model,
+                    parent=object,
                     **property_kwargs,
                 )
-                model.members[prop.name] = prop
+                object.members[prop.name] = prop
 
         for method_captures in [
             METHODS_QUERY.captures(node) for node in captures.get("methods", [])
@@ -386,29 +388,29 @@ class FileParser(object):
                         method_kwargs[key] = AccessKind.private
             for method_node in method_captures.get("methods", []):
                 method = self._parse_function(
-                    method_node, method=True, parent=model, **method_kwargs
+                    method_node, method=True, parent=object, **method_kwargs
                 )
                 if method.name != self.filepath.stem and not method.Static and method.arguments:
                     # Remove self from first method capture_argument
                     method.arguments._args = method.arguments._args[1:]
-                if method.is_getter and method.name in model.members:
-                    prop = model.members[method.name]
+                if method.is_getter and method.name in object.members:
+                    prop = object.members[method.name] # type: ignore[assignment]
                     if isinstance(prop, Property):
                         prop.getter = method
                     else:
                         # This can be either an error or that it is a getter in an inherited class
                         pass
-                elif method.is_setter and method.name in model.members:
-                    prop = model.members[method.name]
+                elif method.is_setter and method.name in object.members:
+                    prop = object.members[method.name] # type: ignore[assignment]
                     if isinstance(prop, Property):
                         prop.setter = method
                     else:
                         # This can be either an error or that it is a setter in an inherited class
                         pass
                 else:
-                    model.members[method.name] = method
+                    object.members[method.name] = method
 
-        return model
+        return object
 
     def _parse_attribute(self, node: Node) -> tuple[str, Any]:
         """
@@ -426,6 +428,8 @@ class FileParser(object):
         captures = ATTRIBUTE_QUERY.captures(node)
 
         key = self._first_from_capture(captures, "name")
+        if TYPE_CHECKING:
+            value: bool | str = ''
         if "value" not in captures:
             value = True
         elif captures["value"][0].type == "boolean":
@@ -437,15 +441,15 @@ class FileParser(object):
 
     def _parse_function(self, node: Node, method: bool = False, **kwargs: Any) -> Function:
         """
-        Parse a function node and return a Function model.
+        Parse a function node and return a Function object.
 
         Args:
             node (Node): The node representing the function in the syntax tree.
             method (bool, optional): Whether the function is a method. Defaults to False.
-            **kwargs: Additional keyword arguments to pass to the Function model.
+            **kwargs: Additional keyword arguments to pass to the Function object.
 
         Returns:
-            Function: The parsed function model.
+            Function: The parsed function object.
 
         Raises:
             KeyError: If required captures are missing from the node.
@@ -475,7 +479,7 @@ class FileParser(object):
         else:
             function_name = self.filepath.stem
 
-        model: Function = Function(
+        object: Function = Function(
             function_name,
             lineno=node.range.start_point.row + 1,
             endlineno=node.range.end_point.row + 1,
@@ -530,15 +534,15 @@ class FileParser(object):
                     argument.default = Expr(capture_argument["default"], self.encoding)
 
                 docstring = self._comment_docstring(
-                    capture_argument.get("comment", None), parent=model
+                    capture_argument.get("comment", None), parent=object
                 )
                 if docstring:
                     argument.docstring = docstring
 
-        model.arguments = Arguments(*list(arguments.values()))
+        object.arguments = Arguments(*list(arguments.values()))
         if returns:
-            model.returns = Arguments(*list(returns.values()))
-        return model
+            object.returns = Arguments(*list(returns.values()))
+        return object
 
     def _decode(self, node: Node) -> str:
         """
@@ -586,22 +590,6 @@ class FileParser(object):
         else:
             return ""
 
-    def _get_expression(self, expr: str) -> Expr | str | None:
-        """
-        Get the expression object from an expression string.
-
-        Args:
-            expr: The expression string to evaluate.
-
-        Returns:
-            A CallableExpr, BuiltinExpr, or the original expression string
-            depending on the type of expression and available information.
-        """
-        if self.paths_collection is not None and expr in self.paths_collection._mapping:
-            return Expr(expr, self.encoding)
-        else:
-            return expr
-
     def _comment_docstring(
         self, nodes: list[Node] | Node | None, parent: Any = None
     ) -> Docstring | None:
@@ -646,7 +634,8 @@ class FileParser(object):
             endlineno = nodes.range.end_point.row + 1
             lines = iter(self._decode(nodes).splitlines())
 
-        docstring, uncommented = [], []
+        docstring: list[str] = []
+        uncommented: list[str] = []
 
         while True:
             try:

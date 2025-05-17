@@ -35,7 +35,8 @@ class Expr:
     def iterate(self) -> Iterator[str]:
         """Iterate over the values of the expression."""
         for node in self.nodes:
-            yield node.text.decode(self.encoding)
+            if node.text:
+                yield node.text.decode(self.encoding)
 
     def __str__(self) -> str:
         """Return the string representation of the builtin expression."""
