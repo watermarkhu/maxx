@@ -8,6 +8,7 @@ from pathlib import Path
 
 from _griffe.c3linear import c3linear_merge
 from griffe import Docstring
+from tree_sitter import Node
 
 from maxx.enums import AccessKind, Kind, ArgumentKind
 from maxx.expressions import Expr
@@ -32,6 +33,7 @@ class Validatable:
         docstring: Docstring | None = None,
         validators: Expr | str | None = None,
         parent: Object | None = None,
+        node: Node | None = None,
         paths_collection: "PathsCollection | None" = None,
     ) -> None:
         """Initialize the validatable.
@@ -57,6 +59,8 @@ class Validatable:
         """The validatable docstring."""
         self.parent: Object | None = parent
         """The parent of the validatable (none if top module)."""
+        self.node: Node | None = node
+        """The tree-sitter node of the object."""
         self._paths_collection: "PathsCollection | None" = paths_collection
 
         # Attach the docstring to this object.
@@ -214,6 +218,7 @@ class Object(ObjectAliasMixin):
         lineno: int | None = None,
         endlineno: int | None = None,
         docstring: Docstring | None = None,
+        node: Node | None = None,
         parent: Object | None = None,
         paths_collection: "PathsCollection | None" = None,
     ) -> None:
@@ -243,6 +248,9 @@ class Object(ObjectAliasMixin):
 
         self.parent: Object | None = parent
         """The parent of the object (none if top module)."""
+
+        self.node: Node | None = node
+        """The tree-sitter node of the object."""
 
         self.members: dict[str, Object | Alias] = {}
         """The object members (folders, namespaces, classes, functions, scripts, properies)."""

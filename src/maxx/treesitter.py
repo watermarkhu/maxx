@@ -256,7 +256,12 @@ class FileParser(object):
             elif "type" in captures:
                 object = self._parse_class(captures["type"][0], **kwargs)
             else:
-                object = Script(self.filepath.stem, filepath=self.filepath, **kwargs)
+                object = Script(
+                    self.filepath.stem,
+                    filepath=self.filepath, 
+                    node=node,
+                    **kwargs
+                )
 
             if not object.docstring:
                 object.docstring = self._comment_docstring(
@@ -309,6 +314,7 @@ class FileParser(object):
             self.filepath.stem,
             lineno=node.range.start_point.row + 1,
             endlineno=node.range.end_point.row + 1,
+            node=node,
             bases=bases,
             docstring=docstring,
             filepath=self.filepath,
@@ -362,6 +368,7 @@ class FileParser(object):
                         property_captures.get("comment", None), parent=object
                     ),
                     parent=object,
+                    node=property_node,
                     **property_kwargs,
                 )
                 object.members[prop.name] = prop
@@ -487,6 +494,7 @@ class FileParser(object):
             docstring=self._comment_docstring(captures.get("docstring", None)),
             getter="getter" in captures,
             setter="setter" in captures,
+            node=node,
             **kwargs,
         )
 
@@ -498,17 +506,19 @@ class FileParser(object):
             is_input = attributes is None or "Input" in attributes or "Output" not in attributes
             # is_repeating = "Repeating" in attributes
 
-            captures_argument = [
-                PROPERTY_QUERY.captures(node) for node in capture_arguments["arguments"]
-            ]
-            for capture_argument in captures_argument:
+            captures_argument = {
+                node: PROPERTY_QUERY.captures(node) for node in capture_arguments["arguments"]
+            }
+            for argument_node, capture_argument in captures_argument.items():
                 arg_name = self._first_from_capture(capture_argument, "name")
 
                 if "options" in capture_argument:
                     options_name = self._first_from_capture(capture_argument, "options")
                     arguments.pop(options_name, None)
                     argument = arguments[arg_name] = Argument(
-                        arg_name, kind=ArgumentKind.keyword_only
+                        arg_name,
+                        kind=ArgumentKind.keyword_only,
+                        node=argument_node
                     )
                 else:
                     if is_input:
