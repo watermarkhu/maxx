@@ -6,6 +6,7 @@ import textwrap
 from collections import OrderedDict
 from pathlib import Path
 from typing import Any, TYPE_CHECKING
+import warnings
 
 import charset_normalizer
 import tree_sitter_matlab as tsmatlab
@@ -30,7 +31,9 @@ if TYPE_CHECKING:
 __all__ = ["FileParser"]
 
 
-LANGUAGE = Language(tsmatlab.language())
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore", DeprecationWarning)
+    LANGUAGE = Language(tsmatlab.language())
 PARSER = Parser(LANGUAGE)
 
 FILE_QUERY = LANGUAGE.query("""(source_file .
@@ -256,12 +259,7 @@ class FileParser(object):
             elif "type" in captures:
                 object = self._parse_class(captures["type"][0], **kwargs)
             else:
-                object = Script(
-                    self.filepath.stem,
-                    filepath=self.filepath, 
-                    node=node,
-                    **kwargs
-                )
+                object = Script(self.filepath.stem, filepath=self.filepath, node=node, **kwargs)
 
             if not object.docstring:
                 object.docstring = self._comment_docstring(
@@ -516,9 +514,7 @@ class FileParser(object):
                     options_name = self._first_from_capture(capture_argument, "options")
                     arguments.pop(options_name, None)
                     argument = arguments[arg_name] = Argument(
-                        arg_name,
-                        kind=ArgumentKind.keyword_only,
-                        node=argument_node
+                        arg_name, kind=ArgumentKind.keyword_only, node=argument_node
                     )
                 else:
                     if is_input:
