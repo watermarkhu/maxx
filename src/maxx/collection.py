@@ -11,6 +11,7 @@ from maxx.objects import (
     Class,
     Docstring,
     Folder,
+    Function,
     Object,
     Namespace,
 )
@@ -42,7 +43,12 @@ class _PathGlobber:
 
     def _glob(self, path: Path, recursive: bool = False):
         for member in path.iterdir():
-            if member.is_dir() and recursive and member.stem != PRIVATE_FOLDER:
+            if (
+                member.is_dir()
+                and recursive
+                and member.name[0] not in FOLDER_PREFIXES
+                and member.stem != PRIVATE_FOLDER
+            ):
                 self._glob(member, recursive=True)
             elif member.is_dir() and member.stem[0] in FOLDER_PREFIXES:
                 self._paths.append(member)
@@ -158,7 +164,9 @@ class _PathResolver:
         self._paths_collection.lines_collection[path] = file.content.split("\n")
         return object
 
-    def _collect_directory(self, path: Path, object: PathType) -> PathType:
+    def _collect_directory(
+        self, path: Path, object: PathType, set_parent: bool = False
+    ) -> PathType:
         for item in path.iterdir():
             if item.is_dir() and item.name[0] in FOLDER_PREFIXES:
                 if item not in self._paths_collection._objects:
@@ -177,6 +185,8 @@ class _PathResolver:
                     subobject = self._paths_collection._objects[item].target
                     if subobject is not None:
                         object.members[subobject.name] = subobject
+                        if set_parent:
+                            subobject.parent = object
 
         if object.docstring is None:
             object.docstring = self._collect_readme_md(path, object)
@@ -196,9 +206,12 @@ class _PathResolver:
                     contentsfile = self._collect_path(member)
                     object.docstring = contentsfile.docstring
                 else:
-                    method = self._collect_path(member)
-                    method.parent = object
-                    object.members[method.name] = method
+                    if member not in self._paths_collection._objects:
+                        raise KeyError(f"Path not found in collection: {member}")
+                    method = self._paths_collection._objects[member].target
+                    if method is not None and isinstance(method, Function):
+                        method.parent = object
+                        object.members[method.name] = method
         if object.docstring is None:
             object.docstring = self._collect_readme_md(path, object)
         return object
@@ -206,12 +219,12 @@ class _PathResolver:
     def _collect_namespace(self, path: Path) -> Namespace:
         name = self.name[1:].split(".")[-1]
         object = Namespace(name, filepath=path, paths_collection=self._paths_collection)
-        return self._collect_directory(path, object)
+        return self._collect_directory(path, object, set_parent=True)
 
     def _collect_folder(self, path: Path) -> Folder:
         name = path.stem
         object = Folder("/" + name, filepath=path, paths_collection=self._paths_collection)
-        return self._collect_directory(path, object)
+        return self._collect_directory(path, object, set_parent=False)
 
     def _collect_readme_md(self, path, parent: PathType) -> Docstring | None:
         if (path / "README.md").exists():
@@ -438,10 +451,12 @@ class PathsCollection:
         else:
             self._path.appendleft(path)
 
-        for member in _PathGlobber(path, recursive=recursive):
+        for member in list(_PathGlobber(path, recursive=recursive)):
             object = Alias(member.stem, target=_PathResolver(member, self))
             self._objects[member] = object
-            self._mapping[object.name].append(member)
+
+        for member, object in self._objects.items():
+            self._mapping[object.path].append(member)
             self._members[path].append((object.name, member))
 
             if object.is_folder and member.parent not in self._folders:
