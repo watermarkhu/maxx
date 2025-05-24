@@ -18,7 +18,7 @@ class TestPathsCollection:
     @pytest.fixture(autouse=True)
     def setup(self, test_files_dir):
         """Set up the test by initializing a PathsCollection with test files."""
-        self.paths_collection = PathsCollection([test_files_dir], recursive=True)
+        self.paths_collection = PathsCollection([test_files_dir], recursive=True, working_directory=TEST_FILES_DIR)
         # Verify the collection has loaded our test files
         assert "TestClass" in self.paths_collection.members
         assert "test_function" in self.paths_collection.members
@@ -32,6 +32,11 @@ class TestPathsCollection:
     def test_path_resolution(self):
         """Test that paths are properly resolved in the collection."""
         # Basic member retrieval
+        assert "TestClass" in self.paths_collection.members
+        assert (testClass := self.paths_collection.get_member("TestClass"))
+        assert testClass.members.ke
+
+
         assert self.test_class is not None
         assert isinstance(self.test_class, Class)
         assert self.test_function is not None

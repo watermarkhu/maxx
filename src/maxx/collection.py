@@ -459,7 +459,7 @@ class PathsCollection:
             self._mapping[object.path].append(member)
             self._members[path].append((object.name, member))
 
-            if object.is_folder and member.parent not in self._folders:
+            if member.parent not in self._folders:
                 self._folders[member.parent] = Alias(
                     str(member.parent), target=_PathResolver(member.parent, self)
                 )
