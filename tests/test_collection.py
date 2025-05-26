@@ -18,58 +18,158 @@ class TestPathsCollection:
     @pytest.fixture(autouse=True)
     def setup(self, test_files_dir):
         """Set up the test by initializing a PathsCollection with test files."""
-        self.paths_collection = PathsCollection([test_files_dir], recursive=True, working_directory=TEST_FILES_DIR)
+        self.paths_collection = PathsCollection(
+            [test_files_dir], recursive=True, working_directory=TEST_FILES_DIR
+        )
         # Verify the collection has loaded our test files
-        assert "TestClass" in self.paths_collection.members
-        assert "test_function" in self.paths_collection.members
-        assert "test_script" in self.paths_collection.members
 
-        # Store references for easier access in tests
-        self.test_class = self.paths_collection.get_member("TestClass")
-        self.test_function = self.paths_collection.get_member("test_function")
-        self.test_script = self.paths_collection.get_member("test_script")
+    def test_testclass_collection(self):
+        """Test that TestClass is properly collected."""
+        testclass = self.paths_collection.get_member("TestClass")
+        assert isinstance(testclass, Class)
+        assert testclass.name == "TestClass"
+        assert testclass.filepath.name == "TestClass.m"
 
-    def test_path_resolution(self):
-        """Test that paths are properly resolved in the collection."""
-        # Basic member retrieval
-        assert "TestClass" in self.paths_collection.members
-        assert (testClass := self.paths_collection.get_member("TestClass"))
-        assert testClass.members.ke
+    def test_classfolder_collection(self):
+        """Test that ClassFolder is properly collected."""
+        classfolder = self.paths_collection.get_member("ClassFolder")
+        assert isinstance(classfolder, Class)
+        assert classfolder.name == "ClassFolder"
+        assert classfolder.filepath.name == "ClassFolder.m"
 
+    def test_classfolder_analyze_method(self):
+        """Test that ClassFolder.analyze method is properly collected."""
+        analyze_method = self.paths_collection.get_member("ClassFolder.analyze")
+        assert isinstance(analyze_method, Function)
+        assert analyze_method.name == "analyze"
+        assert analyze_method.filepath.name == "analyze.m"
 
-        assert self.test_class is not None
-        assert isinstance(self.test_class, Class)
-        assert self.test_function is not None
-        assert isinstance(self.test_function, Function)
-        assert self.test_script is not None
-        assert isinstance(self.test_script, Script)
+    def test_script_collection(self):
+        """Test that test_script is properly collected."""
+        test_script = self.paths_collection.get_member("test_script")
+        assert isinstance(test_script, Script)
+        assert test_script.name == "test_script"
+        assert test_script.filepath.name == "test_script.m"
 
-        # TODO: Add more specific tests for path resolution
-        # 1. Test resolution by full path
-        # 2. Test resolution by relative path
-        # 3. Test resolution of nested members (e.g., Class methods)
-        # 4. Test shadowing behavior (when multiple files with same name exist)
-        # 5. Test addpath and rm_path functionality
+    def test_namespace_collection(self):
+        """Test that namespace is properly collected."""
+        namespace = self.paths_collection.get_member("namespace")
+        assert namespace.kind.value == "namespace"
+        assert namespace.name == "namespace"
 
-    def test_member_access(self):
-        """Test that members and their properties can be accessed correctly."""
-        # TODO: Add specific tests for member access
-        # 1. Test accessing class methods and properties
-        # 2. Test accessing function arguments
-        # 3. Test accessing nested namespace members if applicable
-        # 4. Test that docstrings are properly attached to members
+    def test_namespace_class_collection(self):
+        """Test that namespace.NamespaceClass is properly collected."""
+        namespace_class = self.paths_collection.get_member("namespace.NamespaceClass")
+        assert isinstance(namespace_class, Class)
+        assert namespace_class.name == "NamespaceClass"
+        assert namespace_class.filepath.name == "NamespaceClass.m"
 
-    def test_collection_operations(self):
-        """Test operations on the collection itself."""
-        # TODO: Add tests for collection operations
-        # 1. Test adding new paths
-        # 2. Test removing paths
-        # 3. Test how changes to the collection affect resolution
-        # 4. Test how the collection handles changes to the filesystem
+    def test_namespace_function_collection(self):
+        """Test that namespace.test_namespace_function is properly collected."""
+        namespace_func = self.paths_collection.get_member("namespace.test_namespace_function")
+        assert isinstance(namespace_func, Function)
+        assert namespace_func.name == "test_namespace_function"
+        assert namespace_func.filepath.name == "test_namespace_function.m"
 
-    def test_lines_collection(self):
-        """Test the lines_collection property of PathsCollection."""
-        # TODO: Add tests for the lines_collection
-        # 1. Test that source lines are available for objects
-        # 2. Test that line numbers match expected values
-        # 3. Test retrieving source code from objects
+    def test_function_collection(self):
+        """Test that test_function is properly collected."""
+        test_function = self.paths_collection.get_member("test_function")
+        assert isinstance(test_function, Function)
+        assert test_function.name == "test_function"
+        assert test_function.filepath.name == "test_function.m"
+
+    def test_members_property(self):
+        """Test that the members property returns all collected objects."""
+        members = self.paths_collection.members
+        expected_keys = {
+            "TestClass",
+            "ClassFolder",
+            "ClassFolder.analyze",
+            "test_script",
+            "namespace",
+            "namespace.NamespaceClass",
+            "namespace.test_namespace_function",
+            "test_function",
+        }
+        assert set(members.keys()) == expected_keys
+
+    def test_getitem_access(self):
+        """Test that objects can be accessed using [] syntax."""
+        testclass = self.paths_collection["TestClass"]
+        assert isinstance(testclass, Class)
+        assert testclass.name == "TestClass"
+
+    def test_nonexistent_member(self):
+        """Test accessing a non-existent member returns None."""
+        result = self.paths_collection.get_member("NonExistent")
+        assert result is None
+
+    def test_namespace_member_consistency(self):
+        """Test that namespace members are consistent between different access methods."""
+        # Get namespace from paths collection
+        namespace = self.paths_collection.get_member("namespace")
+
+        # Get class through namespace object
+        namespace_class_via_namespace = namespace.get_member("NamespaceClass")
+
+        # Get class directly through paths collection
+        namespace_class_via_paths = self.paths_collection.get_member("namespace.NamespaceClass")
+
+        # Both should return the same object
+        assert namespace_class_via_namespace is namespace_class_via_paths
+        assert isinstance(namespace_class_via_namespace, Class)
+        assert namespace_class_via_namespace.name == "NamespaceClass"
+
+        # Test function access as well
+        namespace_func_via_namespace = namespace.get_member("test_namespace_function")
+        namespace_func_via_paths = self.paths_collection.get_member(
+            "namespace.test_namespace_function"
+        )
+
+        assert namespace_func_via_namespace is namespace_func_via_paths
+        assert isinstance(namespace_func_via_namespace, Function)
+        assert namespace_func_via_namespace.name == "test_namespace_function"
+
+    def test_classfolder_member_consistency(self):
+        """Test that classfolder members are consistent between different access methods."""
+        # Get classfolder from paths collection
+        classfolder = self.paths_collection.get_member("ClassFolder")
+
+        # Get method through classfolder object
+        analyze_via_classfolder = classfolder.get_member("analyze")
+
+        # Get method directly through paths collection
+        analyze_via_paths = self.paths_collection.get_member("ClassFolder.analyze")
+
+        # Both should return the same object
+        assert analyze_via_classfolder is analyze_via_paths
+        assert isinstance(analyze_via_classfolder, Function)
+        assert analyze_via_classfolder.name == "analyze"
+
+    def test_namespace_members_property(self):
+        """Test that namespace.members contains the same objects as paths collection."""
+        namespace = self.paths_collection.get_member("namespace")
+
+        # Check that members property contains expected items
+        assert "NamespaceClass" in namespace.members
+        assert "test_namespace_function" in namespace.members
+
+        # Verify the objects are the same
+        assert namespace.members["NamespaceClass"] is self.paths_collection.get_member(
+            "namespace.NamespaceClass"
+        )
+        assert namespace.members["test_namespace_function"] is self.paths_collection.get_member(
+            "namespace.test_namespace_function"
+        )
+
+    def test_classfolder_members_property(self):
+        """Test that classfolder.members contains the same objects as paths collection."""
+        classfolder = self.paths_collection.get_member("ClassFolder")
+
+        # Check that members property contains expected items
+        assert "analyze" in classfolder.members
+
+        # Verify the objects are the same
+        assert classfolder.members["analyze"] is self.paths_collection.get_member(
+            "ClassFolder.analyze"
+        )
