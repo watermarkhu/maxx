@@ -67,7 +67,7 @@ jobs:
     - name: Run mypy type checking
       run: |
         echo "## 🔧 MyPy Type Checking Results" >> $GITHUB_STEP_SUMMARY
-        if uv run mypy --pretty --error-summary .; then
+        if uv run mypy --pretty --error-summary; then
           echo "✅ No type errors found" >> $GITHUB_STEP_SUMMARY
         else
           echo "❌ Type errors found" >> $GITHUB_STEP_SUMMARY
