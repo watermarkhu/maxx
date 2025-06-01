@@ -38,7 +38,6 @@ dev = [
     "ruff>=0.11.7",
     "mypy>=1.15.0",
     "pytest>=8.3.5",
-    "python-semantic-release>=9.15.2",
 ]
 reference = [
     "beautifulsoup4>=4.13.3",
@@ -47,7 +46,6 @@ reference = [
 
 [tool.uv.sources]
 tree-sitter = { git = "https://github.com/tree-sitter/py-tree-sitter",  tag = "0.25" }
-
 
 [build-system]
 requires = ["hatchling"]

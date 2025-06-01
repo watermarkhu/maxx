@@ -83,7 +83,7 @@ jobs:
   deploy: 
     name: Deploy package distributions
     needs: release
-    if: needs.release.outputs.released == 'true'
+    if: needs.release.outputs.released == 'true' && github.event.pull_request.merged
     runs-on: ubuntu-latest
     environment: release
     concurrency: release
