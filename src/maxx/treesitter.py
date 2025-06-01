@@ -10,7 +10,7 @@ import warnings
 
 import charset_normalizer
 import tree_sitter_matlab as tsmatlab
-from tree_sitter import Language, Node, Tree, TreeCursor, Parser
+from tree_sitter import Language, Node, Tree, TreeCursor, Parser, Query, QueryCursor
 
 from maxx.enums import AccessKind, ArgumentKind
 from maxx.expressions import Expr
@@ -36,17 +36,25 @@ with warnings.catch_warnings():
     LANGUAGE = Language(tsmatlab.language())
 PARSER = Parser(LANGUAGE)
 
-FILE_QUERY = LANGUAGE.query("""(source_file .
+FILE_QUERY = QueryCursor(
+    Query(
+        LANGUAGE,
+        """(source_file .
     (comment)* @header .
     [
         (function_definition) @function
         (class_definition) @type
     ]?
 )
-""")
+""",
+    )
+)
 
 
-FUNCTION_QUERY = LANGUAGE.query("""(function_definition .
+FUNCTION_QUERY = QueryCursor(
+    Query(
+        LANGUAGE,
+        """(function_definition .
     ("function")
     (function_output . 
         [
@@ -72,10 +80,15 @@ FUNCTION_QUERY = LANGUAGE.query("""(function_definition .
     )?
     (comment)* @docstring
     (arguments_statement)* @arguments
-)""")
+)""",
+    )
+)
 
 
-ARGUMENTS_QUERY = LANGUAGE.query("""(arguments_statement .
+ARGUMENTS_QUERY = QueryCursor(
+    Query(
+        LANGUAGE,
+        """(arguments_statement .
     ("arguments")
     (attributes
         (identifier) @attributes
@@ -83,10 +96,15 @@ ARGUMENTS_QUERY = LANGUAGE.query("""(arguments_statement .
     (comment)?
     ("\\n")?
     (property)+ @arguments
-)""")
+)""",
+    )
+)
 
 
-PROPERTY_QUERY = LANGUAGE.query("""(property . 
+PROPERTY_QUERY = QueryCursor(
+    Query(
+        LANGUAGE,
+        """(property . 
     [
         (identifier) @name
         (property_name
@@ -109,19 +127,29 @@ PROPERTY_QUERY = LANGUAGE.query("""(property .
         _+ @default
     )?
     (comment)* @comment              
-)""")
+)""",
+    )
+)
 
 
-ATTRIBUTE_QUERY = LANGUAGE.query("""(attribute
+ATTRIBUTE_QUERY = QueryCursor(
+    Query(
+        LANGUAGE,
+        """(attribute
     (identifier) @name
     (
         ("=")
         _+ @value
     )?
-)""")
+)""",
+    )
+)
 
 
-CLASS_QUERY = LANGUAGE.query("""("classdef" .
+CLASS_QUERY = QueryCursor(
+    Query(
+        LANGUAGE,
+        """("classdef" .
     (attributes
         (attribute) @attributes
     )?
@@ -137,24 +165,36 @@ CLASS_QUERY = LANGUAGE.query("""("classdef" .
         (properties) @properties
         (enumeration) @enumeration
     ]*
-)""")
+)""",
+    )
+)
 
 
-METHODS_QUERY = LANGUAGE.query("""("methods" .
+METHODS_QUERY = QueryCursor(
+    Query(
+        LANGUAGE,
+        """("methods" .
     (attributes
         (attribute) @attributes
     )? .
     ("\\n")? .
     (function_definition)* @methods
-)""")
+)""",
+    )
+)
 
-PROPERTIES_QUERY = LANGUAGE.query("""("properties" .
+PROPERTIES_QUERY = QueryCursor(
+    Query(
+        LANGUAGE,
+        """("properties" .
     (attributes
         (attribute) @attributes
     )? .
     ("\\n")? .
     (property)* @properties
-)""")
+)""",
+    )
+)
 
 
 def _strtobool(value: str) -> bool:

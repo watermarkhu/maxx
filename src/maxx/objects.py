@@ -637,6 +637,8 @@ class Alias(ObjectAliasMixin):
         return True
 
     def __repr__(self) -> str:
+        if self.resolved:
+            return repr(self._actual)
         return f"Alias({self.name!r}, {self.target_path!r})"
 
     def __str__(self):

@@ -12,6 +12,7 @@ classdef NamespaceClass
     
     properties
         Value double = 0
+            % The stored value
     end
     
     methods

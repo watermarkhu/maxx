@@ -1,0 +1,114 @@
+name: Release
+
+on:
+  pull_request:
+    types: 
+      - closed
+      - opened
+      - reopened
+      - synchronize
+    branches: [main]
+
+
+jobs:
+  release:
+    name: Semantic version release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      released: ${{ steps.semantic-release.outputs.released }}
+      tag: ${{ steps.semantic-release.outputs.tag }}
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        ref: ${{ github.sha }}
+        persist-credentials: true
+  
+    - name: Force correct release branch on workflow sha
+      run: |
+        git checkout -B ${{ github.ref_name }} ${{ github.sha }}
+
+    - name: Update version and changelogs
+      id: semantic-release
+      uses: python-semantic-release/python-semantic-release@v10
+      with: 
+        build: false
+        changelog: true
+        commit: true
+        push: true
+        tag: true
+        vcs_release: true
+        github_token: ${{ github.token }}
+        no_operation_mode: ${{ !github.event.pull_request.merged }}
+
+  comment:
+    name: Create or update comment
+    if: github.event.pull_request.merged == false
+    needs: release
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+    - name: Find Comment
+      id: fc
+      uses: peter-evans/find-comment@v3
+      with:
+        issue-number: ${{ github.event.pull_request.number }}
+        comment-author: 'github-actions[bot]'
+        body-includes: This comment was written by a bot!
+
+    - name: Create comment
+      if: steps.fc.outputs.comment-id == ''
+      uses: peter-evans/create-or-update-comment@v4
+      with:
+        issue-number: ${{ github.event.pull_request.number }}
+        body: |
+          Next release: `${{ needs.release.outputs.tag }}`
+          <!-- This comment was written by a bot! -->
+          
+    - name: Update comment
+      if: steps.fc.outputs.comment-id != ''
+      uses: peter-evans/create-or-update-comment@v4
+      with:
+        comment-id: ${{ steps.fc.outputs.comment-id }}
+        edit-mode: replace
+        body: |
+          Next release: `${{ needs.release.outputs.tag }}`
+          <!-- This comment was written by a bot! -->
+
+  deploy: 
+    name: Deploy package distributions
+    needs: release
+    if: needs.release.outputs.released == 'true' && github.event.pull_request.merged
+    runs-on: ubuntu-latest
+    environment: release
+    concurrency: release
+    permissions:
+      contents: write
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ needs.release.outputs.tag }}
+
+    - name: Install the latest version of uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        version: "latest"
+
+    - name: Build and publish package distributions
+      run: |
+        uv sync --no-dev
+        uv build
+        uv publish
+
+    - name: Publish package distributions to GitHub Releases
+      id: publish-dist
+      uses: python-semantic-release/publish-action@v10
+      with:
+        github_token: ${{ github.token }}
+        tag: ${{ needs.release.outputs.tag }}
