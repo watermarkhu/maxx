@@ -4,6 +4,10 @@ on:
   pull_request:
     branches: [main, development]
 
+permissions:
+  checks: write
+  pull-requests: write
+
 jobs:
   setup:
     runs-on: ubuntu-latest
@@ -84,7 +88,6 @@ jobs:
       if: always()
       with:
         files: pytest.xml
-        comment_mode: create new
         check_name: "Test Results (Python ${{ matrix.python-version }})"
 
   summary:
