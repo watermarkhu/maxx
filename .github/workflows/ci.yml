@@ -84,13 +84,6 @@ jobs:
       with:
         name: Test Results (Python ${{ matrix.python-version }})
         path: pytest.xml
-        
-    - name: Publish test results
-      uses: EnricoMi/publish-unit-test-result-action@v2
-      if: always()
-      with:
-        files: pytest.xml
-        check_name: "Test Results (Python ${{ matrix.python-version }})"
 
   summary:
     runs-on: ubuntu-latest
@@ -108,4 +101,18 @@ jobs:
       - name: Publish Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
         with:
+          comment_mode: off
           files: "artifacts/**/*.xml"
+
+      - name: Check all jobs
+        run: |
+          if [[ "${{ needs.test.result }}" == "success" ]]; then
+            echo "✅ All Python versions passed CI checks"
+            echo "## 🎉 CI Summary" >> $GITHUB_STEP_SUMMARY
+            echo "All tests passed across Python versions: ${{ needs.setup.outputs.python-versions }}" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Some Python versions failed CI checks"
+            echo "## ❌ CI Summary" >> $GITHUB_STEP_SUMMARY
+            echo "Some tests failed. Check individual job results for details." >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
