@@ -9,6 +9,9 @@ on:
       - synchronize
     branches: [main]
 
+concurrency:
+  group: ${{ github.workflow }}-release-${{ github.ref_name }}
+  cancel-in-progress: false
 
 jobs:
   release:
@@ -24,13 +27,12 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
       with:
+        ref: ${{ github.ref_name }}
         fetch-depth: 0
-        ref: ${{ github.sha }}
-        persist-credentials: true
-  
-    - name: Force correct release branch on workflow sha
+
+    - name: Setup | Force release branch to be at workflow sha
       run: |
-        git checkout -B ${{ github.ref_name }} ${{ github.sha }}
+        git reset --hard ${{ github.sha }}
 
     - name: Update version and changelogs
       id: semantic-release
@@ -86,7 +88,6 @@ jobs:
     if: needs.release.outputs.released == 'true' && github.event.pull_request.merged
     runs-on: ubuntu-latest
     environment: release
-    concurrency: release
     permissions:
       contents: write
     steps:

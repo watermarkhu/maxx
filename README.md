@@ -5,17 +5,17 @@
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue)](https://www.python.org)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
-<img src="https://raw.githubusercontent.com/watermarkhu/maxx/refs/heads/main/img/malt-pixel.svg" alt="malt logo, created by Mark Shui Hu" width="150" align="right">
+<img src="https://raw.githubusercontent.com/watermarkhu/maxx/refs/heads/main/img/malt-pixel.svg" alt="malt logo, created by Mark Shui Hu" width="100" align="right">
 
 **maxx** (MATLAB Language Tools) is a Python library for parsing and analyzing MATLAB code. It provides comprehensive support for extracting signatures, documentation, and metadata from MATLAB projects including functions, classes, scripts, and packages.
 
-## Features
+### Features
 
 - 🔍 **Parse MATLAB files** - Extract functions, classes, properties, and methods
 - 📁 **Project structure analysis** - Handle MATLAB packages, namespaces, and class folders
 - 📖 **Documentation extraction** - Parse docstrings and comments from MATLAB code
 - 🎯 **Type information** - Extract argument types, validation functions, and return types
-- 🏗️ **Tree-sitter based** - Fast and accurate parsing using tree-sitter-matlab
+- 🌳 **Tree-sitter based** - Fast and accurate parsing using tree-sitter-matlab
 - 🔗 **Integration ready** - Built for documentation generators like MkDocs
 
 ## Installation
@@ -86,13 +86,6 @@ properties = [m for m in matlab_class.members.values() if m.is_property]
 - **Packages** - Namespace packages (`+package`) and class folders (`@class`)
 - **Arguments blocks** - Input/output validation and type information
 - **Properties blocks** - Class properties with attributes and validation
-
-## Requirements
-
-- Python 3.10+
-- tree-sitter
-- tree-sitter-matlab
-- griffe (for docstring parsing)
 
 
 ## License
