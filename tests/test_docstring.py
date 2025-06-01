@@ -180,8 +180,8 @@ class TestDocstringParsing:
         # Note: Property docstrings might not be implemented yet,
         # this test checks the current behavior
         if value_property is not None and hasattr(value_property, "docstring"):
-            # If property docstrings are supported, test them
-            assert value_property.docstring is not None or value_property.docstring is None
+            assert value_property.docstring is not None
+            assert "The stored value" in value_property.docstring.value
 
     def test_docstring_line_numbers(self):
         """Test that docstring line numbers are correctly captured."""
