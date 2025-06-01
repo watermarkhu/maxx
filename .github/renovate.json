@@ -1,0 +1,14 @@
+{
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "extends": [
+        "config:recommended"
+    ],
+    "branchPrefix": "renovate-", 
+    "packageRules": [
+        {
+          "groupName": "group-github-actions",
+          "description": "Group GitHub Action updates",
+          "matchManagers": ["github-actions"]
+        }
+    ]
+}
