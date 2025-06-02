@@ -9,6 +9,9 @@ on:
       - synchronize
     branches: [main]
 
+concurrency:
+  group: ${{ github.workflow }}-release-${{ github.ref_name }}
+  cancel-in-progress: false
 
 jobs:
   release:
@@ -86,7 +89,6 @@ jobs:
     if: needs.release.outputs.released == 'true' && github.event.pull_request.merged
     runs-on: ubuntu-latest
     environment: release
-    concurrency: release
     permissions:
       contents: write
     steps:
