@@ -27,7 +27,7 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
       with:
-        ref: ${{ github.ref_name }}
+        ref: ${{ github.sha }}
         fetch-depth: 0
 
     - name: Setup | Force release branch to be at workflow sha
