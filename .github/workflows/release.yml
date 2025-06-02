@@ -27,12 +27,13 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
       with:
-        ref: ${{ github.sha }}
         fetch-depth: 0
-
-    - name: Setup | Force release branch to be at workflow sha
+        ref: ${{ github.sha }}
+        persist-credentials: true
+  
+    - name: Force correct release branch on workflow sha
       run: |
-        git reset --hard ${{ github.sha }}
+        git checkout -B ${{ github.ref_name }} ${{ github.sha }}
 
     - name: Update version and changelogs
       id: semantic-release
