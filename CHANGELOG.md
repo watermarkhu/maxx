@@ -5,6 +5,9 @@
 
 ### Features
 
+- Force release with semver action ([#7](https://github.com/watermarkhu/maxx/pull/7),
+  [`1728e0f`](https://github.com/watermarkhu/maxx/commit/1728e0fcbd878353f11441af12d23da7d5444e88))
+
 - Force release with semver action ([#6](https://github.com/watermarkhu/maxx/pull/6),
   [`5b23575`](https://github.com/watermarkhu/maxx/commit/5b23575d7821faf2c1064892ae12f533bbb657e3))
 
