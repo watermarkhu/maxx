@@ -35,6 +35,7 @@ class Validatable:
         parent: Object | None = None,
         node: Node | None = None,
         paths_collection: "PathsCollection | None" = None,
+        **kwargs: Any,
     ) -> None:
         """Initialize the validatable.
 
@@ -221,6 +222,7 @@ class Object(ObjectAliasMixin):
         node: Node | None = None,
         parent: Object | None = None,
         paths_collection: "PathsCollection | None" = None,
+        **kwargs: Any,
     ) -> None:
         """Initialize the object.
 
@@ -419,7 +421,7 @@ class Object(ObjectAliasMixin):
         """
         if self.parent is None:
             return self.name
-        return f"{self.parent.path}.{self.name}"
+        return f"{self.parent.canonical_path}.{self.name}"
 
     @property
     def paths_collection(self) -> "PathsCollection":
@@ -539,7 +541,7 @@ class Alias(ObjectAliasMixin):
     def __init__(
         self,
         name: str,
-        target: Callable | Object | Alias,
+        target: Callable | ObjectAliasMixin,
         *,
         parent: Namespace | Folder | Class | Alias | None = None,
         inherited: bool = False,
@@ -574,7 +576,7 @@ class Alias(ObjectAliasMixin):
         """The path of this alias' target."""
 
         if callable(target):
-            self._target: Object | Alias | None = None
+            self._target: ObjectAliasMixin | None = None
             self._constructor: Callable = target
             self._lock = threading.Lock()
         else:
@@ -677,7 +679,7 @@ class Alias(ObjectAliasMixin):
         # should be the path of the alias plus the member's name,
         # not the original member's path.
         return {
-            name: Alias(name, target=member, parent=self, inherited=False)
+            name: Alias(name, target=member, parent=self, inherited=True)
             for name, member in self._actual.inherited_members.items()
         }
 
@@ -712,6 +714,16 @@ class Namespace(PathMixin, Object):
     def is_subnamespace(self) -> bool:
         """Whether this namespace is a subnamespace."""
         return self.parent is not None and self.parent.is_namespace
+
+    @property
+    def path(self) -> str:
+        """The dotted path of this object.
+
+        On regular objects (not aliases), the path is the canonical path.
+
+        See also: [`canonical_path`][maxx.objects.Object.canonical_path].
+        """
+        return "+" + self.canonical_path
 
 
 class Class(PathMixin, Object):
@@ -813,8 +825,8 @@ class Class(PathMixin, Object):
         Returns:
             dict[str, Object]: A dictionary where the keys are member names and the values are the corresponding Object instances.
         """
-        if self._inherited_members is not False:
-            return self._inherited_members
+        # if self._inherited_members is not False:
+        #     return self._inherited_members
 
         inherited_members: dict[str, Alias] = {}
         for model in reversed(self.mro()):
@@ -938,15 +950,9 @@ class Property(Validatable, Object):
         SetAccess: AccessKind = AccessKind.public,
         **kwargs: Any,
     ) -> None:
-        """Initialize the function.
-
-        Parameters:
-            *args: See [`griffe.Object`][].
-            value: The attribute value, if any.
-            type: The attribute type, if any.
-            **kwargs: See [`griffe.Object`][].
-        """
-        super().__init__(*args, **kwargs)
+        # Explicitly initialize both Validatable and Object
+        Validatable.__init__(self, *args, **kwargs)
+        Object.__init__(self, *args, **kwargs)
         self.AbortSet: bool = AbortSet
         self.Abstract: bool = Abstract
         self.Constant: bool = Constant

@@ -166,12 +166,33 @@ class PathMixin:
         return f"{self.__class__.__name__}({self.name})"  # type: ignore[attr-defined]
 
     @property
+    def is_private(self) -> bool:
+        """Whether this object/alias is private but not special."""
+        return any(part == "private" for part in self._filepath.parts) if self._filepath else False  # type: ignore[attr-defined]
+
+    @property
     def is_internal(self) -> bool:
-        return any(part == "+internal" for part in self.filepath.parts) if self.filepath else False  # type: ignore[attr-defined]
+        return (
+            any(part == "+internal" for part in self._filepath.parts) if self._filepath else False
+        )  # type: ignore[attr-defined]
 
     @property
     def is_hidden(self) -> bool:
         return self.is_internal
+
+    @property
+    def relative_filepath(self) -> Path | None:
+        """The file path where this object was defined, relative to the current working directory.
+
+        If this object's file path is not relative to the current working directory, return its absolute path.
+        """
+        cwd = Path.cwd()
+        if self._filepath is None:
+            return None
+        try:
+            return self._filepath.relative_to(cwd)
+        except ValueError:
+            return self._filepath
 
 
 class ObjectAliasMixin(GetMembersMixin, SetMembersMixin, DelMembersMixin):

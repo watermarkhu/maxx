@@ -173,6 +173,8 @@ class _PathResolver:
                 subobject = self._paths_collection._objects[item].target
                 if subobject is not None:
                     object.members[subobject.name] = subobject
+                    if set_parent:
+                        subobject.parent = object
 
             elif item.is_file() and item.suffix == MFILE_SUFFIX:
                 if item.name == CONTENTS_FILE:

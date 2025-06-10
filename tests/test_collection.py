@@ -52,7 +52,7 @@ class TestPathsCollection:
 
     def test_namespace_collection(self):
         """Test that namespace is properly collected."""
-        namespace = self.paths_collection.get_member("namespace")
+        namespace = self.paths_collection.get_member("+namespace")
         assert namespace.kind.value == "namespace"
         assert namespace.name == "namespace"
 
@@ -85,7 +85,7 @@ class TestPathsCollection:
             "ClassFolder",
             "ClassFolder.analyze",
             "test_script",
-            "namespace",
+            "+namespace",
             "namespace.NamespaceClass",
             "namespace.test_namespace_function",
             "test_function",
@@ -106,7 +106,7 @@ class TestPathsCollection:
     def test_namespace_member_consistency(self):
         """Test that namespace members are consistent between different access methods."""
         # Get namespace from paths collection
-        namespace = self.paths_collection.get_member("namespace")
+        namespace = self.paths_collection.get_member("+namespace")
 
         # Get class through namespace object
         namespace_class_via_namespace = namespace.get_member("NamespaceClass")
@@ -147,7 +147,7 @@ class TestPathsCollection:
 
     def test_namespace_members_property(self):
         """Test that namespace.members contains the same objects as paths collection."""
-        namespace = self.paths_collection.get_member("namespace")
+        namespace = self.paths_collection.get_member("+namespace")
 
         # Check that members property contains expected items
         assert "NamespaceClass" in namespace.members
