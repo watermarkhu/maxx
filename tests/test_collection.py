@@ -7,7 +7,6 @@ import pytest
 from maxx.collection import PathsCollection
 from maxx.objects import Class, Function, Script
 
-
 # Base directory for test files
 TEST_FILES_DIR = Path(__file__).parent / "files"
 

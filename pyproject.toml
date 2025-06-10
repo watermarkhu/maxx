@@ -65,6 +65,17 @@ target-version = "py310"
 line-length = 100
 indent-width = 4
 
+[tool.ruff.lint]
+select = [
+    "E",  # Python specific errors
+    "W",  # Warnings
+    "F",  # Pyflakes (code complexity)
+    "I",  # isort
+]
+ignore = [
+    "E501",  # Line too long
+]
+
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"

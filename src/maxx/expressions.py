@@ -2,11 +2,10 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass
-from typing import Iterator
 from pathlib import Path
+from typing import Iterator
 
 from tree_sitter import Node
-
 
 __all__ = ["Expr", "MATLAB_BUILTINS"]
 
@@ -45,3 +44,10 @@ class Expr:
     def __iter__(self) -> Iterator[str]:
         """Iterate on the expression syntax and elements."""
         yield from self.iterate()
+
+    @property
+    def doc(self) -> str:
+        for elem in self.iterate():
+            if elem in MATLAB_BUILTINS:
+                return f"{MATHWORKS_DOC_URL}/{MATLAB_BUILTINS[elem]}"
+        return ""

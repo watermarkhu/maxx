@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections import defaultdict, deque
 from pathlib import Path
-from typing import Any, Sequence, TypeVar, ItemsView, KeysView, ValuesView
+from typing import Any, ItemsView, KeysView, Sequence, TypeVar, ValuesView
 
 from maxx.objects import (
     Alias,
@@ -12,11 +12,10 @@ from maxx.objects import (
     Docstring,
     Folder,
     Function,
-    Object,
     Namespace,
+    Object,
 )
 from maxx.treesitter import FileParser
-
 
 MFILE_SUFFIX = ".m"
 CLASSFOLDER_PREFIX = "@"

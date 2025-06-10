@@ -1,8 +1,8 @@
-from playwright.sync_api import sync_playwright
-from bs4 import BeautifulSoup
 import json
 import os
 
+from bs4 import BeautifulSoup
+from playwright.sync_api import sync_playwright
 
 REFERENCE_LIST_URL = "https://mathworks.com/help/matlab/referencelist.html"
 

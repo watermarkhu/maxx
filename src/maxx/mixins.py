@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Sequence
 from pathlib import Path
+from typing import TYPE_CHECKING, Any, Sequence
 
 from maxx.enums import Kind
 
 if TYPE_CHECKING:
-    from maxx.objects import Namespace, Folder, Class, Function, Property, Script
+    from maxx.objects import Class, Folder, Function, Namespace, Property, Script
 
 
 def _get_parts(key: str | Sequence[str]) -> Sequence[str]:

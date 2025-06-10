@@ -2,17 +2,17 @@ from __future__ import annotations
 
 import threading
 from contextlib import suppress
-from textwrap import dedent
-from typing import Any, Callable, cast, Sequence, TYPE_CHECKING
 from pathlib import Path
+from textwrap import dedent
+from typing import TYPE_CHECKING, Any, Callable, Sequence, cast
 
 from _griffe.c3linear import c3linear_merge
 from griffe import Docstring
 from tree_sitter import Node
 
-from maxx.enums import AccessKind, Kind, ArgumentKind
-from maxx.expressions import Expr
+from maxx.enums import AccessKind, ArgumentKind, Kind
 from maxx.exceptions import CyclicAliasError, FilePathError, NameResolutionError
+from maxx.expressions import Expr
 from maxx.logger import logger
 from maxx.mixins import ObjectAliasMixin, PathMixin
 

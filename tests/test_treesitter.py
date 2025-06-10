@@ -3,8 +3,8 @@
 import pytest
 
 from maxx.enums import AccessKind, ArgumentKind
-from maxx.treesitter import FileParser
 from maxx.objects import Class, Function, Script
+from maxx.treesitter import FileParser
 
 
 class TestClassParser:
