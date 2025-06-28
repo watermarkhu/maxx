@@ -365,6 +365,18 @@ class PathsCollection:
     def get_member(self, identifier: str) -> Any:
         return self[identifier]
 
+    def __contains__(self, identifier: str) -> bool:
+        """
+        Check if the identifier exists in the collection.
+
+        Args:
+            identifier (str): The identifier to check.
+
+        Returns:
+            bool: True if the identifier exists, False otherwise.
+        """
+        return self.__getitem__(identifier) is not None
+
     def __getitem__(self, identifier: str) -> Any:
         """
         Resolve an identifier to a Object object.

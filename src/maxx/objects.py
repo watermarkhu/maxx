@@ -66,7 +66,7 @@ class Validatable:
 
         # Attach the docstring to this object.
         if self.docstring is not None:
-            self.docstring.parent = self  # type: ignore[assignment]
+            self.docstring.parent = self
 
     @property
     def has_docstring(self) -> bool:
@@ -86,7 +86,7 @@ class Validatable:
         return (
             self.name == value.name
             and self.type == value.type
-            and self.kind == value.kind  # type: ignore[attr-defined]
+            and self.kind == value.kind
             and self.default == value.default
         )
 
@@ -271,7 +271,7 @@ class Object(ObjectAliasMixin):
 
         # Attach the docstring to this object.
         if docstring:
-            docstring.parent = self  # type: ignore[assignment]
+            docstring.parent = self
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({self.name!r}, {self.lineno!r}, {self.endlineno!r})"
@@ -934,6 +934,7 @@ class Property(Validatable, Object):
 
     def __init__(
         self,
+        name: str,
         *args: Any,
         AbortSet: bool = False,
         Abstract: bool = False,
@@ -951,8 +952,8 @@ class Property(Validatable, Object):
         **kwargs: Any,
     ) -> None:
         # Explicitly initialize both Validatable and Object
-        Validatable.__init__(self, *args, **kwargs)
-        Object.__init__(self, *args, **kwargs)
+        Validatable.__init__(self, name, *args, **kwargs)
+        Object.__init__(self, name, *args, **kwargs)
         self.AbortSet: bool = AbortSet
         self.Abstract: bool = Abstract
         self.Constant: bool = Constant
