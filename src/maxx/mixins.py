@@ -121,7 +121,7 @@ class SetMembersMixin:
         if len(parts) == 1:
             name = parts[0]
             self.members[name] = value
-            value.parent = self # ty: ignore[unresolved-attribute]
+            value.parent = self  # ty: ignore[unresolved-attribute]
         else:
             self.members[parts[0]][parts[1:]] = value
 
@@ -145,7 +145,7 @@ class SetMembersMixin:
         if len(parts) == 1:
             name = parts[0]
             self.members[name] = value
-            value.parent = self # ty: ignore[unresolved-attribute]
+            value.parent = self  # ty: ignore[unresolved-attribute]
         else:
             self.members[parts[0]].set_member(parts[1:], value)
 
@@ -225,9 +225,7 @@ class ObjectAliasMixin(GetMembersMixin, SetMembersMixin, DelMembersMixin):
     def folders(self) -> "dict[str, Folder]":
         """Thefolder members."""
         return {
-            name: member
-            for name, member in self.all_members.items()
-            if member.kind is Kind.FOLDER
+            name: member for name, member in self.all_members.items() if member.kind is Kind.FOLDER
         }
 
     @property
@@ -242,19 +240,13 @@ class ObjectAliasMixin(GetMembersMixin, SetMembersMixin, DelMembersMixin):
     @property
     def scripts(self) -> "dict[str, Script]":
         """The script members."""
-        return {
-            name: member
-            for name, member in self.members.items()
-            if member.kind is Kind.SCRIPT
-        }
+        return {name: member for name, member in self.members.items() if member.kind is Kind.SCRIPT}
 
     @property
     def classes(self) -> "dict[str, Class]":
         """The class members."""
         return {
-            name: member
-            for name, member in self.all_members.items()
-            if member.kind is Kind.CLASS
+            name: member for name, member in self.all_members.items() if member.kind is Kind.CLASS
         }
 
     @property
