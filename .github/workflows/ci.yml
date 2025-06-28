@@ -93,13 +93,9 @@ jobs:
           exit 1
         fi
 
-    - name: Run pytest
-      run: |
-        uv run pytest --cov maxx --tb=short -v --junit-xml=pytest.xml
-
     - name: Run tests
       run: |
-        if uv run pytest --cov mkdocstrings_handlers.matlab; then
+        if uv run pytest --cov maxx --tb=short -v --junit-xml=pytest.xml; then
           echo '# ✅ Tests passed' >> $GITHUB_STEP_SUMMARY
         else
           echo '# ❌ Tests failed' >> $GITHUB_STEP_SUMMARY
