@@ -1,6 +1,17 @@
 # CHANGELOG
 
 
+## v0.2.1 (2025-07-01)
+
+### Bug Fixes
+
+- Apply fixes for mkdocstrings-matlab ([#9](https://github.com/watermarkhu/maxx/pull/9),
+  [`0bfe68a`](https://github.com/watermarkhu/maxx/commit/0bfe68abbc4743caa09cc02ed57f006a711a261f))
+
+- Various fixes for mkdocstrings-matlab ([#9](https://github.com/watermarkhu/maxx/pull/9),
+  [`0bfe68a`](https://github.com/watermarkhu/maxx/commit/0bfe68abbc4743caa09cc02ed57f006a711a261f))
+
+
 ## v0.2.0 (2025-06-02)
 
 ### Features
