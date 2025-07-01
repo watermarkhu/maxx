@@ -4,7 +4,23 @@ on:
   push:
     branches: [main]
   pull_request:
+    types:
+      - opened
+      - closed
+      - reopened
+      - synchronize
+      - labeled
+      - unlabeled
+      - edited
     branches: [main, development]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
 
 jobs:
   setup:
@@ -27,11 +43,13 @@ jobs:
         echo "Found Python versions: $versions"
 
   test:
-    runs-on: ubuntu-latest
+    name: Run checks and tests
     needs: setup
     strategy:
+      fail-fast: false
       matrix:
         python-version: ${{ fromJson(needs.setup.outputs.python-versions) }}
+    runs-on: ubuntu-latest
     
     steps:
     - name: Checkout code
@@ -44,7 +62,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        uv sync --dev --frozen --python ${{ matrix.python-version }}
+        uv sync --all-groups --python ${{ matrix.python-version }}
 
     - name: Run ruff linting
       run: |
@@ -66,19 +84,29 @@ jobs:
           exit 1
         fi
 
-    - name: Run mypy type checking
+    - name: Run Ty type checking
       run: |
-        echo "## 🔧 MyPy Type Checking Results" >> $GITHUB_STEP_SUMMARY
-        if uv run mypy --pretty --error-summary; then
+        echo "## 🔧 Ty Type Checking Results" >> $GITHUB_STEP_SUMMARY
+        if uv run ty check; then
           echo "✅ No type errors found" >> $GITHUB_STEP_SUMMARY
         else
           echo "❌ Type errors found" >> $GITHUB_STEP_SUMMARY
           exit 1
         fi
 
-    - name: Run pytest
+    - name: Run tests
       run: |
-        uv run pytest --tb=short -v --junit-xml=pytest.xml
+        if uv run pytest --cov maxx --tb=short -v --junit-xml=pytest.xml; then
+          echo '# ✅ Tests passed' >> $GITHUB_STEP_SUMMARY
+        else
+          echo '# ❌ Tests failed' >> $GITHUB_STEP_SUMMARY
+        fi
+
+    - name: Generate test coverage report
+      if: (!cancelled())
+      run: |
+        echo '### Test Coverage Summary' >> $GITHUB_STEP_SUMMARY
+        uv run coverage report --show-missing --format=markdown >> $GITHUB_STEP_SUMMARY
 
     - name: Upload Test Results
       if: (!cancelled())
@@ -92,8 +120,9 @@ jobs:
     needs: [setup, test]
     if: (!cancelled())
     permissions:
-      checks: write
+      contents: write
       pull-requests: write
+      checks: write
     steps:
       - name: Download Artifacts
         uses: actions/download-artifact@v4

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections import defaultdict, deque
 from pathlib import Path
-from typing import Any, Sequence, TypeVar, ItemsView, KeysView, ValuesView
+from typing import Any, ItemsView, KeysView, Sequence, TypeVar, ValuesView
 
 from maxx.objects import (
     Alias,
@@ -12,11 +12,10 @@ from maxx.objects import (
     Docstring,
     Folder,
     Function,
-    Object,
     Namespace,
+    Object,
 )
 from maxx.treesitter import FileParser
-
 
 MFILE_SUFFIX = ".m"
 CLASSFOLDER_PREFIX = "@"
@@ -174,6 +173,8 @@ class _PathResolver:
                 subobject = self._paths_collection._objects[item].target
                 if subobject is not None:
                     object.members[subobject.name] = subobject
+                    if set_parent:
+                        subobject.parent = object
 
             elif item.is_file() and item.suffix == MFILE_SUFFIX:
                 if item.name == CONTENTS_FILE:
@@ -363,6 +364,21 @@ class PathsCollection:
 
     def get_member(self, identifier: str) -> Any:
         return self[identifier]
+
+    def __contains__(self, identifier: str) -> bool:
+        """
+        Check if the identifier exists in the collection.
+
+        Args:
+            identifier (str): The identifier to check.
+
+        Returns:
+            bool: True if the identifier exists, False otherwise.
+        """
+        try:
+            return self.__getitem__(identifier) is not None
+        except KeyError:
+            return False
 
     def __getitem__(self, identifier: str) -> Any:
         """

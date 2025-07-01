@@ -1,9 +1,10 @@
 """Tests for docstring parsing functionality."""
 
-import pytest
 from pathlib import Path
-from maxx.collection import PathsCollection
 
+import pytest
+
+from maxx.collection import PathsCollection
 
 # Base directory for test files
 TEST_FILES_DIR = Path(__file__).parent / "files"

@@ -3,14 +3,14 @@
 from __future__ import annotations
 
 import textwrap
+import warnings
 from collections import OrderedDict
 from pathlib import Path
-from typing import Any, TYPE_CHECKING
-import warnings
+from typing import TYPE_CHECKING, Any
 
 import charset_normalizer
 import tree_sitter_matlab as tsmatlab
-from tree_sitter import Language, Node, Tree, TreeCursor, Parser, Query, QueryCursor
+from tree_sitter import Language, Node, Parser, Query, QueryCursor, Tree, TreeCursor
 
 from maxx.enums import AccessKind, ArgumentKind
 from maxx.expressions import Expr
@@ -56,7 +56,7 @@ FUNCTION_QUERY = QueryCursor(
         LANGUAGE,
         """(function_definition .
     ("function")
-    (function_output . 
+    (function_output .
         [
             (identifier) @output
             (multioutput_variable .
@@ -74,7 +74,7 @@ FUNCTION_QUERY = QueryCursor(
     (identifier) @name
     (function_arguments .
         [
-            (identifier) @input 
+            (identifier) @input
             _
         ]*
     )?
@@ -104,7 +104,7 @@ ARGUMENTS_QUERY = QueryCursor(
 PROPERTY_QUERY = QueryCursor(
     Query(
         LANGUAGE,
-        """(property . 
+        """(property .
     [
         (identifier) @name
         (property_name
@@ -115,10 +115,10 @@ PROPERTY_QUERY = QueryCursor(
     ]
     (dimensions
         [
-            (number) @dimensions 
+            (number) @dimensions
             (spread_operator) @dimensions
             _
-        ]*                   
+        ]*
     )?
     (identifier)? @type
     (validation_functions)? @validators
@@ -126,7 +126,7 @@ PROPERTY_QUERY = QueryCursor(
         ("=")
         _+ @default
     )?
-    (comment)* @comment              
+    (comment)* @comment
 )""",
     )
 )
@@ -155,7 +155,7 @@ CLASS_QUERY = QueryCursor(
     )?
     (identifier) @name
     (superclasses
-        (property_name) @bases             
+        (property_name) @bases
     )? .
     (comment)* @docstring
     ("\\n")?
@@ -439,14 +439,14 @@ class FileParser(object):
                     # Remove self from first method capture_argument
                     method.arguments._args = method.arguments._args[1:]
                 if method.is_getter and method.name in object.members:
-                    prop = object.members[method.name]  # type: ignore[assignment]
+                    prop = object.members[method.name]
                     if isinstance(prop, Property):
                         prop.getter = method
                     else:
                         # This can be either an error or that it is a getter in an inherited class
                         pass
                 elif method.is_setter and method.name in object.members:
-                    prop = object.members[method.name]  # type: ignore[assignment]
+                    prop = object.members[method.name]
                     if isinstance(prop, Property):
                         prop.setter = method
                     else:

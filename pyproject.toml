@@ -6,7 +6,7 @@ readme = "README.md"
 authors = [
     { name = "Mark Hu", email = "watermarkhu@gmail.com" }
 ]
-license = "GPL-3.0"
+license = {file = "LICENSE"}
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
@@ -36,8 +36,9 @@ dependencies = [
 [dependency-groups]
 dev = [
     "ruff>=0.11.7",
-    "mypy>=1.15.0",
     "pytest>=8.3.5",
+    "ty>=0.0.1a12",
+    "pytest-cov>=6.1.1",
 ]
 reference = [
     "beautifulsoup4>=4.13.3",
@@ -45,7 +46,7 @@ reference = [
 ]
 
 [tool.uv.sources]
-tree-sitter = { git = "https://github.com/tree-sitter/py-tree-sitter",  tag = "master" }
+tree-sitter = { git = "https://github.com/tree-sitter/py-tree-sitter", rev = "c1bd563b330b2c2fe9894beb652bc58ae8613b0c" }
 
 [build-system]
 requires = ["hatchling"]
@@ -65,14 +66,20 @@ target-version = "py310"
 line-length = 100
 indent-width = 4
 
+[tool.ruff.lint]
+select = [
+    "E",  # Python specific errors
+    "W",  # Warnings
+    "F",  # Pyflakes (code complexity)
+    "I",  # isort
+]
+ignore = [
+    "E501",  # Line too long
+]
+
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
-
-[tool.mypy]
-python_version = "3.10"
-packages = ["maxx"]
-plugins = []
 
 [tool.pyright]
 include = ["src"]
