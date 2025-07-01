@@ -46,7 +46,7 @@ reference = [
 ]
 
 [tool.uv.sources]
-tree-sitter = { git = "https://github.com/tree-sitter/py-tree-sitter", branch = "master" }
+tree-sitter = { git = "https://github.com/tree-sitter/py-tree-sitter", rev = "c1bd563b330b2c2fe9894beb652bc58ae8613b0c" }
 
 [build-system]
 requires = ["hatchling"]
@@ -80,11 +80,6 @@ ignore = [
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
-
-[tool.mypy]
-python_version = "3.10"
-packages = ["maxx"]
-plugins = []
 
 [tool.pyright]
 include = ["src"]

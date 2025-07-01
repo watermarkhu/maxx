@@ -375,7 +375,10 @@ class PathsCollection:
         Returns:
             bool: True if the identifier exists, False otherwise.
         """
-        return self.__getitem__(identifier) is not None
+        try:
+            return self.__getitem__(identifier) is not None
+        except KeyError:
+            return False
 
     def __getitem__(self, identifier: str) -> Any:
         """
