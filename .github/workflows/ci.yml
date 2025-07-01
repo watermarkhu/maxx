@@ -1,7 +1,8 @@
 name: CI
 
 on:
-  merge_group:
+  push:
+    branches: [main]
   pull_request:
     types:
       - opened

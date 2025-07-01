@@ -1,6 +1,6 @@
 # maxx
 
-[![CI](https://github.com/watermarkhu/maxx/actions/workflows/ci.yml/badge.svg)](https://github.com/watermarkhu/maxx/actions/workflows/ci.yml)
+[![CI](https://github.com/watermarkhu/maxx/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/watermarkhu/maxx/actions/workflows/ci.yml)
 [![pypi version](https://img.shields.io/pypi/v/maxx.svg)](https://pypi.org/project/maxx/)
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue)](https://www.python.org)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
