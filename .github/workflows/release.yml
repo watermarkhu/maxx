@@ -125,6 +125,9 @@ jobs:
         uv build
         uv publish
 
+    - name: Fetch released tags
+      run: git fetch origin tag ${{ needs.release.outputs.tag }}
+
     - name: Publish package distributions to GitHub Releases
       id: publish-dist
       uses: python-semantic-release/publish-action@v10
