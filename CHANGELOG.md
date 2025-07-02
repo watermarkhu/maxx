@@ -1,6 +1,15 @@
 # CHANGELOG
 
 
+## v0.2.2 (2025-07-02)
+
+### Bug Fixes
+
+- Show type information in arguments if namespace is used
+  ([#12](https://github.com/watermarkhu/maxx/pull/12),
+  [`d0aa656`](https://github.com/watermarkhu/maxx/commit/d0aa656d4055980454f35c00189431c638e22f2a))
+
+
 ## v0.2.1 (2025-07-01)
 
 ### Bug Fixes
