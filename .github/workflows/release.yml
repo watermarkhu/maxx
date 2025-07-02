@@ -66,6 +66,28 @@ jobs:
         github_token: ${{ steps.app-token.outputs.token }}
         no_operation_mode: ${{ !github.event.pull_request.merged }}
 
+    - name: Install the latest version of uv
+      if: steps.semantic-release.outputs.released == 'true' && github.event.pull_request.merged
+      uses: astral-sh/setup-uv@v6
+      with:
+        version: "latest"
+
+    - name: Build and publish package distributions
+      if: steps.semantic-release.outputs.released == 'true' && github.event.pull_request.merged
+      run: |
+        uv sync --no-dev
+        uv build
+        uv publish
+
+    - name: Publish package distributions to GitHub Releases
+      if: steps.semantic-release.outputs.released == 'true' && github.event.pull_request.merged
+      id: publish-dist
+      uses: python-semantic-release/publish-action@v10
+      with:
+        github_token: ${{ github.token }}
+        tag: ${{ steps.semantic-release.outputs.tag }}
+
+
   comment:
     name: Create or update comment
     if: github.event.pull_request.merged == false
@@ -100,36 +122,3 @@ jobs:
         body: |
           Next release: `${{ needs.release.outputs.tag }}`
           <!-- This comment was written by a bot! -->
-
-  deploy: 
-    name: Deploy package distributions
-    needs: release
-    if: needs.release.outputs.released == 'true' && github.event.pull_request.merged
-    runs-on: ubuntu-latest
-    environment: release
-    permissions:
-      contents: write
-      id-token: write
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      with:
-        ref: ${{ needs.release.outputs.tag }}
-
-    - name: Install the latest version of uv
-      uses: astral-sh/setup-uv@v6
-      with:
-        version: "latest"
-
-    - name: Build and publish package distributions
-      run: |
-        uv sync --no-dev
-        uv build
-        uv publish
-
-    - name: Publish package distributions to GitHub Releases
-      id: publish-dist
-      uses: python-semantic-release/publish-action@v10
-      with:
-        github_token: ${{ github.token }}
-        tag: ${{ needs.release.outputs.tag }}

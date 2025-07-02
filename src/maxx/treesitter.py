@@ -120,7 +120,10 @@ PROPERTY_QUERY = QueryCursor(
             _
         ]*
     )?
-    (identifier)? @type
+    [
+        (identifier)
+        (property_name)
+    ]? @type
     (validation_functions)? @validators
     (default_value
         ("=")
