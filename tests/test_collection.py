@@ -89,6 +89,7 @@ class TestPathsCollection:
             "namespace.NamespaceClass",
             "namespace.test_namespace_function",
             "test_function",
+            "plot_axes",
         }
         assert set(members.keys()) == expected_keys
 
@@ -172,3 +173,20 @@ class TestPathsCollection:
         assert classfolder.members["analyze"] is self.paths_collection.get_member(
             "ClassFolder.analyze"
         )
+
+    def test_function_argument_namespace(self):
+        """Test that function arguments with namespaces are properly parsed."""
+        func = self.paths_collection.get_member("plot_axes")
+        assert isinstance(func, Function)
+        assert len(func.arguments) == 1
+
+        arg = func.arguments[0]
+        docstring_sections = arg.docstring.parsed if arg.docstring is not None else []
+        assert len(docstring_sections) == 1
+        assert (
+            docstring_sections[0].value == "adds the gradient to the plot in axes with handle `ax`."
+        )
+        assert arg.name == "ax"
+        assert arg.dimensions == ["1", "1"]
+        assert str(arg.type) == "matlab.graphics.axis.Axes"
+        assert str(arg.default) == "gca"

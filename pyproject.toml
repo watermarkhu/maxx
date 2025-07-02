@@ -39,6 +39,7 @@ dev = [
     "pytest>=8.3.5",
     "ty>=0.0.1a12",
     "pytest-cov>=6.1.1",
+    "pre-commit>=4.2.0",
 ]
 reference = [
     "beautifulsoup4>=4.13.3",
