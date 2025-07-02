@@ -9,6 +9,9 @@
   ([#12](https://github.com/watermarkhu/maxx/pull/12),
   [`d0aa656`](https://github.com/watermarkhu/maxx/commit/d0aa656d4055980454f35c00189431c638e22f2a))
 
+- Use env to release ([#13](https://github.com/watermarkhu/maxx/pull/13),
+  [`38ce50f`](https://github.com/watermarkhu/maxx/commit/38ce50f4accb87dcd2d08820d1aff03d7eb52601))
+
 
 ## v0.2.1 (2025-07-01)
 
