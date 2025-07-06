@@ -1,6 +1,17 @@
 # CHANGELOG
 
 
+## v0.2.3 (2025-07-06)
+
+### Bug Fixes
+
+- Arguments sorting ([#14](https://github.com/watermarkhu/maxx/pull/14),
+  [`d567b35`](https://github.com/watermarkhu/maxx/commit/d567b35c6d786e7153b38d9ade531f1d062d603b))
+
+- Upload dists ([#15](https://github.com/watermarkhu/maxx/pull/15),
+  [`88c223b`](https://github.com/watermarkhu/maxx/commit/88c223bb1cb4651045be46af16ebfabd467449f7))
+
+
 ## v0.2.2 (2025-07-02)
 
 ### Bug Fixes
