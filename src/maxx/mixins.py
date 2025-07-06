@@ -200,18 +200,12 @@ class ObjectAliasMixin(GetMembersMixin, SetMembersMixin, DelMembersMixin):
 
     Attributes:
         all_members: All members (declared and inherited).
-        modules: The module members.
+        folder: The folder members.
+        namespaces: The namespace members.
+        scripts: The script members.
         classes: The class members.
         functions: The function members.
-        attributes: The attribute members.
-        is_private: Whether this object/alias is private (starts with `_`) but not special.
-        is_class_private: Whether this object/alias is class-private (starts with `__` and is a class member).
-        is_special: Whether this object/alias is special ("dunder" attribute/method, starts and end with `__`).
-        is_imported: Whether this object/alias was imported from another module.
-        is_exported: Whether this object/alias is exported (listed in `__all__`).
-        is_wildcard_exposed: Whether this object/alias is exposed to wildcard imports.
-        is_public: Whether this object is considered public.
-        is_deprecated: Whether this object is deprecated.
+        properties: The property members.
     """
 
     @property
@@ -265,3 +259,11 @@ class ObjectAliasMixin(GetMembersMixin, SetMembersMixin, DelMembersMixin):
             for name, member in self.all_members.items()
             if member.kind is Kind.PROPERTY
         }
+
+    @property
+    def is_hidden(self) -> bool:
+        return False
+
+    @property
+    def is_private(self) -> bool:
+        return False

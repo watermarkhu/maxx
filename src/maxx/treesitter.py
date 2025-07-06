@@ -231,6 +231,19 @@ def _dedent(lines: list[str]) -> list[str]:
     return dedented_text.split("\n")
 
 
+def _sort_nodes(nodes: list[Node]) -> list[Node]:
+    """
+    Sort a list of nodes based on their start point.
+
+    Args:
+        nodes: A list of Node objects to be sorted.
+
+    Returns:
+        A new list of Node objects sorted by their start point.
+    """
+    return sorted(nodes, key=lambda node: node.start_point)
+
+
 class FileParser(object):
     """
     A class to parse MATLAB files using Tree-sitter.
@@ -363,7 +376,7 @@ class FileParser(object):
         )
 
         for property_captures in [
-            PROPERTIES_QUERY.captures(node) for node in captures.get("properties", [])
+            PROPERTIES_QUERY.captures(node) for node in _sort_nodes(captures.get("properties", []))
         ]:
             property_kwargs = {key: value for key, value in saved_kwargs.items()}
             attribute_pairs = [
@@ -415,7 +428,7 @@ class FileParser(object):
                 object.members[prop.name] = prop
 
         for method_captures in [
-            METHODS_QUERY.captures(node) for node in captures.get("methods", [])
+            METHODS_QUERY.captures(node) for node in _sort_nodes(captures.get("methods", []))
         ]:
             method_kwargs = {key: value for key, value in saved_kwargs.items()}
             attribute_pairs = [
@@ -547,10 +560,8 @@ class FileParser(object):
             is_input = attributes is None or "Input" in attributes or "Output" not in attributes
             # is_repeating = "Repeating" in attributes
 
-            captures_argument = {
-                node: PROPERTY_QUERY.captures(node) for node in capture_arguments["arguments"]
-            }
-            for argument_node, capture_argument in captures_argument.items():
+            for argument_node in _sort_nodes(capture_arguments["arguments"]):
+                capture_argument = PROPERTY_QUERY.captures(argument_node)
                 arg_name = self._first_from_capture(capture_argument, "name")
 
                 if "options" in capture_argument:
