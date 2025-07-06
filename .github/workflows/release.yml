@@ -113,6 +113,8 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
+      with:
+        ref: ${{ needs.release.outputs.tag }}
 
     - name: Install the latest version of uv
       uses: astral-sh/setup-uv@v6
@@ -125,12 +127,11 @@ jobs:
         uv build
         uv publish
 
-    - name: Fetch released tags
-      run: git fetch origin tag ${{ needs.release.outputs.tag }}
-
     - name: Publish package distributions to GitHub Releases
       id: publish-dist
-      uses: python-semantic-release/publish-action@v10
+      uses: softprops/action-gh-release@v2
       with:
-        github_token: ${{ github.token }}
-        tag: ${{ needs.release.outputs.tag }}
+        tag_name: ${{ needs.release.outputs.tag }}
+        files: |
+          dist/*.whl
+          dist/*.tar.gz
