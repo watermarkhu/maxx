@@ -28,7 +28,7 @@ requires-python = ">=3.10"
 dependencies = [
     "charset-normalizer~=3.4",
     "griffe~=1.7.2",
-    "tree-sitter~=0.24",
+    "tree-sitter-language-version-15~=0.25.0",,
     "tree-sitter-matlab~=1.0",
     "typing-extensions>=4.0; python_version < '3.11'",
 ]
@@ -45,9 +45,6 @@ reference = [
     "beautifulsoup4>=4.13.3",
     "playwright>=1.51.0",
 ]
-
-[tool.uv.sources]
-tree-sitter = { git = "https://github.com/tree-sitter/py-tree-sitter", rev = "c1bd563b330b2c2fe9894beb652bc58ae8613b0c" }
 
 [build-system]
 requires = ["hatchling"]
