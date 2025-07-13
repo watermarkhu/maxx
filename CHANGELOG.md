@@ -1,6 +1,15 @@
 # CHANGELOG
 
 
+## v0.2.4 (2025-07-13)
+
+### Bug Fixes
+
+- Use mirror release of py-tree-sitter that supports language version 15
+  ([#16](https://github.com/watermarkhu/maxx/pull/16),
+  [`23f1562`](https://github.com/watermarkhu/maxx/commit/23f15629f30e0463e2bf0e16e4bde0cb760f42d6))
+
+
 ## v0.2.3 (2025-07-06)
 
 ### Bug Fixes
