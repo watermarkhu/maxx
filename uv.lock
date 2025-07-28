@@ -246,14 +246,14 @@ wheels = [
 
 [[package]]
 name = "griffe"
-version = "1.7.3"
+version = "1.9.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "colorama" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/a9/3e/5aa9a61f7c3c47b0b52a1d930302992229d191bf4bc76447b324b731510a/griffe-1.7.3.tar.gz", hash = "sha256:52ee893c6a3a968b639ace8015bec9d36594961e156e23315c8e8e51401fa50b", size = 395137, upload-time = "2025-04-23T11:29:09.147Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/2d/42/486d21a6c33ff69a7381511d507b6db7a7b7f4d5bec3279bc0dc45c658a9/griffe-1.9.0.tar.gz", hash = "sha256:b5531cf45e9b73f0842c2121cc4d4bcbb98a55475e191fc9830e7aef87a920a0", size = 409341, upload-time = "2025-07-28T17:45:38.712Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/58/c6/5c20af38c2a57c15d87f7f38bee77d63c1d2a3689f74fefaf35915dd12b2/griffe-1.7.3-py3-none-any.whl", hash = "sha256:c6b3ee30c2f0f17f30bcdef5068d6ab7a2a4f1b8bf1a3e74b56fffd21e1c5f75", size = 129303, upload-time = "2025-04-23T11:29:07.145Z" },
+    { url = "https://files.pythonhosted.org/packages/e6/65/7b3fcef8c9fb6d1023484d9caf87e78450a5c9cd1e191ce9632990b65284/griffe-1.9.0-py3-none-any.whl", hash = "sha256:bcf90ee3ad42bbae70a2a490c782fc8e443de9b84aa089d857c278a4e23215fc", size = 137060, upload-time = "2025-07-28T17:45:36.973Z" },
 ]
 
 [[package]]
@@ -276,12 +276,12 @@ wheels = [
 
 [[package]]
 name = "maxx"
-version = "0.2.1"
+version = "0.2.4"
 source = { editable = "." }
 dependencies = [
     { name = "charset-normalizer" },
     { name = "griffe" },
-    { name = "tree-sitter" },
+    { name = "tree-sitter-language-version-15" },
     { name = "tree-sitter-matlab" },
     { name = "typing-extensions", marker = "python_full_version < '3.11'" },
 ]
@@ -302,8 +302,8 @@ reference = [
 [package.metadata]
 requires-dist = [
     { name = "charset-normalizer", specifier = "~=3.4" },
-    { name = "griffe", specifier = "~=1.7.2" },
-    { name = "tree-sitter", git = "https://github.com/tree-sitter/py-tree-sitter?rev=c1bd563b330b2c2fe9894beb652bc58ae8613b0c" },
+    { name = "griffe", specifier = "~=1.9.0" },
+    { name = "tree-sitter-language-version-15", specifier = "~=0.25.0" },
     { name = "tree-sitter-matlab", specifier = "~=1.0" },
     { name = "typing-extensions", marker = "python_full_version < '3.11'", specifier = ">=4.0" },
 ]
@@ -563,9 +563,17 @@ wheels = [
 ]
 
 [[package]]
-name = "tree-sitter"
-version = "0.24.0"
-source = { git = "https://github.com/tree-sitter/py-tree-sitter?rev=c1bd563b330b2c2fe9894beb652bc58ae8613b0c#c1bd563b330b2c2fe9894beb652bc58ae8613b0c" }
+name = "tree-sitter-language-version-15"
+version = "0.25.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/bc/5f/f014dcefb102e285bd2b21d4b7191508b9dfa35f1189dfebaa0fe3e68dee/tree_sitter_language_version_15-0.25.0.tar.gz", hash = "sha256:be8e42bcc4b986d498d122453111c2c73d85fc446f309429e3609dd3ad96834a", size = 187619, upload-time = "2025-07-13T11:41:48.615Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a3/98/f1c3ed504207ab421920fb565bbafe35002c4403eeb660800f0d87f16db0/tree_sitter_language_version_15-0.25.0-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:9927abecaa2da126a20cb79008fc853dbbebb341d2147955924109638e652b06", size = 563585, upload-time = "2025-07-13T11:41:43.444Z" },
+    { url = "https://files.pythonhosted.org/packages/61/94/d7e2e69eb9d0f2619ab061f681433df816fe0e53e63eed01caac28010039/tree_sitter_language_version_15-0.25.0-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:5bdcbc7714b282c1b287675a1be881b2e3429e6431af86ea8a64b5a3777a46ec", size = 577873, upload-time = "2025-07-13T11:41:44.593Z" },
+    { url = "https://files.pythonhosted.org/packages/30/3b/c9fd35bb3e6c2f46eabd8fb6f2c65250de9c83ba4f6d6104f03d09a2d4fa/tree_sitter_language_version_15-0.25.0-cp313-cp313-macosx_10_13_universal2.whl", hash = "sha256:f0b4f683c10b3deab113a322e294153825be76163547d28dcef3464082d1f45c", size = 277688, upload-time = "2025-07-13T11:41:45.867Z" },
+    { url = "https://files.pythonhosted.org/packages/d8/cd/2458c0cbb690eb8fcc2c8f24b9a602a809b652b91bbf32912cdc70ba978a/tree_sitter_language_version_15-0.25.0-cp313-cp313-macosx_14_0_arm64.whl", hash = "sha256:aa2d67b69a86ec841964ca7194a9cd3cbb1c2bae706598ca228af184b9601c8b", size = 139786, upload-time = "2025-07-13T11:41:46.725Z" },
+    { url = "https://files.pythonhosted.org/packages/9a/6d/4b104fd6ab0a82747bcee1306144408abad61592f08b7199c8cdfaa68d2c/tree_sitter_language_version_15-0.25.0-cp313-cp313-win_amd64.whl", hash = "sha256:91f327711bd8e8ada61baea127c0d8a352c553806330d3525a7ffbe32f99b797", size = 126933, upload-time = "2025-07-13T11:41:47.563Z" },
+]
 
 [[package]]
 name = "tree-sitter-matlab"
