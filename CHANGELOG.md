@@ -1,6 +1,15 @@
 # CHANGELOG
 
 
+## v0.2.6 (2025-08-06)
+
+### Bug Fixes
+
+- **deps**: Update dependency griffe to ~=1.10.0
+  ([#19](https://github.com/watermarkhu/maxx/pull/19),
+  [`f562697`](https://github.com/watermarkhu/maxx/commit/f562697093565ce5630adc94b5fe324d11f6bb34))
+
+
 ## v0.2.5 (2025-07-29)
 
 ### Bug Fixes
