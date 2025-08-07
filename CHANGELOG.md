@@ -1,6 +1,15 @@
 # CHANGELOG
 
 
+## v0.2.8 (2025-08-07)
+
+### Chores
+
+- **deps**: Update actions/download-artifact action to v5
+  ([#18](https://github.com/watermarkhu/maxx/pull/18),
+  [`1d6a0da`](https://github.com/watermarkhu/maxx/commit/1d6a0da2e0f864b3306e9437e018403804e29c75))
+
+
 ## v0.2.7 (2025-08-07)
 
 ### Bug Fixes
