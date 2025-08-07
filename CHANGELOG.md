@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.2.7 (2025-08-07)
+
+### Bug Fixes
+
+- Use official tree-sitter release ([#20](https://github.com/watermarkhu/maxx/pull/20),
+  [`0be3cd2`](https://github.com/watermarkhu/maxx/commit/0be3cd2bd5d57fdb37faffb2ec8d29b8ce9e8329))
+
+
 ## v0.2.6 (2025-08-06)
 
 ### Bug Fixes
