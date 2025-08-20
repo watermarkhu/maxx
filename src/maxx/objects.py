@@ -6,7 +6,7 @@ from pathlib import Path
 from textwrap import dedent
 from typing import TYPE_CHECKING, Any, Callable, Sequence, cast
 
-from _griffe.c3linear import c3linear_merge
+from griffe._internal.c3linear import c3linear_merge
 from griffe import Docstring
 from tree_sitter import Node
 
