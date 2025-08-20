@@ -29,7 +29,7 @@ dependencies = [
     "charset-normalizer~=3.4",
     "griffe~=1.12.1",
     "tree-sitter~=0.25.1",
-    "tree-sitter-matlab~=1.0",
+    "tree-sitter-matlab~=1.0.10",
     "typing-extensions>=4.0; python_version < '3.11'",
 ]
 
@@ -37,9 +37,9 @@ dependencies = [
 dev = [
     "ruff>=0.11.7",
     "pytest>=8.3.5",
-    "ty>=0.0.1a12",
     "pytest-cov>=6.1.1",
     "pre-commit>=4.2.0",
+    "ty>=0.0.1a19",
 ]
 reference = [
     "beautifulsoup4>=4.13.3",
