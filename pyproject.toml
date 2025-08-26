@@ -27,7 +27,7 @@ classifiers = [
 requires-python = ">=3.10"
 dependencies = [
     "charset-normalizer~=3.4",
-    "griffe~=1.12.1",
+    "griffe~=1.13.0",
     "tree-sitter~=0.25.1",
     "tree-sitter-matlab~=1.0.10",
     "typing-extensions>=4.0; python_version < '3.11'",
