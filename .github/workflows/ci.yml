@@ -62,7 +62,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        uv sync --all-groups --python ${{ matrix.python-version }}
+        uv sync --dev --python ${{ matrix.python-version }}
 
     - name: Run ruff linting
       run: |
@@ -115,6 +115,44 @@ jobs:
       with:
         name: Test Results (Python ${{ matrix.python-version }})
         path: pytest.xml
+
+  matlab:
+    name: Verify path collection with MATLAB
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Set up MATLAB
+        uses: matlab-actions/setup-matlab@v2
+        with:
+          release: R2025a
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: "latest"
+
+      - name: Install dependencies
+        run: |
+          uv sync --all-groups
+
+      - name: Run tests
+        run: |
+          if uv run pytest tests/test_matlab_path.py --tb=short -v --junit-xml=pytest.xml; then
+            echo '# ✅ Tests passed' >> $GITHUB_STEP_SUMMARY
+          else
+            echo '# ❌ Tests failed' >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+
+      - name: Upload Test Results
+        if: (!cancelled())
+        uses: actions/upload-artifact@v4
+        with:
+          name: Test Results (MATLAB path regression)
+          path: pytest.xml
 
   summary:
     runs-on: ubuntu-latest
