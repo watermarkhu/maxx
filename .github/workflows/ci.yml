@@ -129,12 +129,6 @@ jobs:
         with:
           release: R2025a # This version is tied to the version of matlabengine in pyproject.toml
 
-      - name: Set LD_LIBRARY_PATH for MATLAB # Required for setting up matlabengine
-        run: |
-          MATLABROOT=$(matlab -batch "disp(matlabroot)" | tail -n 1)
-          export LD_LIBRARY_PATH="$MATLABROOT/bin/glnxa64:$LD_LIBRARY_PATH"
-          echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH" >> $GITHUB_ENV
-
       - name: Set up uv
         uses: astral-sh/setup-uv@v6
         with:
@@ -145,20 +139,17 @@ jobs:
           uv sync --all-groups
 
       - name: Run tests
-        run: |
-          if uv run pytest tests/test_matlab_path.py --tb=short -v --junit-xml=pytest.xml; then
-            echo '# ✅ Tests passed' >> $GITHUB_STEP_SUMMARY
-          else
-            echo '# ❌ Tests failed' >> $GITHUB_STEP_SUMMARY
-            exit 1
-          fi
+        uses: matlab-actions/run-tests@v2
+        with:
+          source-folder: tests
+          test-results-junit: matlab.xml
 
       - name: Upload Test Results
         if: (!cancelled())
         uses: actions/upload-artifact@v4
         with:
           name: Test Results (MATLAB path regression)
-          path: pytest.xml
+          path: matlab.xml
 
   summary:
     runs-on: ubuntu-latest
