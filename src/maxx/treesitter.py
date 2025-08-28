@@ -19,6 +19,7 @@ from maxx.objects import (
     Arguments,
     Class,
     Docstring,
+    Enumeration,
     Function,
     Property,
     Script,
@@ -180,8 +181,10 @@ METHODS_QUERY = QueryCursor(
     (attributes
         (attribute) @attributes
     )? .
-    ("\\n")? .
-    (function_definition)* @methods
+    (
+        ("\\n")* .
+        (function_definition)* @methods
+    )*
 )""",
     )
 )
@@ -193,8 +196,31 @@ PROPERTIES_QUERY = QueryCursor(
     (attributes
         (attribute) @attributes
     )? .
-    ("\\n")? .
-    (property)* @properties
+    (
+        ("\\n")* .
+        (property)* @properties
+    )*
+)""",
+    )
+)
+
+ENUMERATIONS_QUERY = QueryCursor(
+    Query(
+        LANGUAGE,
+        """("enumeration" .
+    (
+        ("\\n")* .
+        (enum
+            (identifier) @content
+            (
+                ("(")
+                (_)+ @content
+                (")")
+            )?
+        ) .
+        ("\\n")* .
+        (comment)* @content
+    )*
 )""",
     )
 )
@@ -375,12 +401,43 @@ class FileParser(object):
             **kwargs,
         )
 
+        def add_enum(identifier, comment_nodes, value_nodes):
+            docstring = (
+                self._comment_docstring(comment_nodes, parent=object) if comment_nodes else None
+            )
+            value = Expr(value_nodes, self.encoding) if value_nodes else None
+            enumeration = Enumeration(identifier, docstring=docstring, parent=object, value=value)
+            object.members[enumeration.name] = enumeration
+
+        for enumeration_captures in [
+            ENUMERATIONS_QUERY.captures(n) for n in _sort_nodes(captures.get("enumeration", []))
+        ]:
+            identifier: str = ""
+            comment_nodes: list[Node] = []
+            value_nodes: list[Node] = []
+
+            for n in _sort_nodes(enumeration_captures["content"]):
+                match n.type:
+                    case "identifier":
+                        if identifier:
+                            add_enum(identifier, comment_nodes, value_nodes)
+                        identifier: str = self._decode(n)
+                        comment_nodes = []
+                        value_nodes = []
+                    case "comment":
+                        comment_nodes.append(n)
+                    case _:
+                        value_nodes.append(n)
+            else:
+                if identifier:
+                    add_enum(identifier, comment_nodes, value_nodes)
+
         for property_captures in [
-            PROPERTIES_QUERY.captures(node) for node in _sort_nodes(captures.get("properties", []))
+            PROPERTIES_QUERY.captures(n) for n in _sort_nodes(captures.get("properties", []))
         ]:
             property_kwargs = {key: value for key, value in saved_kwargs.items()}
             attribute_pairs = [
-                self._parse_attribute(node) for node in property_captures.get("attributes", [])
+                self._parse_attribute(n) for n in property_captures.get("attributes", [])
             ]
             for key, value in attribute_pairs:
                 if key in [
@@ -428,11 +485,11 @@ class FileParser(object):
                 object.members[prop.name] = prop
 
         for method_captures in [
-            METHODS_QUERY.captures(node) for node in _sort_nodes(captures.get("methods", []))
+            METHODS_QUERY.captures(n) for n in _sort_nodes(captures.get("methods", []))
         ]:
             method_kwargs = {key: value for key, value in saved_kwargs.items()}
             attribute_pairs = [
-                self._parse_attribute(node) for node in method_captures.get("attributes", [])
+                self._parse_attribute(n) for n in method_captures.get("attributes", [])
             ]
             for key, value in attribute_pairs:
                 if key in [
@@ -689,7 +746,7 @@ class FileParser(object):
                     for line in lines
                 ]
             )
-        else:
+        elif isinstance(nodes, Node):
             lineno = nodes.range.start_point.row + 1
             endlineno = nodes.range.end_point.row + 1
             lines = iter(self._decode(nodes).splitlines())

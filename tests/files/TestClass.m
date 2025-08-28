@@ -1,4 +1,4 @@
-classdef TestClass < handle
+classdef TestClass < handle & int16
 % Test class for MATLAB parser
 % This class is used to test the FileParser functionality.
 %
@@ -10,6 +10,13 @@ classdef TestClass < handle
 %   method1 - The first method
 %   method2 - The second method (private)
 %   method3 - The third method
+    enumeration
+        foo (0) % foo
+        bar (42)
+            % bar
+        baz (69)
+    end
+
     properties
         Property1 double = 0
         Property2 string = ""

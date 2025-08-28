@@ -840,6 +840,34 @@ class Class(PathMixin, Object):
         return inherited_members
 
 
+class Enumeration(PathMixin, Object):
+    """This class represents a MATLAB enumeration."""
+
+    kind: Kind = Kind.ENUMERATION
+
+    def __init__(
+        self,
+        *args: Any,
+        value: Expr | None = None,
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(*args, **kwargs)
+        self.value: Expr | None = value
+        """The enumeration superclass value"""
+
+    @property
+    def has_docstring(self) -> bool:
+        """Whether this object has a docstring (empty or not)."""
+        return bool(self.docstring)
+
+    def __str__(self) -> str:
+        return f"{self.parent.name}.{self.name}" if self.parent else self.name
+
+    def __eq__(self, value: Enumeration) -> bool:
+        """Arguments are equal if all their attributes except `docstring` and `function` are equal."""
+        return self.name == value.name and self.parent == value.parent
+
+
 class Function(PathMixin, Object):
     """The class representing a MATLAB function."""
 
