@@ -35,6 +35,12 @@ classdef TestMatlabPath < matlab.unittest.TestCase
             % Example test: verify that 1+1 equals 2
             path_matlab = which(call);
             testCase.verifyNotEmpty(path_matlab, sprintf('Failed to find %s in MATLAB path', call));
+            if contains(path_matlab, '@')
+                parts = strsplit(path_matlab, filesep);
+                if strcmp(parts{end}(2:end), parts{end-1}(2:end))
+                    path_matlab = strjoin(parts(1:end-1), filesep);
+                end
+            end
             try
                 path_python = char(py.str(testCase.collection.get_path(call)));
             catch
