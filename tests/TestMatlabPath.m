@@ -4,7 +4,7 @@ classdef TestMatlabPath < matlab.unittest.TestCase
         collection
     end
 
-    methods (MyClassSetup)
+    methods (TestClassSetup)
         function setup_pyenv(MyClass)
             [status, pythonpath] = system("uv python find");
             if status ~= 0
