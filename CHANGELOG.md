@@ -1,6 +1,20 @@
 # CHANGELOG
 
 
+## v0.3.0 (2025-08-28)
+
+### Chores
+
+- **deps**: Update dependency tree-sitter-matlab to ~=1.2.0
+  ([#23](https://github.com/watermarkhu/maxx/pull/23),
+  [`aef4648`](https://github.com/watermarkhu/maxx/commit/aef4648603ba1f45e78cd7274a5f502785dde765))
+
+### Features
+
+- Add support for enumerations ([#23](https://github.com/watermarkhu/maxx/pull/23),
+  [`aef4648`](https://github.com/watermarkhu/maxx/commit/aef4648603ba1f45e78cd7274a5f502785dde765))
+
+
 ## v0.2.10 (2025-08-26)
 
 ### Chores
