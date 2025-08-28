@@ -127,7 +127,13 @@ jobs:
       - name: Set up MATLAB
         uses: matlab-actions/setup-matlab@v2
         with:
-          release: R2025a
+          release: R2025a # This version is tied to the version of matlabengine in pyproject.toml
+
+      - name: Set LD_LIBRARY_PATH for MATLAB # Required for setting up matlabengine
+        run: |
+          MATLABROOT=$(matlab -batch "disp(matlabroot)" | tail -n 1)
+          export LD_LIBRARY_PATH="$MATLABROOT/bin/glnxa64:$LD_LIBRARY_PATH"
+          echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH" >> $GITHUB_ENV
 
       - name: Set up uv
         uses: astral-sh/setup-uv@v6
