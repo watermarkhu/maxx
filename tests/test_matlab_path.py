@@ -5,7 +5,7 @@ import pytest
 from maxx.collection import PathsCollection
 
 try:
-    import matlab.engine
+    import matlab.engine  # ty: ignore[unresolved-import]
 except ImportError:
     pytest.skip("matlab.engine not available", allow_module_level=True)
 
