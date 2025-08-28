@@ -36,11 +36,7 @@ classdef TestMatlabPath < matlab.unittest.TestCase
             path_matlab = which(call);
             testCase.verifyNotEmpty(path_matlab, sprintf('Failed to find %s in MATLAB path', call));
             try
-                deque = testCase.collection.get_path(call);
-                deque
-                list = py.list(deque);
-                list
-                path_python = char(py.str(list(0)));
+                path_python = char(py.str(testCase.collection.get_path(call)));
             catch
                 error('Failed to find %s in Python path', call);
             end

@@ -82,6 +82,7 @@ class TestPathsCollection:
         members = self.paths_collection.members
         expected_keys = {
             "MyClass",
+            "MyEnum",
             "ClassFolder",
             "ClassFolder.analyze",
             "my_script",
