@@ -4,25 +4,26 @@ classdef TestMatlabPath < matlab.unittest.TestCase
         collection
     end
 
-    methods (TestClassSetup)
-        function setup_pyenv(testClass)
+    methods (MyClassSetup)
+        function setup_pyenv(MyClass)
             [status, pythonpath] = system("uv python find");
             if status ~= 0
                 error("python:failedToFindPython", ...
                     "Failed to find Python in %s", projectpath);
             end
             pyenv('Version', strtrim(pythonpath), 'ExecutionMode', 'InProcess');
-            path = fullfile(fileparts(mfilename('fullpath')), 'files');
-            testClass.collection = py.maxx.collection.PathsCollection({path}, recursive=true);
+            test_path = fullfile(fileparts(mfilename('fullpath')), 'files');
+            addpath(genpath(test_path))
+            MyClass.collection = py.maxx.collection.PathsCollection({test_path}, recursive=true);
         end
     end
 
     properties (TestParameter)
         call = {
-            'TestClass',
+            'MyClass',
             'test_function',
             'plot_axes',
-            'test_script',
+            'my_script',
             'ClassFolder',
             'namespace.NamespaceClass',
             'namespace.test_namespace_function',
@@ -35,7 +36,7 @@ classdef TestMatlabPath < matlab.unittest.TestCase
             path_matlab = which(call);
             testCase.verifyNotEmpty(path_matlab, sprintf('Failed to find %s in MATLAB path', call));
             try
-                deque = testCase.collection._mapping.get(call);
+                deque = testCase.collection.get_path(call);
                 list = py.list(deque);
                 path_python = char(py.str(list(0)));
             catch

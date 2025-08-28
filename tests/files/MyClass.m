@@ -1,4 +1,4 @@
-classdef TestClass < handle & int16
+classdef MyClass < handle & int16
 % Test class for MATLAB parser
 % This class is used to test the FileParser functionality.
 %
@@ -23,8 +23,8 @@ classdef TestClass < handle & int16
     end
     
     methods
-        function obj = TestClass(init_val)
-            % TestClass constructor
+        function obj = MyClass(init_val)
+            % MyClass constructor
             % Initialize the class properties
             
             arguments

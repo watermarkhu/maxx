@@ -365,6 +365,12 @@ class PathsCollection:
     def get_member(self, identifier: str) -> Any:
         return self[identifier]
 
+    def get_path(self, identifier: str) -> Path | None:
+        if identifier in self._mapping:
+            return self._mapping[identifier][0]
+        else:
+            return None
+
     def __contains__(self, identifier: str) -> bool:
         """
         Check if the identifier exists in the collection.

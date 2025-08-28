@@ -7,20 +7,20 @@ from maxx.objects import Class, Enumeration, Function, Script
 from maxx.treesitter import FileParser
 
 
-class TestClassParser:
+class MyClassParser:
     """Test class for parsing MATLAB class files."""
 
     @pytest.fixture(autouse=True)
     def setup(self, test_files_dir):
-        """Set up the test by parsing the TestClass.m file."""
-        class_file = test_files_dir / "TestClass.m"
+        """Set up the test by parsing the MyClass.m file."""
+        class_file = test_files_dir / "MyClass.m"
         parser = FileParser(class_file)
         self.model = parser.parse()
 
     def test_class_basic_properties(self):
         """Test basic class properties were parsed correctly."""
         assert isinstance(self.model, Class)
-        assert self.model.name == "TestClass"
+        assert self.model.name == "MyClass"
 
         # Verify docstring was parsed
         assert self.model.docstring is not None
@@ -97,7 +97,7 @@ class TestClassParser:
 
         # Check constructor docstring
         assert constructor.docstring is not None
-        assert "TestClass constructor" in constructor.docstring.value
+        assert "MyClass constructor" in constructor.docstring.value
         assert "Initialize the class properties" in constructor.docstring.value
 
     def test_method1(self):
@@ -311,13 +311,13 @@ def test_parse_function(test_files_dir):
 
 def test_parse_script(test_files_dir):
     """Test parsing a MATLAB script file."""
-    script_file = test_files_dir / "test_script.m"
+    script_file = test_files_dir / "my_script.m"
     parser = FileParser(script_file)
     model = parser.parse()
 
     # Verify the model is a Script
     assert isinstance(model, Script)
-    assert model.name == "test_script"
+    assert model.name == "my_script"
 
     # Verify docstring was parsed
     assert model.docstring is not None

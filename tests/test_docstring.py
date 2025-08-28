@@ -20,39 +20,39 @@ class TestDocstringParsing:
             [test_files_dir], recursive=True, working_directory=TEST_FILES_DIR
         )
 
-    def test_testclass_docstring(self):
-        """Test that TestClass docstring is properly parsed."""
-        testclass = self.paths_collection.get_member("TestClass")
-        assert testclass.has_docstring
-        assert "Test class for MATLAB parser" in testclass.docstring.value
+    def test_MyClass_docstring(self):
+        """Test that MyClass docstring is properly parsed."""
+        MyClass = self.paths_collection.get_member("MyClass")
+        assert MyClass.has_docstring
+        assert "Test class for MATLAB parser" in MyClass.docstring.value
         assert (
-            "This class is used to test the FileParser functionality" in testclass.docstring.value
+            "This class is used to test the FileParser functionality" in MyClass.docstring.value
         )
-        assert "Properties:" in testclass.docstring.value
-        assert "Methods:" in testclass.docstring.value
+        assert "Properties:" in MyClass.docstring.value
+        assert "Methods:" in MyClass.docstring.value
 
-    def test_testclass_method1_docstring(self):
-        """Test that TestClass.method1 docstring is properly parsed."""
-        testclass = self.paths_collection.get_member("TestClass")
-        method1 = testclass.members.get("method1")
+    def test_MyClass_method1_docstring(self):
+        """Test that MyClass.method1 docstring is properly parsed."""
+        MyClass = self.paths_collection.get_member("MyClass")
+        method1 = MyClass.members.get("method1")
         assert method1 is not None
         assert method1.has_docstring
         assert "First test method" in method1.docstring.value
         assert "This method demonstrates parsing of a class method" in method1.docstring.value
 
-    def test_testclass_method2_docstring(self):
-        """Test that TestClass.method2 docstring is properly parsed."""
-        testclass = self.paths_collection.get_member("TestClass")
-        method2 = testclass.members.get("method2")
+    def test_MyClass_method2_docstring(self):
+        """Test that MyClass.method2 docstring is properly parsed."""
+        MyClass = self.paths_collection.get_member("MyClass")
+        method2 = MyClass.members.get("method2")
         assert method2 is not None
         assert method2.has_docstring
         assert "Second test method (private)" in method2.docstring.value
         assert "This method demonstrates a void method with options" in method2.docstring.value
 
-    def test_testclass_method3_docstring(self):
-        """Test that TestClass.method3 docstring is properly parsed."""
-        testclass = self.paths_collection.get_member("TestClass")
-        method3 = testclass.members.get("method3")
+    def test_MyClass_method3_docstring(self):
+        """Test that MyClass.method3 docstring is properly parsed."""
+        MyClass = self.paths_collection.get_member("MyClass")
+        method3 = MyClass.members.get("method3")
         assert method3 is not None
         assert method3.has_docstring
         assert "Third test method" in method3.docstring.value
@@ -96,14 +96,14 @@ class TestDocstringParsing:
             in test_function.docstring.value
         )
 
-    def test_test_script_docstring(self):
-        """Test that test_script docstring is properly parsed."""
-        test_script = self.paths_collection.get_member("test_script")
-        assert test_script.has_docstring
-        assert "Test script for MATLAB parser" in test_script.docstring.value
+    def test_my_script_docstring(self):
+        """Test that my_script docstring is properly parsed."""
+        my_script = self.paths_collection.get_member("my_script")
+        assert my_script.has_docstring
+        assert "Test script for MATLAB parser" in my_script.docstring.value
         assert (
             "This script is used to test the FileParser functionality"
-            in test_script.docstring.value
+            in my_script.docstring.value
         )
 
     def test_namespace_class_docstring(self):
@@ -186,9 +186,9 @@ class TestDocstringParsing:
 
     def test_docstring_line_numbers(self):
         """Test that docstring line numbers are correctly captured."""
-        testclass = self.paths_collection.get_member("TestClass")
-        assert testclass.docstring.lineno > 0
-        assert testclass.docstring.endlineno >= testclass.docstring.lineno
+        MyClass = self.paths_collection.get_member("MyClass")
+        assert MyClass.docstring.lineno > 0
+        assert MyClass.docstring.endlineno >= MyClass.docstring.lineno
 
         test_function = self.paths_collection.get_member("test_function")
         assert test_function.docstring.lineno > 0

@@ -22,12 +22,12 @@ class TestPathsCollection:
         )
         # Verify the collection has loaded our test files
 
-    def test_testclass_collection(self):
-        """Test that TestClass is properly collected."""
-        testclass = self.paths_collection.get_member("TestClass")
-        assert isinstance(testclass, Class)
-        assert testclass.name == "TestClass"
-        assert testclass.filepath.name == "TestClass.m"
+    def test_MyClass_collection(self):
+        """Test that MyClass is properly collected."""
+        MyClass = self.paths_collection.get_member("MyClass")
+        assert isinstance(MyClass, Class)
+        assert MyClass.name == "MyClass"
+        assert MyClass.filepath.name == "MyClass.m"
 
     def test_classfolder_collection(self):
         """Test that ClassFolder is properly collected."""
@@ -43,12 +43,12 @@ class TestPathsCollection:
         assert analyze_method.name == "analyze"
         assert analyze_method.filepath.name == "analyze.m"
 
-    def test_script_collection(self):
-        """Test that test_script is properly collected."""
-        test_script = self.paths_collection.get_member("test_script")
-        assert isinstance(test_script, Script)
-        assert test_script.name == "test_script"
-        assert test_script.filepath.name == "test_script.m"
+    def my_script_collection(self):
+        """Test that my_script is properly collected."""
+        my_script = self.paths_collection.get_member("my_script")
+        assert isinstance(my_script, Script)
+        assert my_script.name == "my_script"
+        assert my_script.filepath.name == "my_script.m"
 
     def test_namespace_collection(self):
         """Test that namespace is properly collected."""
@@ -81,10 +81,10 @@ class TestPathsCollection:
         """Test that the members property returns all collected objects."""
         members = self.paths_collection.members
         expected_keys = {
-            "TestClass",
+            "MyClass",
             "ClassFolder",
             "ClassFolder.analyze",
-            "test_script",
+            "my_script",
             "+namespace",
             "namespace.NamespaceClass",
             "namespace.test_namespace_function",
@@ -95,9 +95,9 @@ class TestPathsCollection:
 
     def test_getitem_access(self):
         """Test that objects can be accessed using [] syntax."""
-        testclass = self.paths_collection["TestClass"]
-        assert isinstance(testclass, Class)
-        assert testclass.name == "TestClass"
+        MyClass = self.paths_collection["MyClass"]
+        assert isinstance(MyClass, Class)
+        assert MyClass.name == "MyClass"
 
     def test_nonexistent_member(self):
         """Test accessing a non-existent member returns None."""
