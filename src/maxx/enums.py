@@ -17,6 +17,8 @@ class Kind(str, Enum):
     """namespaces"""
     CLASS = "class"
     """Classes."""
+    ENUMERATION = "class"
+    """Class enumeration"""
     FUNCTION = "function"
     """Functions and methods."""
     SCRIPT = "script"

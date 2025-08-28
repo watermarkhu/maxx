@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Any, Sequence
 from maxx.enums import Kind
 
 if TYPE_CHECKING:
-    from maxx.objects import Class, Folder, Function, Namespace, Property, Script
+    from maxx.objects import Class, Enumeration, Folder, Function, Namespace, Property, Script
 
 
 def _get_parts(key: str | Sequence[str]) -> Sequence[str]:
@@ -258,6 +258,14 @@ class ObjectAliasMixin(GetMembersMixin, SetMembersMixin, DelMembersMixin):
             name: member
             for name, member in self.all_members.items()
             if member.kind is Kind.PROPERTY
+        }
+
+    @property
+    def enumerations(self) -> "dict[str, Enumeration]":
+        return {
+            name: member
+            for name, member in self.all_members.items()
+            if member.kind is Kind.ENUMERATION
         }
 
     @property

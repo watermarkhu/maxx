@@ -3,7 +3,7 @@
 import pytest
 
 from maxx.enums import AccessKind, ArgumentKind
-from maxx.objects import Class, Function, Script
+from maxx.objects import Class, Enumeration, Function, Script
 from maxx.treesitter import FileParser
 
 
@@ -31,9 +31,29 @@ class TestClassParser:
         assert "Properties:" in self.model.docstring.value
         assert "Methods:" in self.model.docstring.value
 
+    def test_class_enumeration(self):
+        """Test that class enumerations were parsed correctly."""
+        assert "foo" in self.model.members
+        assert "bar" in self.model.members
+        assert "baz" in self.model.members
+
+        assert isinstance(self.model.members["foo"], Enumeration)
+        assert isinstance(self.model.members["bar"], Enumeration)
+        assert isinstance(self.model.members["baz"], Enumeration)
+
+        assert str(self.model.members["foo"].value) == "0"
+        assert str(self.model.members["bar"].value) == "42"
+        assert str(self.model.members["baz"].value) == "69"
+
+        assert self.model.members["foo"].docstring is not None
+        assert self.model.members["foo"].docstring.value == "foo"
+        assert self.model.members["bar"].docstring is not None
+        assert self.model.members["bar"].docstring.value == "bar"
+        assert self.model.members["baz"].docstring is None
+
     def test_class_inheritance(self):
         """Test that class inheritance was parsed correctly."""
-        assert len(self.model.bases) == 1
+        assert len(self.model.bases) == 2
         assert "handle" in self.model.bases
 
     def test_class_properties(self):
