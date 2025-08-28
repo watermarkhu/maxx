@@ -324,9 +324,10 @@ class PathsCollection:
 
     def __init__(
         self,
-        matlab_path: Sequence[str | Path],
+        matlab_path: Sequence[str | Path] = [],
         recursive: bool = False,
         working_directory: Path = Path.cwd(),
+        _local: bool = False,
     ):
         """
         Initialize an instance of PathsCollection.
@@ -352,17 +353,47 @@ class PathsCollection:
         # Stores which objects and subpaths are added from each added path. Allows for path element to be removed.
         self._folders: dict[Path, Alias] = {}
         # Stores mapping of each directory to a Folder object. Allows for auto-documenting folders.
+        self._local_collections: dict[Path, PathsCollection] = {}
+        # The local or private paths collection on specific directories.
+        self._local = _local
+        # Indicator for whether the current collection is local
         self._working_directory: Path = working_directory
+        # The working directory for the collection.
         self.lines_collection = LinesCollection()
 
         for path in matlab_path:
             self.addpath(Path(path), to_end=True, recursive=recursive)
 
+    @staticmethod
+    def as_local_collection(path: Path) -> PathsCollection:
+        """
+        Create a local PathsCollection for a given path.
+
+        Args:
+            path (Path): The path for which to create the local collection.
+
+        Returns:
+            PathsCollection: A new PathsCollection instance for the given path.
+        """
+        private_dir = path / "private"
+        local_collection_path = [private_dir] if private_dir.exists() else []
+        collection = PathsCollection(
+            local_collection_path, recursive=False, working_directory=path, _local=True
+        )
+        collection._path.appendleft(path)
+        return collection
+
     @property
     def members(self) -> dict[str, Any]:
         return {identifier: self._objects[paths[0]] for identifier, paths in self._mapping.items()}
 
-    def get_member(self, identifier: str) -> Any:
+    def get_member(self, identifier: str, working_directory: Path | None = None) -> Any:
+        if (
+            working_directory is not None
+            and working_directory in self._local_collections
+            and identifier in self._local_collections[working_directory]
+        ):
+            return self._local_collections[working_directory][identifier]
         return self[identifier]
 
     def get_path(self, identifier: str) -> Path | None:
@@ -486,6 +517,22 @@ class PathsCollection:
                     str(member.parent), target=_PathResolver(member.parent, self)
                 )
 
+            if not self._local and member.is_file():
+                if member.parent not in self._local_collections:
+                    self._local_collections[member.parent] = PathsCollection.as_local_collection(
+                        member.parent
+                    )
+                local_collection = self._local_collections[member.parent]
+                local_collection._objects[member] = object
+                local_collection._mapping[member.stem].append(member)
+
+        for member, collection in self._local_collections.items():
+            if member.stem[0] == CLASSFOLDER_PREFIX:
+                object = self._objects[member]
+                for name, child in collection.members.items():
+                    if name not in object.members:
+                        object.members[name] = child
+
     def rm_path(self, path: str | Path, recursive: bool = False):
         """
         Removes a path from the search path and updates the namespace and database accordingly.
@@ -509,6 +556,9 @@ class PathsCollection:
         for name, member in self._members.pop(path):
             self._mapping[name].remove(member)
             self._objects.pop(member)
+
+        if path in self._local_collections:
+            self._local_collections.pop(path)
 
         if recursive:
             for subdir in [item for item in self._path if _is_subdirectory(path, item)]:

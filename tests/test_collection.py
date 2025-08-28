@@ -85,6 +85,7 @@ class TestPathsCollection:
             "MyEnum",
             "ClassFolder",
             "ClassFolder.analyze",
+            "ClassFolder.static_method",
             "my_script",
             "+namespace",
             "namespace.NamespaceClass",

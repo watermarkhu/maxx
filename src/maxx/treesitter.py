@@ -601,7 +601,7 @@ class FileParser(object):
             function_name,
             lineno=node.range.start_point.row + 1,
             endlineno=node.range.end_point.row + 1,
-            filepath=self.filepath,
+            filepath=None if method else self.filepath,
             docstring=self._comment_docstring(captures.get("docstring", None)),
             getter="getter" in captures,
             setter="setter" in captures,

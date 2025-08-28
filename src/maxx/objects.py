@@ -917,12 +917,14 @@ class Function(PathMixin, Object):
     @property
     def is_private(self) -> bool:
         """Whether this function is private."""
-        return self.Access != AccessKind.public and self.Access != AccessKind.immutable
+        return PathMixin.is_private.__get__(self) or (
+            self.Access != AccessKind.public and self.Access != AccessKind.immutable
+        )
 
     @property
     def is_hidden(self) -> bool:
         """Whether this function is hidden."""
-        return self.Hidden or self.is_internal
+        return PathMixin.is_hidden.__get__(self) or self.Hidden
 
     @property
     def is_method(self) -> bool:

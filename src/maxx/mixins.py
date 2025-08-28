@@ -267,11 +267,3 @@ class ObjectAliasMixin(GetMembersMixin, SetMembersMixin, DelMembersMixin):
             for name, member in self.all_members.items()
             if member.kind is Kind.ENUMERATION
         }
-
-    @property
-    def is_hidden(self) -> bool:
-        return False
-
-    @property
-    def is_private(self) -> bool:
-        return False
