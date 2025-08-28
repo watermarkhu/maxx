@@ -25,9 +25,7 @@ class TestDocstringParsing:
         MyClass = self.paths_collection.get_member("MyClass")
         assert MyClass.has_docstring
         assert "Test class for MATLAB parser" in MyClass.docstring.value
-        assert (
-            "This class is used to test the FileParser functionality" in MyClass.docstring.value
-        )
+        assert "This class is used to test the FileParser functionality" in MyClass.docstring.value
         assert "Properties:" in MyClass.docstring.value
         assert "Methods:" in MyClass.docstring.value
 
@@ -102,8 +100,7 @@ class TestDocstringParsing:
         assert my_script.has_docstring
         assert "Test script for MATLAB parser" in my_script.docstring.value
         assert (
-            "This script is used to test the FileParser functionality"
-            in my_script.docstring.value
+            "This script is used to test the FileParser functionality" in my_script.docstring.value
         )
 
     def test_namespace_class_docstring(self):
