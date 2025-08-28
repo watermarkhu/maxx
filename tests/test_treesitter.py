@@ -53,8 +53,8 @@ class MyClassParser:
 
     def test_class_inheritance(self):
         """Test that class inheritance was parsed correctly."""
-        assert len(self.model.bases) == 2
-        assert "handle" in self.model.bases
+        assert len(self.model.bases) == 1
+        assert "int16" in self.model.bases
 
     def test_class_properties(self):
         """Test that class properties were parsed correctly."""

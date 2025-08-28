@@ -1,4 +1,4 @@
-classdef MyClass < handle & int16
+classdef MyClass < int16
 % Test class for MATLAB parser
 % This class is used to test the FileParser functionality.
 %
