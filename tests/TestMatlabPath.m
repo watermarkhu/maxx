@@ -16,11 +16,13 @@ classdef TestMatlabPath < matlab.unittest.TestCase
             addpath(genpath(test_path));
             testClass.collection = py.maxx.collection.PathsCollection({test_path}, recursive=true);
 
-            logger_path = fullfile(fileparts(mfilename('fullpath')), 'advanced-logger', 'advancedLogger');
+            logger_path = fullfile(fileparts(fileparts(mfilename('fullpath'))), ...
+                'submodule', 'advanced-logger', 'advancedLogger');
             addpath(logger_path)
             testClass.collection.addpath(logger_path);
 
-            logger_test_path = fullfile(fileparts(mfilename('fullpath')), 'advanced-logger', 'test');
+            logger_test_path = fullfile(fileparts(fileparts(mfilename('fullpath'))), ...
+                'submodule', 'advanced-logger', 'test');
             addpath(logger_test_path)
             testClass.collection.addpath(logger_test_path);
         end
