@@ -18,11 +18,11 @@ classdef TestMatlabPath < matlab.unittest.TestCase
 
             logger_path = fullfile(fileparts(mfilename('fullpath')), 'advanced-logger', 'advancedLogger');
             addpath(logger_path)
-            testClass.collection.add_path(logger_path);
+            testClass.collection.addpath(logger_path);
 
             logger_test_path = fullfile(fileparts(mfilename('fullpath')), 'advanced-logger', 'test');
             addpath(logger_test_path)
-            testClass.collection.add_path(logger_test_path);
+            testClass.collection.addpath(logger_test_path);
         end
     end
 

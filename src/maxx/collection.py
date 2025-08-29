@@ -314,7 +314,7 @@ class PathsCollection:
         addpath(path: str | Path, to_end: bool = False, recursive: bool = False) -> list[Path]:
             Adds a path to the search path.
 
-        rm_path(path: str | Path, recursive: bool = False) -> list[Path]:
+        rmpath(path: str | Path, recursive: bool = False) -> list[Path]:
             Removes a path from the search path and updates the namespace and database accordingly.
 
     """
@@ -533,7 +533,7 @@ class PathsCollection:
                     if name not in object.members:
                         object.members[name] = child
 
-    def rm_path(self, path: str | Path, recursive: bool = False):
+    def rmpath(self, path: str | Path, recursive: bool = False):
         """
         Removes a path from the search path and updates the namespace and database accordingly.
 
@@ -562,7 +562,7 @@ class PathsCollection:
 
         if recursive:
             for subdir in [item for item in self._path if _is_subdirectory(path, item)]:
-                self.rm_path(subdir, recursive=False)
+                self.rmpath(subdir, recursive=False)
 
 
 def _is_subdirectory(parent_path: Path, child_path: Path) -> bool:
