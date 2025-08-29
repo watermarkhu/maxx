@@ -123,6 +123,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
+        with:
+          submodules: true
 
       - name: Set up MATLAB
         uses: matlab-actions/setup-matlab@v2

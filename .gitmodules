@@ -1,0 +1,3 @@
+[submodule "tests/advanced-logger"]
+	path = tests/advanced-logger
+	url = https://github.com/mathworks/advanced-logger

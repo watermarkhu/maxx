@@ -5,7 +5,7 @@ classdef TestMatlabPath < matlab.unittest.TestCase
     end
 
     methods (TestClassSetup)
-        function setup_pyenv(MyClass)
+        function setup_pyenv(testClass)
             [status, pythonpath] = system("uv python find");
             if status ~= 0
                 error("python:failedToFindPython", ...
@@ -13,8 +13,16 @@ classdef TestMatlabPath < matlab.unittest.TestCase
             end
             pyenv('Version', strtrim(pythonpath), 'ExecutionMode', 'InProcess');
             test_path = fullfile(fileparts(mfilename('fullpath')), 'files');
-            addpath(genpath(test_path))
-            MyClass.collection = py.maxx.collection.PathsCollection({test_path}, recursive=true);
+            addpath(genpath(test_path));
+            testClass.collection = py.maxx.collection.PathsCollection({test_path}, recursive=true);
+
+            logger_path = fullfile(fileparts(mfilename('fullpath')), 'advanced-logger', 'advancedLogger');
+            addpath(logger_path)
+            testClass.collection.add_path(logger_path);
+
+            logger_test_path = fullfile(fileparts(mfilename('fullpath')), 'advanced-logger', 'test');
+            addpath(logger_test_path)
+            testClass.collection.add_path(logger_test_path);
         end
     end
 
@@ -27,6 +35,11 @@ classdef TestMatlabPath < matlab.unittest.TestCase
             'ClassFolder',
             'namespace.NamespaceClass',
             'namespace.test_namespace_function',
+            'mlog.Logger',
+            'mlog.Level',
+            'mlog.Message',
+            'mlog.view.LogDisplay',
+            'mlog.test.TestLogger',
         }
     end
 
