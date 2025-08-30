@@ -176,47 +176,15 @@ jobs:
       run: |
         uv sync --dev --python 3.14
 
-    - name: Run ruff linting
-      shell: pwsh
-      run: |
-        "## 🔍 Ruff Linting Results" | Out-File -Append $env:GITHUB_STEP_SUMMARY
-        if (uv run ruff check --output-format=github .) {
-          "✅ No linting errors found" | Out-File -Append $env:GITHUB_STEP_SUMMARY
-        } else {
-          "❌ Linting errors found" | Out-File -Append $env:GITHUB_STEP_SUMMARY
-          exit 1
-        }
-
-    - name: Run ruff formatting check
-      shell: pwsh
-      run: |
-        "## 🎨 Code Formatting Check" | Out-File -Append $env:GITHUB_STEP_SUMMARY
-        if (uv run ruff format --check .) {
-          "✅ Code formatting is correct" | Out-File -Append $env:GITHUB_STEP_SUMMARY
-        } else {
-          "❌ Code formatting issues found" | Out-File -Append $env:GITHUB_STEP_SUMMARY
-          exit 1
-        }
-
-    - name: Run Ty type checking
-      shell: pwsh
-      run: |
-        "## 🔧 Ty Type Checking Results" | Out-File -Append $env:GITHUB_STEP_SUMMARY
-        if (uv run ty check) {
-          "✅ No type errors found" | Out-File -Append $env:GITHUB_STEP_SUMMARY
-        } else {
-          "❌ Type errors found" | Out-File -Append $env:GITHUB_STEP_SUMMARY
-          exit 1
-        }
-
     - name: Run tests
       shell: pwsh
       run: |
-        if (uv run pytest --cov maxx --tb=short -v --junit-xml=pytest.xml) {
+        uv run pytest --cov maxx --tb=short -v --junit-xml=windows.xml
+        if ($LASTEXITCODE -eq 0) {
           '# ✅ Tests passed' | Out-File -Append $env:GITHUB_STEP_SUMMARY
         } else {
           '# ❌ Tests failed' | Out-File -Append $env:GITHUB_STEP_SUMMARY
-          exit 1
+          throw "Tests failed"
         }
 
     - name: Generate test coverage report
