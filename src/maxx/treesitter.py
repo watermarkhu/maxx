@@ -729,6 +729,7 @@ class FileParser(object):
         if nodes is None:
             return None
         elif isinstance(nodes, list):
+            nodes = _sort_nodes(nodes)
             # Ensure that if there is a gap between subsequent comment nodes, only the first block is considered
             if gaps := (
                 end.start_point.row - start.end_point.row
