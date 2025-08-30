@@ -145,7 +145,7 @@ jobs:
       - name: Run tests
         uses: matlab-actions/run-tests@v2
         with:
-          source-folder: tests
+          select-by-folder: tests
           test-results-junit: matlab.xml
 
       - name: Upload Test Results
