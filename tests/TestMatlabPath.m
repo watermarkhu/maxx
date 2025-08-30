@@ -11,6 +11,12 @@ classdef TestMatlabPath < matlab.unittest.TestCase
                 error("python:failedToFindPython", ...
                     "Failed to find Python in %s", projectpath);
             end
+            if ispc % Use headless python if possible on Windows
+                pythondir = fileparts(pythonpath);
+                if isfile(fullfile(pythondir, 'pythonw.exe'))
+                    pythonpath = fullfile(pythondir, 'pythonw.exe');
+                end
+            end
             pyenv('Version', strtrim(pythonpath), 'ExecutionMode', 'InProcess');
             test_path = fullfile(fileparts(mfilename('fullpath')), 'files');
             addpath(genpath(test_path));
@@ -30,19 +36,20 @@ classdef TestMatlabPath < matlab.unittest.TestCase
 
     properties (TestParameter)
         call = {
-            'MyClass',
-            'test_function',
-            'plot_axes',
-            'my_script',
-            'ClassFolder',
-            'namespace.NamespaceClass',
-            'namespace.test_namespace_function',
-            'mlog.Logger',
-            'mlog.Level',
-            'mlog.Message',
-            'mlog.view.LogDisplay',
-            'mlog.test.TestLogger',
-        }
+            'MyClass'
+            'test_function'
+            'plot_axes'
+            'my_script'
+            'ClassFolder'
+            'namespace.NamespaceClass'
+            'namespace.test_namespace_function'
+            'mlog.Logger'
+            'mlog.Level'
+            'mlog.Message'
+            'mlog.view.LogDisplay'
+            'mlog.test.TestLogger'
+            }
+        testParameter1 = struct("scalar",1,"vector",[1 1]);
     end
 
     methods(Test)

@@ -6,6 +6,7 @@ from collections import defaultdict, deque
 from pathlib import Path
 from typing import Any, ItemsView, KeysView, Sequence, TypeVar, ValuesView
 
+from maxx.logger import logger
 from maxx.objects import (
     Alias,
     Class,
@@ -87,12 +88,13 @@ class _PathResolver:
         object: Collects and returns the MATLAB object object..
     """
 
-    def __init__(self, path: Path, paths_collection: PathsCollection):
+    def __init__(self, path: Path, paths_collection: "PathsCollection"):
         if not path.exists():
+            logger.error(f"Path does not exist: {path}")
             raise FileNotFoundError(f"Path does not exist: {path}")
         self._path: Path = path
         self._object: Object | None = None
-        self._paths_collection: PathsCollection = paths_collection
+        self._paths_collection: "PathsCollection" = paths_collection
 
     @property
     def is_folder(self) -> bool:
@@ -138,6 +140,7 @@ class _PathResolver:
 
     def __call__(self) -> Object | None:
         if not self._path.exists():
+            logger.error(f"Path does not exist when resolving: {self._path}")
             raise FileNotFoundError(f"Path does not exist: {self._path}")
 
         if self._object is None:
@@ -169,37 +172,38 @@ class _PathResolver:
         for item in path.iterdir():
             if item.is_dir() and item.name[0] in FOLDER_PREFIXES:
                 if item not in self._paths_collection._objects:
+                    logger.warning(f"Path not found in collection (dir): {item}")
                     raise KeyError(f"Path not found in collection: {item}")
                 subobject = self._paths_collection._objects[item].target
                 if subobject is not None:
                     object.members[subobject.name] = subobject
                     if set_parent:
                         subobject.parent = object
-
             elif item.is_file() and item.suffix == MFILE_SUFFIX:
                 if item.name == CONTENTS_FILE:
                     contentsfile = self._collect_path(item)
                     object.docstring = contentsfile.docstring
                 else:
                     if item not in self._paths_collection._objects:
+                        logger.warning(f"Path not found in collection (file): {item}")
                         raise KeyError(f"Path not found in collection: {item}")
                     subobject = self._paths_collection._objects[item].target
                     if subobject is not None:
                         object.members[subobject.name] = subobject
                         if set_parent:
                             subobject.parent = object
-
         if object.docstring is None:
             object.docstring = self._collect_readme_md(path, object)
-
         return object
 
     def _collect_classfolder(self, path: Path) -> Class | None:
         classfile = path / (path.name[1:] + MFILE_SUFFIX)
         if not classfile.exists():
+            logger.warning(f"Class file does not exist in class folder: {classfile}")
             return None
         object = self._collect_path(classfile)
         if not isinstance(object, Class):
+            logger.error(f"Object parsed from class file is not a Class: {classfile}")
             return None
         for member in path.iterdir():
             if member.is_file() and member.suffix == MFILE_SUFFIX and member != classfile:
@@ -208,6 +212,7 @@ class _PathResolver:
                     object.docstring = contentsfile.docstring
                 else:
                     if member not in self._paths_collection._objects:
+                        logger.warning(f"Path not found in collection (class member): {member}")
                         raise KeyError(f"Path not found in collection: {member}")
                     method = self._paths_collection._objects[member].target
                     if method is not None and isinstance(method, Function):
@@ -341,6 +346,7 @@ class PathsCollection:
         """
         for path in matlab_path:
             if not isinstance(path, (str, Path)):
+                logger.error(f"Invalid path type in matlab_path: {type(path)}")
                 raise TypeError(f"Expected str or Path, got {type(path)}")
 
         self._path: deque[Path] = deque()
@@ -501,8 +507,10 @@ class PathsCollection:
 
         if to_end:
             self._path.append(path)
+            logger.info(f"Added path to end: {path}")
         else:
             self._path.appendleft(path)
+            logger.info(f"Added path to start: {path}")
 
         for member in list(_PathGlobber(path, recursive=recursive)):
             object = Alias(member.stem, target=_PathResolver(member, self))
@@ -549,9 +557,11 @@ class PathsCollection:
             path = Path(path)
 
         if path not in self._path:
+            logger.warning(f"Attempted to remove path not in search path: {path}")
             return list(self._path)
 
         self._path.remove(path)
+        logger.info(f"Removed path: {path}")
 
         for name, member in self._members.pop(path):
             self._mapping[name].remove(member)
