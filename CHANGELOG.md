@@ -1,6 +1,37 @@
 # CHANGELOG
 
 
+## v0.4.0 (2025-08-30)
+
+### Bug Fixes
+
+- Allow more comments, better logging, more testing
+  ([#26](https://github.com/watermarkhu/maxx/pull/26),
+  [`aa27718`](https://github.com/watermarkhu/maxx/commit/aa27718e9242d62871838752d61f5cbb9111d043))
+
+- Comment nodes are unsorted on Windows, always sort
+  ([#26](https://github.com/watermarkhu/maxx/pull/26),
+  [`aa27718`](https://github.com/watermarkhu/maxx/commit/aa27718e9242d62871838752d61f5cbb9111d043))
+
+- Rename rm_path to rmpath to match addpath ([#26](https://github.com/watermarkhu/maxx/pull/26),
+  [`aa27718`](https://github.com/watermarkhu/maxx/commit/aa27718e9242d62871838752d61f5cbb9111d043))
+
+### Features
+
+- Local namespace database, allow for collecting private files
+  ([#26](https://github.com/watermarkhu/maxx/pull/26),
+  [`aa27718`](https://github.com/watermarkhu/maxx/commit/aa27718e9242d62871838752d61f5cbb9111d043))
+
+### Testing
+
+- Add regression testing for path namespace via MATLAB
+  ([#26](https://github.com/watermarkhu/maxx/pull/26),
+  [`aa27718`](https://github.com/watermarkhu/maxx/commit/aa27718e9242d62871838752d61f5cbb9111d043))
+
+- Add submodule for additional testing ([#26](https://github.com/watermarkhu/maxx/pull/26),
+  [`aa27718`](https://github.com/watermarkhu/maxx/commit/aa27718e9242d62871838752d61f5cbb9111d043))
+
+
 ## v0.3.0 (2025-08-28)
 
 ### Chores
