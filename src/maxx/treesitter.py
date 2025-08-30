@@ -14,6 +14,7 @@ from tree_sitter import Language, Node, Parser, Query, QueryCursor, Tree, TreeCu
 
 from maxx.enums import AccessKind, ArgumentKind
 from maxx.expressions import Expr
+from maxx.logger import logger
 from maxx.objects import (
     Argument,
     Arguments,
@@ -178,11 +179,14 @@ METHODS_QUERY = QueryCursor(
     Query(
         LANGUAGE,
         """("methods" .
+    (comment)* .
     (attributes
         (attribute) @attributes
     )? .
+    (comment)* .
     (
         ("\\n")* .
+        (comment)* .
         (function_definition)* @methods
     )*
 )""",
@@ -193,11 +197,14 @@ PROPERTIES_QUERY = QueryCursor(
     Query(
         LANGUAGE,
         """("properties" .
+    (comment)* .
     (attributes
         (attribute) @attributes
     )? .
+    (comment)* .
     (
         ("\\n")* .
+        (comment)* .
         (property)* @properties
     )*
 )""",
@@ -210,6 +217,7 @@ ENUMERATIONS_QUERY = QueryCursor(
         """("enumeration" .
     (
         ("\\n")* .
+        (comment)* .
         (enum
             (identifier) @content
             (
@@ -297,6 +305,7 @@ class FileParser(object):
         with open(filepath, "rb") as f:
             self._content: bytes = f.read()
         self._node: Node | None = None
+        logger.debug(f"Initialized FileParser for {filepath}")
 
     @property
     def content(self):
@@ -331,16 +340,20 @@ class FileParser(object):
             node: Node | None = cursor.node
 
             if node is None:
+                logger.error(f"Tree-sitter failed to parse file: {self.filepath}")
                 raise ValueError(f"The file {self.filepath} could not be parsed.")
             captures = FILE_QUERY.captures(node)
 
             if TYPE_CHECKING:
                 object: Function | Class | Script | None = None
             if "function" in captures:
+                logger.debug(f"Parsing function in file: {self.filepath}")
                 object = self._parse_function(captures["function"][0], **kwargs)
             elif "type" in captures:
+                logger.debug(f"Parsing class in file: {self.filepath}")
                 object = self._parse_class(captures["type"][0], **kwargs)
             else:
+                logger.debug(f"Parsing script in file: {self.filepath}")
                 object = Script(self.filepath.stem, filepath=self.filepath, node=node, **kwargs)
 
             if not object.docstring:
@@ -348,9 +361,11 @@ class FileParser(object):
                     captures.get("header", None), parent=object
                 )
 
+            logger.info(f"Parsed object type: {type(object).__name__} for file: {self.filepath}")
             return object
 
         except Exception as ex:
+            logger.error(f"Exception while parsing {self.filepath}: {ex}")
             syntax_error = SyntaxError("Error parsing Matlab file")
             syntax_error.filename = str(self.filepath)
             if self._node is not None:
@@ -601,7 +616,7 @@ class FileParser(object):
             function_name,
             lineno=node.range.start_point.row + 1,
             endlineno=node.range.end_point.row + 1,
-            filepath=self.filepath,
+            filepath=None if method else self.filepath,
             docstring=self._comment_docstring(captures.get("docstring", None)),
             getter="getter" in captures,
             setter="setter" in captures,
@@ -729,6 +744,7 @@ class FileParser(object):
         if nodes is None:
             return None
         elif isinstance(nodes, list):
+            nodes = _sort_nodes(nodes)
             # Ensure that if there is a gap between subsequent comment nodes, only the first block is considered
             if gaps := (
                 end.start_point.row - start.end_point.row

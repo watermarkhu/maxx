@@ -1,0 +1,9 @@
+[submodule "submodule/advanced-logger"]
+	path = submodule/advanced-logger
+	url = https://github.com/mathworks/advanced-logger
+[submodule "submodule/gnu-octave-statistics"]
+	path = submodule/gnu-octave-statistics
+	url = https://github.com/gnu-octave/statistics
+[submodule "submodule/OpenTelemetry-MATLAB"]
+	path = submodule/OpenTelemetry-MATLAB
+	url = https://github.com/mathworks/OpenTelemetry-MATLAB

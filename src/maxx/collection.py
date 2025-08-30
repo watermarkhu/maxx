@@ -6,6 +6,7 @@ from collections import defaultdict, deque
 from pathlib import Path
 from typing import Any, ItemsView, KeysView, Sequence, TypeVar, ValuesView
 
+from maxx.logger import logger
 from maxx.objects import (
     Alias,
     Class,
@@ -87,12 +88,13 @@ class _PathResolver:
         object: Collects and returns the MATLAB object object..
     """
 
-    def __init__(self, path: Path, paths_collection: PathsCollection):
+    def __init__(self, path: Path, paths_collection: "PathsCollection"):
         if not path.exists():
+            logger.error(f"Path does not exist: {path}")
             raise FileNotFoundError(f"Path does not exist: {path}")
         self._path: Path = path
         self._object: Object | None = None
-        self._paths_collection: PathsCollection = paths_collection
+        self._paths_collection: "PathsCollection" = paths_collection
 
     @property
     def is_folder(self) -> bool:
@@ -138,6 +140,7 @@ class _PathResolver:
 
     def __call__(self) -> Object | None:
         if not self._path.exists():
+            logger.error(f"Path does not exist when resolving: {self._path}")
             raise FileNotFoundError(f"Path does not exist: {self._path}")
 
         if self._object is None:
@@ -169,37 +172,38 @@ class _PathResolver:
         for item in path.iterdir():
             if item.is_dir() and item.name[0] in FOLDER_PREFIXES:
                 if item not in self._paths_collection._objects:
+                    logger.warning(f"Path not found in collection (dir): {item}")
                     raise KeyError(f"Path not found in collection: {item}")
                 subobject = self._paths_collection._objects[item].target
                 if subobject is not None:
                     object.members[subobject.name] = subobject
                     if set_parent:
                         subobject.parent = object
-
             elif item.is_file() and item.suffix == MFILE_SUFFIX:
                 if item.name == CONTENTS_FILE:
                     contentsfile = self._collect_path(item)
                     object.docstring = contentsfile.docstring
                 else:
                     if item not in self._paths_collection._objects:
+                        logger.warning(f"Path not found in collection (file): {item}")
                         raise KeyError(f"Path not found in collection: {item}")
                     subobject = self._paths_collection._objects[item].target
                     if subobject is not None:
                         object.members[subobject.name] = subobject
                         if set_parent:
                             subobject.parent = object
-
         if object.docstring is None:
             object.docstring = self._collect_readme_md(path, object)
-
         return object
 
     def _collect_classfolder(self, path: Path) -> Class | None:
         classfile = path / (path.name[1:] + MFILE_SUFFIX)
         if not classfile.exists():
+            logger.warning(f"Class file does not exist in class folder: {classfile}")
             return None
         object = self._collect_path(classfile)
         if not isinstance(object, Class):
+            logger.error(f"Object parsed from class file is not a Class: {classfile}")
             return None
         for member in path.iterdir():
             if member.is_file() and member.suffix == MFILE_SUFFIX and member != classfile:
@@ -208,6 +212,7 @@ class _PathResolver:
                     object.docstring = contentsfile.docstring
                 else:
                     if member not in self._paths_collection._objects:
+                        logger.warning(f"Path not found in collection (class member): {member}")
                         raise KeyError(f"Path not found in collection: {member}")
                     method = self._paths_collection._objects[member].target
                     if method is not None and isinstance(method, Function):
@@ -314,7 +319,7 @@ class PathsCollection:
         addpath(path: str | Path, to_end: bool = False, recursive: bool = False) -> list[Path]:
             Adds a path to the search path.
 
-        rm_path(path: str | Path, recursive: bool = False) -> list[Path]:
+        rmpath(path: str | Path, recursive: bool = False) -> list[Path]:
             Removes a path from the search path and updates the namespace and database accordingly.
 
     """
@@ -324,9 +329,10 @@ class PathsCollection:
 
     def __init__(
         self,
-        matlab_path: Sequence[str | Path],
+        matlab_path: Sequence[str | Path] = [],
         recursive: bool = False,
         working_directory: Path = Path.cwd(),
+        _local: bool = False,
     ):
         """
         Initialize an instance of PathsCollection.
@@ -340,6 +346,7 @@ class PathsCollection:
         """
         for path in matlab_path:
             if not isinstance(path, (str, Path)):
+                logger.error(f"Invalid path type in matlab_path: {type(path)}")
                 raise TypeError(f"Expected str or Path, got {type(path)}")
 
         self._path: deque[Path] = deque()
@@ -352,18 +359,54 @@ class PathsCollection:
         # Stores which objects and subpaths are added from each added path. Allows for path element to be removed.
         self._folders: dict[Path, Alias] = {}
         # Stores mapping of each directory to a Folder object. Allows for auto-documenting folders.
+        self._local_collections: dict[Path, PathsCollection] = {}
+        # The local or private paths collection on specific directories.
+        self._local = _local
+        # Indicator for whether the current collection is local
         self._working_directory: Path = working_directory
+        # The working directory for the collection.
         self.lines_collection = LinesCollection()
 
         for path in matlab_path:
             self.addpath(Path(path), to_end=True, recursive=recursive)
 
+    @staticmethod
+    def as_local_collection(path: Path) -> PathsCollection:
+        """
+        Create a local PathsCollection for a given path.
+
+        Args:
+            path (Path): The path for which to create the local collection.
+
+        Returns:
+            PathsCollection: A new PathsCollection instance for the given path.
+        """
+        private_dir = path / "private"
+        local_collection_path = [private_dir] if private_dir.exists() else []
+        collection = PathsCollection(
+            local_collection_path, recursive=False, working_directory=path, _local=True
+        )
+        collection._path.appendleft(path)
+        return collection
+
     @property
     def members(self) -> dict[str, Any]:
         return {identifier: self._objects[paths[0]] for identifier, paths in self._mapping.items()}
 
-    def get_member(self, identifier: str) -> Any:
+    def get_member(self, identifier: str, working_directory: Path | None = None) -> Any:
+        if (
+            working_directory is not None
+            and working_directory in self._local_collections
+            and identifier in self._local_collections[working_directory]
+        ):
+            return self._local_collections[working_directory][identifier]
         return self[identifier]
+
+    def get_path(self, identifier: str) -> Path | None:
+        if identifier in self._mapping:
+            return self._mapping[identifier][0]
+        else:
+            return None
 
     def __contains__(self, identifier: str) -> bool:
         """
@@ -464,8 +507,10 @@ class PathsCollection:
 
         if to_end:
             self._path.append(path)
+            logger.info(f"Added path to end: {path}")
         else:
             self._path.appendleft(path)
+            logger.info(f"Added path to start: {path}")
 
         for member in list(_PathGlobber(path, recursive=recursive)):
             object = Alias(member.stem, target=_PathResolver(member, self))
@@ -480,7 +525,23 @@ class PathsCollection:
                     str(member.parent), target=_PathResolver(member.parent, self)
                 )
 
-    def rm_path(self, path: str | Path, recursive: bool = False):
+            if not self._local and member.is_file():
+                if member.parent not in self._local_collections:
+                    self._local_collections[member.parent] = PathsCollection.as_local_collection(
+                        member.parent
+                    )
+                local_collection = self._local_collections[member.parent]
+                local_collection._objects[member] = object
+                local_collection._mapping[member.stem].append(member)
+
+        for member, collection in self._local_collections.items():
+            if member.stem[0] == CLASSFOLDER_PREFIX:
+                object = self._objects[member]
+                for name, child in collection.members.items():
+                    if name not in object.members:
+                        object.members[name] = child
+
+    def rmpath(self, path: str | Path, recursive: bool = False):
         """
         Removes a path from the search path and updates the namespace and database accordingly.
 
@@ -496,17 +557,22 @@ class PathsCollection:
             path = Path(path)
 
         if path not in self._path:
+            logger.warning(f"Attempted to remove path not in search path: {path}")
             return list(self._path)
 
         self._path.remove(path)
+        logger.info(f"Removed path: {path}")
 
         for name, member in self._members.pop(path):
             self._mapping[name].remove(member)
             self._objects.pop(member)
 
+        if path in self._local_collections:
+            self._local_collections.pop(path)
+
         if recursive:
             for subdir in [item for item in self._path if _is_subdirectory(path, item)]:
-                self.rm_path(subdir, recursive=False)
+                self.rmpath(subdir, recursive=False)
 
 
 def _is_subdirectory(parent_path: Path, child_path: Path) -> bool:

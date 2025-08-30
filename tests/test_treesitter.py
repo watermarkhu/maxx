@@ -7,75 +7,76 @@ from maxx.objects import Class, Enumeration, Function, Script
 from maxx.treesitter import FileParser
 
 
-class TestClassParser:
+class MyClassParser:
     """Test class for parsing MATLAB class files."""
 
     @pytest.fixture(autouse=True)
     def setup(self, test_files_dir):
-        """Set up the test by parsing the TestClass.m file."""
-        class_file = test_files_dir / "TestClass.m"
-        parser = FileParser(class_file)
-        self.model = parser.parse()
+        """Set up the test by parsing the MyClass.m file."""
+        class_file = test_files_dir / "MyClass.m"
+        self.class_obj = FileParser(class_file).parse()
+        enum_file = test_files_dir / "MyEnum.m"
+        self.enum_obj = FileParser(enum_file).parse()
 
     def test_class_basic_properties(self):
         """Test basic class properties were parsed correctly."""
-        assert isinstance(self.model, Class)
-        assert self.model.name == "TestClass"
+        assert isinstance(self.class_obj, Class)
+        assert self.class_obj.name == "MyClass"
 
         # Verify docstring was parsed
-        assert self.model.docstring is not None
-        assert "Test class for MATLAB parser" in self.model.docstring.value
-        assert "This class is used to test" in self.model.docstring.value
+        assert self.class_obj.docstring is not None
+        assert "Test class for MATLAB parser" in self.class_obj.docstring.value
+        assert "This class is used to test" in self.class_obj.docstring.value
 
         # Verify class documentation structure
-        assert "Properties:" in self.model.docstring.value
-        assert "Methods:" in self.model.docstring.value
+        assert "Properties:" in self.class_obj.docstring.value
+        assert "Methods:" in self.class_obj.docstring.value
 
     def test_class_enumeration(self):
         """Test that class enumerations were parsed correctly."""
-        assert "foo" in self.model.members
-        assert "bar" in self.model.members
-        assert "baz" in self.model.members
+        assert "foo" in self.enum_obj.members
+        assert "bar" in self.enum_obj.members
+        assert "baz" in self.enum_obj.members
 
-        assert isinstance(self.model.members["foo"], Enumeration)
-        assert isinstance(self.model.members["bar"], Enumeration)
-        assert isinstance(self.model.members["baz"], Enumeration)
+        assert isinstance(self.enum_obj.members["foo"], Enumeration)
+        assert isinstance(self.enum_obj.members["bar"], Enumeration)
+        assert isinstance(self.enum_obj.members["baz"], Enumeration)
 
-        assert str(self.model.members["foo"].value) == "0"
-        assert str(self.model.members["bar"].value) == "42"
-        assert str(self.model.members["baz"].value) == "69"
+        assert str(self.enum_obj.members["foo"].value) == "0"
+        assert str(self.enum_obj.members["bar"].value) == "42"
+        assert str(self.enum_obj.members["baz"].value) == "69"
 
-        assert self.model.members["foo"].docstring is not None
-        assert self.model.members["foo"].docstring.value == "foo"
-        assert self.model.members["bar"].docstring is not None
-        assert self.model.members["bar"].docstring.value == "bar"
-        assert self.model.members["baz"].docstring is None
+        assert self.enum_obj.members["foo"].docstring is not None
+        assert self.enum_obj.members["foo"].docstring.value == "foo"
+        assert self.enum_obj.members["bar"].docstring is not None
+        assert self.enum_obj.members["bar"].docstring.value == "bar"
+        assert self.enum_obj.members["baz"].docstring is None
 
     def test_class_inheritance(self):
         """Test that class inheritance was parsed correctly."""
-        assert len(self.model.bases) == 2
-        assert "handle" in self.model.bases
+        assert len(self.class_obj.bases) == 1
+        assert "handle" in self.class_obj.bases
 
     def test_class_properties(self):
         """Test that class properties were parsed correctly."""
         # Check if properties exist
-        assert "Property1" in self.model.members
-        assert "Property2" in self.model.members
+        assert "Property1" in self.class_obj.members
+        assert "Property2" in self.class_obj.members
 
         # Test Property1 details
-        prop1 = self.model.members["Property1"]
+        prop1 = self.class_obj.members["Property1"]
         assert str(prop1.type) == "double"
         assert str(prop1.default) == "0"
 
         # Test Property2 details
-        prop2 = self.model.members["Property2"]
+        prop2 = self.class_obj.members["Property2"]
         assert str(prop2.type) == "string"
         assert str(prop2.default) == '""'
 
     def test_constructor_method(self):
         """Test that constructor method was parsed correctly."""
-        assert self.model.name in self.model.members
-        constructor = self.model.members[self.model.name]
+        assert self.class_obj.name in self.class_obj.members
+        constructor = self.class_obj.members[self.class_obj.name]
 
         # Verify it's a Function
         assert isinstance(constructor, Function)
@@ -97,13 +98,13 @@ class TestClassParser:
 
         # Check constructor docstring
         assert constructor.docstring is not None
-        assert "TestClass constructor" in constructor.docstring.value
+        assert "MyClass constructor" in constructor.docstring.value
         assert "Initialize the class properties" in constructor.docstring.value
 
     def test_method1(self):
         """Test that method1 was parsed correctly."""
-        assert "method1" in self.model.members
-        method1 = self.model.members["method1"]
+        assert "method1" in self.class_obj.members
+        method1 = self.class_obj.members["method1"]
 
         # Verify it's a Function
         assert isinstance(method1, Function)
@@ -134,8 +135,8 @@ class TestClassParser:
 
     def test_private_method2(self):
         """Test that private method2 was parsed correctly."""
-        assert "method2" in self.model.members
-        method2 = self.model.members["method2"]
+        assert "method2" in self.class_obj.members
+        method2 = self.class_obj.members["method2"]
 
         # Verify it's a Function
         assert isinstance(method2, Function)
@@ -182,8 +183,8 @@ class TestClassParser:
 
     def test_public_method3(self):
         """Test that explicitly public method3 was parsed correctly."""
-        assert "method3" in self.model.members
-        method3 = self.model.members["method3"]
+        assert "method3" in self.class_obj.members
+        method3 = self.class_obj.members["method3"]
 
         # Verify it's a Function
         assert isinstance(method3, Function)
@@ -234,17 +235,17 @@ class TestClassParser:
     def test_method_access_levels(self):
         """Test that method access levels were parsed correctly."""
         # method1 should have default public access
-        method1 = self.model.members["method1"]
+        method1 = self.class_obj.members["method1"]
         assert method1.Access == AccessKind.public
         assert not method1.is_private
 
         # method2 should have private access
-        method2 = self.model.members["method2"]
+        method2 = self.class_obj.members["method2"]
         assert method2.Access == AccessKind.private
         assert method2.is_private
 
         # method3 should have explicit public access
-        method3 = self.model.members["method3"]
+        method3 = self.class_obj.members["method3"]
         assert method3.Access == AccessKind.public
         assert not method3.is_private
 
@@ -311,13 +312,13 @@ def test_parse_function(test_files_dir):
 
 def test_parse_script(test_files_dir):
     """Test parsing a MATLAB script file."""
-    script_file = test_files_dir / "test_script.m"
+    script_file = test_files_dir / "my_script.m"
     parser = FileParser(script_file)
     model = parser.parse()
 
     # Verify the model is a Script
     assert isinstance(model, Script)
-    assert model.name == "test_script"
+    assert model.name == "my_script"
 
     # Verify docstring was parsed
     assert model.docstring is not None
