@@ -157,7 +157,7 @@ jobs:
 
   windows:
     name: Run checks and tests on Windows
-    needs: setup
+    needs: [test]
     runs-on: windows-latest
 
     steps:
