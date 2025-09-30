@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.4.2 (2025-09-30)
+
+### Bug Fixes
+
+- Method filepath ([#28](https://github.com/watermarkhu/maxx/pull/28),
+  [`e168603`](https://github.com/watermarkhu/maxx/commit/e1686035769c3401436a7ffd4c11bf7f5c05494c))
+
+
 ## v0.4.1 (2025-09-05)
 
 ### Chores
