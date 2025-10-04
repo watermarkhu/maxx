@@ -14,17 +14,17 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+
   release:
     name: Semantic version release
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      pull-requests: write
     outputs:
-      released: ${{ steps.semantic-release.outputs.released }}
-      tag: ${{ steps.semantic-release.outputs.tag }}
+      released: ${{ steps.get-version.outputs.released == 'true' }}
+      next-tag: ${{ steps.get-version.outputs.next-tag }}
 
     steps:
-
     - uses: actions/create-github-app-token@v2
       id: app-token
       with:
@@ -53,27 +53,33 @@ jobs:
       run: |
         git checkout -B ${{ github.ref_name }} ${{ github.sha }}
 
-    - name: Update version and changelogs
-      id: semantic-release
-      uses: python-semantic-release/python-semantic-release@v10
-      with: 
-        build: false
-        changelog: true
-        commit: true
-        push: true
-        tag: true
-        vcs_release: true
-        github_token: ${{ steps.app-token.outputs.token }}
-        no_operation_mode: ${{ !github.event.pull_request.merged }}
+    - name: Set up uv
+      uses: astral-sh/setup-uv@v6
+      with:
+        version: "latest"
 
-  comment:
-    name: Create or update comment
-    if: github.event.pull_request.merged == false
-    needs: release
-    runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
-    steps:
+    - name: Install dependencies
+      shell: bash
+      run: |
+        uv sync --all-groups
+
+    - name: Get check version
+      id: get-version
+      shell: bash
+      env:
+        GH_TOKEN: ${{ steps.app-token.outputs.token }}
+      run: |
+        LAST_TAG=$(uv run semantic-release --noop version --print-last-released-tag)
+        NEXT_TAG=$(uv run semantic-release --noop version --print-tag)
+        if [ "$LAST_TAG" == "$NEXT_TAG" ] || [ -z "$NEXT_TAG" ]; then
+          RELEASED=false
+        else
+          RELEASED=true
+        fi
+        echo "last-tag=$LAST_TAG" >> $GITHUB_OUTPUT
+        echo "next-tag=$NEXT_TAG" >> $GITHUB_OUTPUT
+        echo "released=$RELEASED" >> $GITHUB_OUTPUT
+
     - name: Find Comment
       id: fc
       uses: peter-evans/find-comment@v3
@@ -83,23 +89,31 @@ jobs:
         body-includes: This comment was written by a bot!
 
     - name: Create comment
-      if: steps.fc.outputs.comment-id == ''
+      if: steps.fc.outputs.comment-id == '' && steps.get-version.outputs.released == 'true' 
       uses: peter-evans/create-or-update-comment@v4
       with:
         issue-number: ${{ github.event.pull_request.number }}
         body: |
-          Next release: `${{ needs.release.outputs.tag }}`
+          Next release: `${{ steps.get-version.outputs.next-tag }}`
           <!-- This comment was written by a bot! -->
           
     - name: Update comment
-      if: steps.fc.outputs.comment-id != ''
+      if: steps.fc.outputs.comment-id != '' && steps.get-version.outputs.released == 'true' 
       uses: peter-evans/create-or-update-comment@v4
       with:
         comment-id: ${{ steps.fc.outputs.comment-id }}
         edit-mode: replace
         body: |
-          Next release: `${{ needs.release.outputs.tag }}`
+          Next release: `${{ steps.get-version.outputs.next-tag }}`
           <!-- This comment was written by a bot! -->
+
+    - name: Create release
+      if: github.event.pull_request.merged && steps.get-version.outputs.released == 'true'
+      shell: bash
+      env:
+        GH_TOKEN: ${{ steps.app-token.outputs.token }}
+      run: |
+        uv run semantic-release -v version --commit --tag --push --changelog --vcs-release --skip-build
 
   deploy: 
     name: Deploy package distributions
@@ -114,7 +128,7 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v5
       with:
-        ref: ${{ needs.release.outputs.tag }}
+        ref: ${{ needs.release.outputs.next-tag }}
 
     - name: Install the latest version of uv
       uses: astral-sh/setup-uv@v6
@@ -131,7 +145,7 @@ jobs:
       id: publish-dist
       uses: softprops/action-gh-release@v2
       with:
-        tag_name: ${{ needs.release.outputs.tag }}
+        tag_name: ${{ needs.release.outputs.next-tag }}
         files: |
           dist/*.whl
           dist/*.tar.gz

@@ -31,20 +31,21 @@ dependencies = [
     "tree-sitter~=0.25.1",
     "tree-sitter-matlab~=1.2.0",
     "loguru~=0.7.3",
-    "typing-extensions>=4.0; python_version < '3.11'",
+    "typing-extensions~=4.0; python_version < '3.11'",
 ]
 
 [dependency-groups]
 dev = [
-    "ruff>=0.11.7",
-    "pytest>=8.3.5",
-    "pytest-cov>=6.1.1",
-    "pre-commit>=4.2.0",
-    "ty>=0.0.1a19",
+    "ruff~=0.11.7",
+    "pytest~=8.3.5",
+    "pytest-cov~=6.1.1",
+    "ty~=0.0.1a19",
+    "prek~=0.2.3",
+    "python-semantic-release~=10.4.1",
 ]
 reference = [
-    "beautifulsoup4>=4.13.3",
-    "playwright>=1.51.0",
+    "beautifulsoup4~=4.13.3",
+    "playwright~=1.51.0",
 ]
 
 [build-system]
