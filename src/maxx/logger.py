@@ -1,111 +1,54 @@
-# This module contains the logger used throughout Griffe.
-# The logger is actually a wrapper around the standard Python logger.
-# We wrap it so that it is easier for other downstream libraries to patch it.
-# For example, mkdocstrings-python patches the logger to relocate it as a child
-# of `mkdocs.plugins` so that it fits in the MkDocs logging configuration.
-#
-# We use a single, global logger because our public API is exposed in a single module, `griffe`.
-# Extensions however should use their own logger, which is why we provide the `get_logger` function.
-
-from __future__ import annotations
-
+import inspect
 import logging
-from contextlib import contextmanager
-from typing import TYPE_CHECKING, Any, Callable, ClassVar
+import sys
+from typing import Literal
 
-if TYPE_CHECKING:
-    from collections.abc import Iterator
+from loguru import logger
+
+LogLevel = Literal["CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"]
+
+DEFAULT_TIME_FORMAT = "<green>{time:YYYY-MM-DD HH:mm:ss:SSS}</green>"
+DEFAULT_SOURCE_FORMAT = "<cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan>"
+DEFAULT_LEVEL_FORMAT = "<level>{level: <8}</level>"
+DEFAULT_MESSAGE_FORMAT = "<level>{message}</level>"
 
 
-class Logger:
-    _default_logger: Any = logging.getLogger
-    _instances: ClassVar[dict[str, Logger]] = {}
-
-    def __init__(self, name: str) -> None:
-        # Default logger that can be patched by third-party.
-        self._logger = self.__class__._default_logger(name)
-
-    def __getattr__(self, name: str) -> Any:
-        # Forward everything to the logger.
-        return getattr(self._logger, name)
-
-    @contextmanager
-    def disable(self) -> Iterator[None]:
-        """Temporarily disable logging."""
-        old_level = self._logger.level
-        self._logger.setLevel(100)
+# Intercept standard logging messages and route them to Loguru
+# https://loguru.readthedocs.io/en/stable/overview.html#entirely-compatible-with-standard-logging
+class InterceptHandler(logging.Handler):
+    def emit(self, record: logging.LogRecord) -> None:
+        # Get corresponding Loguru level if it exists.
+        level: str | int
         try:
-            yield
-        finally:
-            self._logger.setLevel(old_level)
+            level = logger.level(record.levelname).name
+        except ValueError:
+            level = record.levelno
 
-    @classmethod
-    def _get(cls, name: str = "griffe") -> Logger:
-        if name not in cls._instances:
-            cls._instances[name] = cls(name)
-        return cls._instances[name]
+        # Find caller from where originated the logged message.
+        frame, depth = inspect.currentframe(), 0
+        while frame and (depth == 0 or frame.f_code.co_filename == logging.__file__):
+            frame = frame.f_back
+            depth += 1
 
-    @classmethod
-    def _patch_loggers(cls, get_logger_func: Callable) -> None:
-        # Patch current instances.
-        for name, instance in cls._instances.items():
-            instance._logger = get_logger_func(name)
-
-        # Future instances will be patched as well.
-        cls._default_logger = get_logger_func
+        logger.opt(depth=depth, exception=record.exc_info).log(level, record.getMessage())
 
 
-logger: Logger = Logger._get()
-"""Our global logger, used throughout the library.
-
-Griffe's output and error messages are logging messages.
-
-Griffe provides the [`patch_loggers`][griffe.patch_loggers]
-function so dependent libraries can patch Griffe loggers as they see fit.
-
-For example, to fit in the MkDocs logging configuration
-and prefix each log message with the module name:
-
-```python
-import logging
-from griffe import patch_loggers
+logging.basicConfig(handlers=[InterceptHandler()], level=0, force=True)
 
 
-class LoggerAdapter(logging.LoggerAdapter):
-    def __init__(self, prefix, logger):
-        super().__init__(logger, {})
-        self.prefix = prefix
+def configure(*, level: LogLevel = "INFO", format: str | None = None) -> None:
+    logging.basicConfig(handlers=[InterceptHandler()], level=0, force=True)
 
-    def process(self, msg, kwargs):
-        return f"{self.prefix}: {msg}", kwargs
+    chatty_packages: tuple[str] = ("scanner_scope",)
+    if level in ("DEBUG",):
+        for package in chatty_packages:
+            logging.getLogger(package).setLevel("INFO")
 
-
-def get_logger(name):
-    logger = logging.getLogger(f"mkdocs.plugins.{name}")
-    return LoggerAdapter(name, logger)
-
-
-patch_loggers(get_logger)
-```
-"""
-
-
-def get_logger(name: str = "griffe") -> Logger:
-    """Create and return a new logger instance.
-
-    Parameters:
-        name: The logger name.
-
-    Returns:
-        The logger.
-    """
-    return Logger._get(name)
-
-
-def patch_loggers(get_logger_func: Callable[[str], Any]) -> None:
-    """Patch Griffe logger and Griffe extensions' loggers.
-
-    Parameters:
-        get_logger_func: A function accepting a name as parameter and returning a logger.
-    """
-    Logger._patch_loggers(get_logger_func)
+    format = (
+        format
+        or f"{DEFAULT_TIME_FORMAT} | {DEFAULT_LEVEL_FORMAT} | {DEFAULT_SOURCE_FORMAT} - {DEFAULT_MESSAGE_FORMAT}"
+    )
+    logger.remove()
+    # explicitly set colorize to True, since btq runs as part of a script inside the action
+    # and the output is not recognized as a terminal
+    logger.add(sys.stderr, colorize=True, level=level, format=format)

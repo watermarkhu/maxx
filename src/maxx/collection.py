@@ -6,7 +6,8 @@ from collections import defaultdict, deque
 from pathlib import Path
 from typing import Any, ItemsView, KeysView, Sequence, TypeVar, ValuesView
 
-from maxx.logger import logger
+from loguru import logger
+
 from maxx.objects import (
     Alias,
     Class,
