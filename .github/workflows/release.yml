@@ -89,7 +89,7 @@ jobs:
         body-includes: This comment was written by a bot!
 
     - name: Create comment
-      if: steps.fc.outputs.comment-id == '' && steps.get-version.outputs.released == 'true' 
+      if: steps.fc.outputs.comment-id == '' && steps.get-version.outputs.released == 'true'
       uses: peter-evans/create-or-update-comment@v4
       with:
         issue-number: ${{ github.event.pull_request.number }}
