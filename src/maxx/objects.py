@@ -4,7 +4,7 @@ import threading
 from contextlib import suppress
 from pathlib import Path
 from textwrap import dedent
-from typing import TYPE_CHECKING, Any, Callable, Sequence, cast
+from typing import TYPE_CHECKING, Any, Callable, NoReturn, Sequence, cast
 
 from griffe import Docstring
 from griffe._internal.c3linear import c3linear_merge
@@ -285,7 +285,7 @@ class Object(ObjectAliasMixin):
         return len(self.members) + sum(len(member) for member in self.members.values())
 
     @property
-    def module(self) -> None:
+    def module(self) -> NoReturn:
         """In order to use griffe for docstring parsing"""
         raise ValueError("Object does not have a module")
 
