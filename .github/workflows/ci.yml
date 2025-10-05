@@ -1,6 +1,8 @@
 name: CI
 
 on:
+  schedule:
+    - cron: '0 0 1 * *'  # Monthly on the 1st at midnight
   push:
     branches: [main]
   pull_request:

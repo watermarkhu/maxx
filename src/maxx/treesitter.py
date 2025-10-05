@@ -10,11 +10,11 @@ from typing import TYPE_CHECKING, Any
 
 import charset_normalizer
 import tree_sitter_matlab as tsmatlab
+from loguru import logger
 from tree_sitter import Language, Node, Parser, Query, QueryCursor, Tree, TreeCursor
 
 from maxx.enums import AccessKind, ArgumentKind
 from maxx.expressions import Expr
-from maxx.logger import logger
 from maxx.objects import (
     Argument,
     Arguments,

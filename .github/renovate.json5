@@ -1,0 +1,66 @@
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  extends: [
+    "config:recommended",
+  ],
+  automerge: true,
+  semanticCommits: "enabled",
+  branchPrefix: "renovate-",
+  packageRules: [
+    {
+      groupName: "group-github-actions",
+      description: "Group GitHub Action updates",
+      matchManagers: [
+        "github-actions",
+      ],
+      semanticCommitType: "ci",
+      semanticCommitScope: "deps",
+    },
+    {
+      groupName: "group-pre-commit",
+      description: "Group pre-commit hook updates",
+      matchManagers: [
+        "pre-commit",
+      ],
+      semanticCommitType: "build",
+      semanticCommitScope: "deps",
+    },
+    {
+      // This handles all non-dev, non-doc dependencies in pyproject.toml
+      groupName: "group-pyproject",
+      description: "Group dependency updates from pyproject.toml",
+      matchFileNames: [
+        "pyproject.toml",
+      ],
+      semanticCommitType: "chore",
+      semanticCommitScope: "deps",
+    },
+    {
+      // This handles dev dependencies in pyproject.toml
+      groupName: "group-pyproject-dev",
+      description: "Group dev dependency updates from pyproject.toml",
+      matchFileNames: [
+        "pyproject.toml",
+      ],
+      matchPackageNames: [
+        "ty",
+        "prek",
+        "ruff",
+        "pytest",
+        "pytest-cov",
+        "playwright",
+        "beautifulsoup4",
+        "python-semantic-release",
+      ],
+      semanticCommitType: "build",
+      semanticCommitScope: "deps",
+    },
+  ],
+  "pre-commit": {
+    enabled: true,
+  },
+  // Disable poetry and let the PEP621 manager handle pyproject.toml
+  "poetry": {
+    "enabled": false
+  }
+}

@@ -4,16 +4,16 @@ import threading
 from contextlib import suppress
 from pathlib import Path
 from textwrap import dedent
-from typing import TYPE_CHECKING, Any, Callable, Sequence, cast
+from typing import TYPE_CHECKING, Any, Callable, NoReturn, Sequence, cast
 
 from griffe import Docstring
 from griffe._internal.c3linear import c3linear_merge
+from loguru import logger
 from tree_sitter import Node
 
 from maxx.enums import AccessKind, ArgumentKind, Kind
 from maxx.exceptions import CyclicAliasError, FilePathError, NameResolutionError
 from maxx.expressions import Expr
-from maxx.logger import logger
 from maxx.mixins import ObjectAliasMixin, PathMixin
 
 if TYPE_CHECKING:
@@ -283,6 +283,11 @@ class Object(ObjectAliasMixin):
     def __len__(self) -> int:
         """The number of members in this object, recursively."""
         return len(self.members) + sum(len(member) for member in self.members.values())
+
+    @property
+    def module(self) -> NoReturn:
+        """In order to use griffe for docstring parsing"""
+        raise ValueError("Object does not have a module")
 
     @property
     def has_docstring(self) -> bool:
