@@ -17,13 +17,14 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Topic :: Documentation",
     "Topic :: Software Development",
     "Topic :: Software Development :: Documentation",
     "Topic :: Utilities",
     "Typing :: Typed",
 ]
-requires-python = ">=3.10,<=3.13"
+requires-python = ">=3.10"
 dependencies = [
     "charset-normalizer~=3.4",
     "griffe~=1.14.0",
@@ -40,7 +41,9 @@ dev = [
     "pytest-cov~=6.1.1",
     "ty~=0.0.1a19",
     "prek~=0.2.3",
-    "python-semantic-release~=10.4.1",
+]
+release = [
+    "python-semantic-release~=10.4.1; python_version < '3.14'",
 ]
 reference = [
     "beautifulsoup4~=4.13.3",

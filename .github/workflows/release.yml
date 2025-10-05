@@ -61,7 +61,7 @@ jobs:
     - name: Install dependencies
       shell: bash
       run: |
-        uv sync --all-groups
+        uv sync --group release --no-dev --python "3.13"
 
     - name: Get check version
       id: get-version
