@@ -1,6 +1,33 @@
 # CHANGELOG
 
 
+## v0.5.0 (2025-10-05)
+
+### Bug Fixes
+
+- Module property allowing griffe to parse docstring without error
+  ([#30](https://github.com/watermarkhu/maxx/pull/30),
+  [`349fc79`](https://github.com/watermarkhu/maxx/commit/349fc793acfbd1136210a20504e7ce5e9f1269d6))
+
+### Continuous Integration
+
+- Only support up to 3.13 ([#30](https://github.com/watermarkhu/maxx/pull/30),
+  [`349fc79`](https://github.com/watermarkhu/maxx/commit/349fc793acfbd1136210a20504e7ce5e9f1269d6))
+
+- Update workflows, prek, renovate ([#30](https://github.com/watermarkhu/maxx/pull/30),
+  [`349fc79`](https://github.com/watermarkhu/maxx/commit/349fc793acfbd1136210a20504e7ce5e9f1269d6))
+
+### Features
+
+- Loguru, better renovate config ([#30](https://github.com/watermarkhu/maxx/pull/30),
+  [`349fc79`](https://github.com/watermarkhu/maxx/commit/349fc793acfbd1136210a20504e7ce5e9f1269d6))
+
+### Refactoring
+
+- Switch to loguru for logging ([#30](https://github.com/watermarkhu/maxx/pull/30),
+  [`349fc79`](https://github.com/watermarkhu/maxx/commit/349fc793acfbd1136210a20504e7ce5e9f1269d6))
+
+
 ## v0.4.2 (2025-09-30)
 
 ### Bug Fixes
