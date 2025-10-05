@@ -49,6 +49,4 @@ def configure(*, level: LogLevel = "INFO", format: str | None = None) -> None:
         or f"{DEFAULT_TIME_FORMAT} | {DEFAULT_LEVEL_FORMAT} | {DEFAULT_SOURCE_FORMAT} - {DEFAULT_MESSAGE_FORMAT}"
     )
     logger.remove()
-    # explicitly set colorize to True, since btq runs as part of a script inside the action
-    # and the output is not recognized as a terminal
     logger.add(sys.stderr, colorize=True, level=level, format=format)
