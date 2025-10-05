@@ -285,6 +285,11 @@ class Object(ObjectAliasMixin):
         return len(self.members) + sum(len(member) for member in self.members.values())
 
     @property
+    def module(self) -> None:
+        """In order to use griffe for docstring parsing"""
+        raise ValueError("Object does not have a module")
+
+    @property
     def has_docstring(self) -> bool:
         """Whether this object has a docstring (empty or not)."""
         return bool(self.docstring)
