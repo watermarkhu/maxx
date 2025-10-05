@@ -98,7 +98,7 @@ jobs:
           <!-- This comment was written by a bot! -->
           
     - name: Update comment
-      if: steps.fc.outputs.comment-id != '' && steps.get-version.outputs.released == 'true' 
+      if: steps.fc.outputs.comment-id != '' && steps.get-version.outputs.released == 'true'
       uses: peter-evans/create-or-update-comment@v4
       with:
         comment-id: ${{ steps.fc.outputs.comment-id }}
