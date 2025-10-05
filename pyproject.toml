@@ -36,9 +36,9 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "ruff~=0.11.7",
-    "pytest~=8.3.5",
-    "pytest-cov~=6.1.1",
+    "ruff~=0.13.3",
+    "pytest~=8.4.2",
+    "pytest-cov~=6.3.0",
     "ty~=0.0.1a19",
     "prek~=0.2.3",
 ]
@@ -46,8 +46,8 @@ release = [
     "python-semantic-release~=10.4.1; python_version < '3.14'",
 ]
 reference = [
-    "beautifulsoup4~=4.13.3",
-    "playwright~=1.51.0",
+    "beautifulsoup4~=4.14.2",
+    "playwright~=1.55.0",
 ]
 
 [build-system]
