@@ -247,7 +247,7 @@ jobs:
 
       - name: Check all jobs
         run: |
-          if [[ "${{ needs.test.result }}" == "success" ]]; then
+          if [[ "${{ needs.test.result }}" == "success" ]] && [[ "${{ needs.matlab.result }}" == "success" ]] && [[ "${{ needs.windows.result }}" == "success" ]]; then
             echo "✅ All Python versions passed CI checks"
             echo "## 🎉 CI Summary" >> $GITHUB_STEP_SUMMARY
             echo "All tests passed across Python versions: ${{ needs.setup.outputs.python-versions }}" >> $GITHUB_STEP_SUMMARY
