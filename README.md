@@ -3,6 +3,7 @@
 [![CI](https://github.com/watermarkhu/maxx/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/watermarkhu/maxx/actions/workflows/ci.yml)
 [![pypi version](https://img.shields.io/pypi/v/maxx.svg)](https://pypi.org/project/maxx/)
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue)](https://www.python.org)
+[![codecov](https://codecov.io/github/watermarkhu/maxx/graph/badge.svg?token=230Qtw5Wgy)](https://codecov.io/github/watermarkhu/maxx)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 <img src="https://raw.githubusercontent.com/watermarkhu/maxx/refs/heads/main/img/malt-pixel.svg" alt="malt logo, created by Mark Shui Hu" width="100" align="right">
