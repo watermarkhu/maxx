@@ -102,7 +102,7 @@ jobs:
       run: |
         if uv run pytest -v --tb=short --color=yes \
           --cov maxx --cov-branch --cov-report=xml \
-          --junit-xml=pytest.xml; then
+          --junit-xml=test.xml; then
           echo '# ✅ Tests passed' >> $GITHUB_STEP_SUMMARY
         else
           echo '# ❌ Tests failed' >> $GITHUB_STEP_SUMMARY
@@ -150,7 +150,7 @@ jobs:
         uses: matlab-actions/run-tests@v2
         with:
           select-by-folder: tests
-          test-results-junit: matlab.xml
+          test-results-junit: test.xml
           code-coverage-cobertura: coverage.xml
 
       - name: Upload Test Results
@@ -184,7 +184,7 @@ jobs:
     - name: Run tests
       shell: pwsh
       run: |
-        uv run pytest -v --tb=short --color=yes --junit-xml=windows.xml `
+        uv run pytest -v --tb=short --color=yes --junit-xml=test.xml `
           --cov maxx --cov-branch --cov-report=xml
         if ($LASTEXITCODE -eq 0) {
           '# ✅ Tests passed' | Out-File -Append $env:GITHUB_STEP_SUMMARY
@@ -230,7 +230,7 @@ jobs:
       - name: Publish Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
         with:
-          files: "results/**/pytest.xml"
+          files: "results/**/test.xml"
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
