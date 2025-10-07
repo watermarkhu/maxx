@@ -100,7 +100,9 @@ jobs:
 
     - name: Run tests
       run: |
-        if uv run pytest --cov maxx --tb=short -v --junit-xml=pytest.xml; then
+        if uv run pytest -v --tb=short --color=yes \
+          --cov maxx --cov-branch --cov-report=xml \
+          --junit-xml=test.xml; then
           echo '# ✅ Tests passed' >> $GITHUB_STEP_SUMMARY
         else
           echo '# ❌ Tests failed' >> $GITHUB_STEP_SUMMARY
@@ -117,8 +119,8 @@ jobs:
       if: (!cancelled())
       uses: actions/upload-artifact@v4
       with:
-        name: Test Results (Python ${{ matrix.python-version }})
-        path: pytest.xml
+        name: python${{ matrix.python-version }}
+        path: "*.xml"
 
   matlab:
     name: Verify path collection with MATLAB
@@ -147,15 +149,17 @@ jobs:
       - name: Run tests
         uses: matlab-actions/run-tests@v2
         with:
+          source-folder: src
           select-by-folder: tests
-          test-results-junit: matlab.xml
+          test-results-junit: test.xml
+          code-coverage-cobertura: coverage.xml
 
       - name: Upload Test Results
         if: (!cancelled())
         uses: actions/upload-artifact@v4
         with:
-          name: Test Results (MATLAB path regression)
-          path: matlab.xml
+          name: matlab
+          path: "*.xml"
 
   windows:
     name: Run checks and tests on Windows
@@ -181,7 +185,8 @@ jobs:
     - name: Run tests
       shell: pwsh
       run: |
-        uv run pytest --cov maxx --tb=short -v --junit-xml=windows.xml
+        uv run pytest -v --tb=short --color=yes --junit-xml=test.xml `
+          --cov maxx --cov-branch --cov-report=xml
         if ($LASTEXITCODE -eq 0) {
           '# ✅ Tests passed' | Out-File -Append $env:GITHUB_STEP_SUMMARY
         } else {
@@ -200,27 +205,46 @@ jobs:
       if: (!cancelled())
       uses: actions/upload-artifact@v4
       with:
-        name: Test Results (Windows)
-        path: windows.xml
+        name: windows
+        path: "*.xml"
 
   summary:
     runs-on: ubuntu-latest
     needs: [setup, test, matlab, windows]
     if: (!cancelled())
     permissions:
-      contents: write
-      pull-requests: write
+      contents: read
       checks: write
+      id-token: write
+      pull-requests: write
     steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 2
+
       - name: Download Artifacts
         uses: actions/download-artifact@v5
         with:
-          path: artifacts
+          path: results
 
       - name: Publish Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
         with:
-          files: "artifacts/**/*.xml"
+          files: "results/**/test.xml"
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          use_oidc: true
+          directory: results
+
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
+        with:
+          use_oidc: true
+          directory: results
 
       - name: Check all jobs
         run: |
