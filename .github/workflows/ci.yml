@@ -60,7 +60,7 @@ jobs:
         submodules: true
 
     - name: Set up uv
-      uses: astral-sh/setup-uv@v6
+      uses: astral-sh/setup-uv@v7
       with:
         version: "latest"
 
@@ -136,7 +136,7 @@ jobs:
           release: R2025a
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
         with:
           version: "latest"
 
@@ -169,7 +169,7 @@ jobs:
         submodules: true
 
     - name: Set up uv
-      uses: astral-sh/setup-uv@v6
+      uses: astral-sh/setup-uv@v7
       with:
         version: "latest"
 
