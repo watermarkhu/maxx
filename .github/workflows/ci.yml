@@ -117,7 +117,7 @@ jobs:
 
     - name: Upload Test Results
       if: (!cancelled())
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: python${{ matrix.python-version }}
         path: "*.xml"
@@ -156,7 +156,7 @@ jobs:
 
       - name: Upload Test Results
         if: (!cancelled())
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: matlab
           path: "*.xml"
@@ -203,7 +203,7 @@ jobs:
 
     - name: Upload Test Results
       if: (!cancelled())
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: windows
         path: "*.xml"
@@ -224,7 +224,7 @@ jobs:
           fetch-depth: 2
 
       - name: Download Artifacts
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           path: results
 
