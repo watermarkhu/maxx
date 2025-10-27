@@ -44,11 +44,11 @@ class DelMembersMixin:
         if len(parts) == 1:
             name = parts[0]
             try:
-                del self.members[name]
+                del self.members[name]  # ty: ignore[unresolved-attribute]
             except KeyError:
-                del self.inherited_members[name]
+                del self.inherited_members[name]  # ty: ignore[unresolved-attribute]
         else:
-            del self.all_members[parts[0]][parts[1:]]
+            del self.all_members[parts[0]][parts[1:]]  # ty: ignore[unresolved-attribute]
 
     def del_member(self, key: str | Sequence[str]) -> None:
         """Delete a member with its name or path.
@@ -61,9 +61,9 @@ class DelMembersMixin:
         parts = _get_parts(key)
         if len(parts) == 1:
             name = parts[0]
-            del self.members[name]
+            del self.members[name]  # ty: ignore[unresolved-attribute]
         else:
-            self.members[parts[0]].del_member(parts[1:])
+            self.members[parts[0]].del_member(parts[1:])  # ty: ignore[unresolved-attribute]
 
 
 class GetMembersMixin:
@@ -85,8 +85,8 @@ class GetMembersMixin:
         """
         parts = _get_parts(key)
         if len(parts) == 1:
-            return self.all_members[parts[0]]
-        return self.all_members[parts[0]][parts[1:]]
+            return self.all_members[parts[0]]  # ty: ignore[unresolved-attribute]
+        return self.all_members[parts[0]][parts[1:]]  # ty: ignore[unresolved-attribute]
 
     def get_member(self, key: str | Sequence[str]) -> Any:
         """Get a member with its name or path.
@@ -98,8 +98,8 @@ class GetMembersMixin:
         """
         parts = _get_parts(key)
         if len(parts) == 1:
-            return self.members[parts[0]]
-        return self.members[parts[0]].get_member(parts[1:])
+            return self.members[parts[0]]  # ty: ignore[unresolved-attribute]
+        return self.members[parts[0]].get_member(parts[1:])  # ty: ignore[unresolved-attribute]
 
 
 class SetMembersMixin:
@@ -120,10 +120,10 @@ class SetMembersMixin:
         parts = _get_parts(key)
         if len(parts) == 1:
             name = parts[0]
-            self.members[name] = value
+            self.members[name] = value  # ty: ignore[unresolved-attribute]
             value.parent = self  # ty: ignore[unresolved-attribute]
         else:
-            self.members[parts[0]][parts[1:]] = value
+            self.members[parts[0]][parts[1:]] = value  # ty: ignore[unresolved-attribute]
 
     def set_member(self, key: str | Sequence[str], value: ObjectAliasMixin) -> None:
         """Set a member with its name or path.
@@ -144,10 +144,10 @@ class SetMembersMixin:
         parts = _get_parts(key)
         if len(parts) == 1:
             name = parts[0]
-            self.members[name] = value
+            self.members[name] = value  # ty: ignore[unresolved-attribute]
             value.parent = self  # ty: ignore[unresolved-attribute]
         else:
-            self.members[parts[0]].set_member(parts[1:], value)
+            self.members[parts[0]].set_member(parts[1:], value)  # ty: ignore[unresolved-attribute]
 
 
 class PathMixin:
@@ -163,7 +163,7 @@ class PathMixin:
         self._filepath: Path | None = filepath
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}({self.name})"
+        return f"{self.__class__.__name__}({self.name})"  # ty: ignore[unresolved-attribute]
 
     @property
     def is_private(self) -> bool:
