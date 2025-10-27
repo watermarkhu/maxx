@@ -3,7 +3,7 @@
 import pytest
 
 from maxx.enums import AccessKind, ArgumentKind
-from maxx.objects import Class, Enumeration, Function, Script
+from maxx.objects import Class, Enumeration, Function, Property, Script
 from maxx.treesitter import FileParser
 
 
@@ -14,9 +14,9 @@ class MyClassParser:
     def setup(self, test_files_dir):
         """Set up the test by parsing the MyClass.m file."""
         class_file = test_files_dir / "MyClass.m"
-        self.class_obj = FileParser(class_file).parse()
+        self.class_obj: Class = FileParser(class_file).parse()
         enum_file = test_files_dir / "MyEnum.m"
-        self.enum_obj = FileParser(enum_file).parse()
+        self.enum_obj: Enumeration = FileParser(enum_file).parse()
 
     def test_class_basic_properties(self):
         """Test basic class properties were parsed correctly."""
@@ -65,11 +65,13 @@ class MyClassParser:
 
         # Test Property1 details
         prop1 = self.class_obj.members["Property1"]
+        assert isinstance(prop1, Property)
         assert str(prop1.type) == "double"
         assert str(prop1.default) == "0"
 
         # Test Property2 details
         prop2 = self.class_obj.members["Property2"]
+        assert isinstance(prop2, Property)
         assert str(prop2.type) == "string"
         assert str(prop2.default) == '""'
 
@@ -236,16 +238,19 @@ class MyClassParser:
         """Test that method access levels were parsed correctly."""
         # method1 should have default public access
         method1 = self.class_obj.members["method1"]
+        assert isinstance(method1, Function)
         assert method1.Access == AccessKind.public
         assert not method1.is_private
 
         # method2 should have private access
         method2 = self.class_obj.members["method2"]
+        assert isinstance(method2, Function)
         assert method2.Access == AccessKind.private
         assert method2.is_private
 
         # method3 should have explicit public access
         method3 = self.class_obj.members["method3"]
+        assert isinstance(method3, Function)
         assert method3.Access == AccessKind.public
         assert not method3.is_private
 

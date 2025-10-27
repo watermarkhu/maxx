@@ -37,15 +37,7 @@ class Validatable:
         paths_collection: "PathsCollection | None" = None,
         **kwargs: Any,
     ) -> None:
-        """Initialize the validatable.
-
-        Parameters:
-            name: The validatable name, without leading stars (`*` or `**`).
-            type: The validatable type, if any.
-            kind: The validatable kind.
-            default: The validatable default, if any.
-            docstring: The validatable docstring.
-        """
+        """Initialize the validatable."""
         self.name: str = name
         """The validatable name."""
         self.type: Expr | str | None = type
@@ -66,7 +58,7 @@ class Validatable:
 
         # Attach the docstring to this object.
         if self.docstring is not None:
-            self.docstring.parent = self
+            self.docstring.parent = self  # type: ignore[assignment]
 
     @property
     def has_docstring(self) -> bool:
@@ -76,19 +68,8 @@ class Validatable:
     def __str__(self) -> str:
         arg = f"{self.name}: {self.type} = {self.default}"
         if hasattr(self, "kind") and self.kind is not None:
-            return f"[{self.kind.value}] {arg}"
+            return f"[{self.kind.value}] {arg}"  # ty: ignore[unresolved-attribute]
         return arg
-
-    def __eq__(self, value: object, /) -> bool:
-        """Arguments are equal if all their attributes except `docstring` and `function` are equal."""
-        if not isinstance(value, Argument):
-            return NotImplemented
-        return (
-            self.name == value.name
-            and self.type == value.type
-            and self.kind == value.kind
-            and self.default == value.default
-        )
 
 
 class Argument(Validatable):
@@ -107,6 +88,17 @@ class Argument(Validatable):
     def required(self) -> bool:
         """Whether this argument is required."""
         return self.default is None
+
+    def __eq__(self, value: object, /) -> bool:
+        """Arguments are equal if all their attributes except `docstring` and `function` are equal."""
+        if not isinstance(value, Argument):
+            return NotImplemented
+        return (
+            self.name == value.name
+            and self.type == value.type
+            and self.kind == value.kind
+            and self.default == value.default
+        )
 
 
 class Arguments:
@@ -271,7 +263,7 @@ class Object(ObjectAliasMixin):
 
         # Attach the docstring to this object.
         if docstring:
-            docstring.parent = self
+            docstring.parent = self  # type: ignore[assignment]
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({self.name!r}, {self.lineno!r}, {self.endlineno!r})"
