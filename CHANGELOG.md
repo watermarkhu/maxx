@@ -1,6 +1,46 @@
 # CHANGELOG
 
 
+## v0.5.1 (2025-11-01)
+
+### Bug Fixes
+
+- Pin tree-sitter ([#37](https://github.com/watermarkhu/maxx/pull/37),
+  [`79c5559`](https://github.com/watermarkhu/maxx/commit/79c55591026ae6b77cf54809e2450357aa6cee6a))
+
+### Build System
+
+- **deps**: Update dependency pytest-cov to v7 ([#32](https://github.com/watermarkhu/maxx/pull/32),
+  [`bb5ba4f`](https://github.com/watermarkhu/maxx/commit/bb5ba4f348cbe5b6a80b6362384babd69358340e))
+
+- **deps**: Update dependency ruff to ~=0.14.0 ([#33](https://github.com/watermarkhu/maxx/pull/33),
+  [`6024020`](https://github.com/watermarkhu/maxx/commit/6024020181eefeee290dc237d91315d794d1b128))
+
+- **deps**: Update group-pyproject-dev ([#31](https://github.com/watermarkhu/maxx/pull/31),
+  [`62dbd94`](https://github.com/watermarkhu/maxx/commit/62dbd94803fc3724da2398777663792ad5670944))
+
+### Continuous Integration
+
+- Codecov ([#35](https://github.com/watermarkhu/maxx/pull/35),
+  [`0e4c9db`](https://github.com/watermarkhu/maxx/commit/0e4c9db0614da9a478c9ad96bb1f9a94cac60add))
+
+- **deps**: Update astral-sh/setup-uv action to v7
+  ([#34](https://github.com/watermarkhu/maxx/pull/34),
+  [`1fa38ff`](https://github.com/watermarkhu/maxx/commit/1fa38ffda577c8f1281ed6247592fd74b0838744))
+
+- **deps**: Update group-github-actions ([#36](https://github.com/watermarkhu/maxx/pull/36),
+  [`3c50b9a`](https://github.com/watermarkhu/maxx/commit/3c50b9a459e8b4e8473f30217e6d25be6cc0359b))
+
+- **deps**: Update group-github-actions ([#29](https://github.com/watermarkhu/maxx/pull/29),
+  [`b819cf0`](https://github.com/watermarkhu/maxx/commit/b819cf08dfca033f255215790b2657b34c67bbde))
+
+- **deps**: Update group-github-actions (major) ([#36](https://github.com/watermarkhu/maxx/pull/36),
+  [`3c50b9a`](https://github.com/watermarkhu/maxx/commit/3c50b9a459e8b4e8473f30217e6d25be6cc0359b))
+
+- **deps**: Update group-github-actions (major) ([#29](https://github.com/watermarkhu/maxx/pull/29),
+  [`b819cf0`](https://github.com/watermarkhu/maxx/commit/b819cf08dfca033f255215790b2657b34c67bbde))
+
+
 ## v0.5.0 (2025-10-05)
 
 ### Bug Fixes
