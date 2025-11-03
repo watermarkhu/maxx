@@ -1,6 +1,19 @@
 # CHANGELOG
 
 
+## v0.5.2 (2025-11-03)
+
+### Chores
+
+- **deps**: Update dependency tree-sitter-matlab to ~=1.2.4,<1.2.5
+  ([#38](https://github.com/watermarkhu/maxx/pull/38),
+  [`758bdce`](https://github.com/watermarkhu/maxx/commit/758bdceb7f27c0c140babc73eae1d5798f4531b2))
+
+- **deps**: Update dependency tree-sitter-matlab to ~=1.2.5
+  ([#38](https://github.com/watermarkhu/maxx/pull/38),
+  [`758bdce`](https://github.com/watermarkhu/maxx/commit/758bdceb7f27c0c140babc73eae1d5798f4531b2))
+
+
 ## v0.5.1 (2025-11-01)
 
 ### Bug Fixes
