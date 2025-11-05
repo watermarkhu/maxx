@@ -4,7 +4,7 @@ import pytest
 
 from maxx.enums import AccessKind, ArgumentKind
 from maxx.objects import Class, Enumeration, Function, Property, Script
-from maxx.treesitter import FileParser
+from maxx.treesitter import FileParser, _strtobool
 
 
 class MyClassParser:
@@ -328,3 +328,21 @@ def test_parse_script(test_files_dir):
     # Verify docstring was parsed
     assert model.docstring is not None
     assert "Test script for MATLAB parser" in model.docstring.value
+
+
+def test_strtobool_true():
+    """Test _strtobool with true values."""
+    assert _strtobool("true") is True
+    assert _strtobool("True") is True
+    assert _strtobool("TRUE") is True
+    assert _strtobool("1") is True
+
+
+def test_strtobool_false():
+    """Test _strtobool with false values."""
+    assert _strtobool("false") is False
+    assert _strtobool("False") is False
+    assert _strtobool("FALSE") is False
+    assert _strtobool("0") is False
+    assert _strtobool("anything_else") is False
+    assert _strtobool("") is False

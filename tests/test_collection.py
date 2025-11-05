@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from maxx.collection import PathsCollection
+from maxx.collection import LinesCollection, PathsCollection
 from maxx.objects import Class, Function, Script
 
 # Base directory for test files
@@ -192,3 +192,77 @@ class TestPathsCollection:
         assert arg.dimensions == ["1", "1"]
         assert str(arg.type) == "matlab.graphics.axis.Axes"
         assert str(arg.default) == "gca"
+
+
+class TestLinesCollection:
+    """Test class for LinesCollection."""
+
+    def test_getitem(self):
+        """Test getting lines by path."""
+        collection = LinesCollection()
+        path = Path("/path/to/file.m")
+        lines = ["line1", "line2", "line3"]
+        collection[path] = lines
+        assert collection[path] == lines
+
+    def test_setitem(self):
+        """Test setting lines by path."""
+        collection = LinesCollection()
+        path = Path("/path/to/file.m")
+        lines = ["line1", "line2"]
+        collection[path] = lines
+        assert collection[path] == lines
+
+    def test_contains_true(self):
+        """Test __contains__ when path exists."""
+        collection = LinesCollection()
+        path = Path("/path/to/file.m")
+        collection[path] = ["line1"]
+        assert path in collection
+
+    def test_contains_false(self):
+        """Test __contains__ when path doesn't exist."""
+        collection = LinesCollection()
+        path = Path("/path/to/file.m")
+        assert path not in collection
+
+    def test_bool_empty(self):
+        """Test __bool__ returns True even when empty."""
+        collection = LinesCollection()
+        assert bool(collection) is True
+
+    def test_bool_with_data(self):
+        """Test __bool__ returns True with data."""
+        collection = LinesCollection()
+        path = Path("/path/to/file.m")
+        collection[path] = ["line1"]
+        assert bool(collection) is True
+
+    def test_keys(self):
+        """Test keys() method."""
+        collection = LinesCollection()
+        path1 = Path("/path/to/file1.m")
+        path2 = Path("/path/to/file2.m")
+        collection[path1] = ["line1"]
+        collection[path2] = ["line2"]
+        keys = list(collection.keys())
+        assert path1 in keys
+        assert path2 in keys
+
+    def test_values(self):
+        """Test values() method."""
+        collection = LinesCollection()
+        path = Path("/path/to/file.m")
+        lines = ["line1", "line2"]
+        collection[path] = lines
+        values = list(collection.values())
+        assert lines in values
+
+    def test_items(self):
+        """Test items() method."""
+        collection = LinesCollection()
+        path = Path("/path/to/file.m")
+        lines = ["line1", "line2"]
+        collection[path] = lines
+        items = list(collection.items())
+        assert (path, lines) in items
