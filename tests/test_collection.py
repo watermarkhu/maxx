@@ -92,6 +92,9 @@ class TestPathsCollection:
             "namespace.test_namespace_function",
             "test_function",
             "plot_axes",
+            "AbstractClass",
+            "GetterSetterClass",
+            "block_comment_function",
         }
         assert set(members.keys()) == expected_keys
 

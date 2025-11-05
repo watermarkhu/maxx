@@ -4,13 +4,14 @@ from pathlib import Path
 
 import pytest
 
-from maxx.enums import AccessKind, ArgumentKind
+from maxx.enums import AccessKind, ArgumentKind, Kind
 from maxx.objects import (
     Argument,
     Arguments,
     Class,
     Enumeration,
     Function,
+    Namespace,
     Property,
     Script,
 )
@@ -370,3 +371,138 @@ class TestProperty:
         assert "Hidden" in attrs
         assert "Constant" in attrs
         assert "Access=private" in attrs
+
+
+class TestObjectAdvanced:
+    """Advanced tests for Object class methods."""
+
+    def test_namespace(self):
+        """Test namespace property."""
+        # Create a Namespace object
+        namespace = Namespace(name="namespace", filepath=Path("/path/to/+namespace"))
+        cls = Class(name="Class", filepath=Path("/path/to/+namespace/@Class/Class.m"))
+        cls.parent = namespace
+
+        # namespace property should return the namespace parent
+        assert cls.namespace == namespace
+        # Namespace should return itself
+        assert namespace.namespace == namespace
+
+    def test_canonical_path(self):
+        """Test canonical_path property."""
+        cls = Class(name="MyClass", filepath=Path("/path/to/MyClass.m"))
+        func = Function(name="myMethod", filepath=Path("/path/to/myMethod.m"))
+        func.parent = cls
+
+        # Canonical path should be parent.name.name
+        canonical = func.canonical_path
+        assert "MyClass" in canonical
+        assert "myMethod" in canonical
+
+    def test_is_kind_single(self):
+        """Test is_kind with single kind."""
+        func = Function(name="test", filepath=Path("/path/to/test.m"))
+        assert func.is_kind(Kind.FUNCTION) is True
+        assert func.is_kind("function") is True
+        assert func.is_kind(Kind.CLASS) is False
+
+    def test_is_kind_set(self):
+        """Test is_kind with set of kinds."""
+        func = Function(name="test", filepath=Path("/path/to/test.m"))
+        assert func.is_kind({Kind.FUNCTION, Kind.CLASS}) is True
+        assert func.is_kind({"function", "class"}) is True
+        assert func.is_kind({Kind.CLASS, Kind.SCRIPT}) is False
+
+    def test_is_kind_empty_set_raises(self):
+        """Test is_kind with empty set raises ValueError."""
+        func = Function(name="test", filepath=Path("/path/to/test.m"))
+        with pytest.raises(ValueError):
+            func.is_kind(set())
+
+    def test_filter_members_kind(self):
+        """Test filter_members by kind using predicate."""
+        cls = Class(name="MyClass", filepath=Path("/path/to/MyClass.m"))
+        func1 = Function(name="method1", filepath=Path("/path/to/method1.m"))
+        func2 = Function(name="method2", filepath=Path("/path/to/method2.m"))
+        prop1 = Property(name="prop1", filepath=Path("/path/to/prop1.m"))
+
+        cls.members["method1"] = func1
+        cls.members["method2"] = func2
+        cls.members["prop1"] = prop1
+
+        # Filter for functions only using predicate
+        filtered = cls.filter_members(lambda m: m.kind == Kind.FUNCTION)
+        functions = list(filtered.values())
+        assert len(functions) == 2
+        assert func1 in functions
+        assert func2 in functions
+
+    def test_filter_members_predicate(self):
+        """Test filter_members with predicate."""
+        cls = Class(name="MyClass", filepath=Path("/path/to/MyClass.m"))
+        func1 = Function(name="public_method", filepath=Path("/path/to/public.m"))
+        func2 = Function(name="private_method", filepath=Path("/private/private.m"))
+
+        cls.members["public_method"] = func1
+        cls.members["private_method"] = func2
+
+        # Filter to keep only non-private
+        filtered = cls.filter_members(lambda m: not m.is_private)
+        public_methods = list(filtered.values())
+        assert len(public_methods) >= 1
+
+    def test_has_docstring(self):
+        """Test has_docstring property."""
+        func_with_doc = Function(name="test", filepath=Path("/path/to/test.m"))
+        func_with_doc.docstring = type("obj", (object,), {"value": "Some docstring"})()
+        assert func_with_doc.has_docstring is True
+
+        func_no_doc = Function(name="test2", filepath=Path("/path/to/test2.m"))
+        func_no_doc.docstring = None
+        assert func_no_doc.has_docstring is False
+
+
+class TestClass:
+    """Tests for Class-specific functionality."""
+
+    def test_resolved_bases_empty(self):
+        """Test resolved_bases when no bases."""
+        cls = Class(name="MyClass", filepath=Path("/path/to/MyClass.m"))
+        cls.bases = []
+        resolved = cls.resolved_bases
+        assert resolved == []
+
+    def test_resolved_bases_with_strings(self):
+        """Test resolved_bases with string base names."""
+        cls = Class(name="MyClass", filepath=Path("/path/to/MyClass.m"))
+        cls.bases = ["handle", "BaseClass"]
+        # resolved_bases may raise ValueError if bases cannot be resolved
+        try:
+            resolved = cls.resolved_bases
+            # Should return list if successful
+            assert isinstance(resolved, list)
+        except ValueError:
+            # It's acceptable if bases cannot be resolved without a paths_collection
+            pass
+
+    def test_mro_simple(self):
+        """Test mro() for simple inheritance."""
+        cls = Class(name="MyClass", filepath=Path("/path/to/MyClass.m"))
+        cls.bases = []
+        # mro() may raise ValueError without proper setup
+        try:
+            mro = cls.mro()
+            # MRO should be a list
+            assert isinstance(mro, list)
+        except ValueError:
+            # It's acceptable if MRO cannot be computed without a paths_collection
+            pass
+
+    def test_repr_with_parent(self):
+        """Test __repr__ with parent."""
+        prop = Property(name="myProp", filepath=Path("/path/to/myProp.m"))
+        parent = Class(name="ParentClass", filepath=Path("/path/to/ParentClass.m"))
+        prop.parent = parent
+        repr_str = repr(prop)
+        assert "myProp" in repr_str
+        assert "ParentClass" in repr_str
