@@ -365,40 +365,49 @@ def test_parse_abstract_sealed_class(test_files_dir):
     # Check properties with different attributes
     assert "AbstractProp" in model.members
     abstract_prop = model.members["AbstractProp"]
+    assert isinstance(abstract_prop, Property)
     assert abstract_prop.Abstract is True
 
     assert "HiddenProp" in model.members
     hidden_prop = model.members["HiddenProp"]
+    assert isinstance(hidden_prop, Property)
     assert hidden_prop.Hidden is True
 
     assert "ConstantProp" in model.members
     constant_prop = model.members["ConstantProp"]
+    assert isinstance(constant_prop, Property)
     assert constant_prop.Constant is True
 
     assert "ProtectedProp" in model.members
     protected_prop = model.members["ProtectedProp"]
+    assert isinstance(protected_prop, Property)
     assert protected_prop.Access == AccessKind.protected
 
     assert "PrivateSetProp" in model.members
     private_set_prop = model.members["PrivateSetProp"]
+    assert isinstance(private_set_prop, Property)
     assert private_set_prop.SetAccess == AccessKind.private
 
     # Check methods with different attributes
     # Note: Abstract methods without body may not be parsed
     if "abstractMethod" in model.members:
         abstract_method = model.members["abstractMethod"]
+        assert isinstance(abstract_method, Function)
         assert abstract_method.Abstract is True
 
     assert "staticMethod" in model.members
     static_method = model.members["staticMethod"]
+    assert isinstance(static_method, Function)
     assert static_method.Static is True
 
     assert "privateMethod" in model.members
     private_method = model.members["privateMethod"]
+    assert isinstance(private_method, Function)
     assert private_method.Access == AccessKind.private
 
     assert "hiddenMethod" in model.members
     hidden_method = model.members["hiddenMethod"]
+    assert isinstance(hidden_method, Function)
     assert hidden_method.Hidden is True
 
 
@@ -432,6 +441,7 @@ def test_parse_getter_setter_class(test_files_dir):
     # Check private property
     assert "InternalValue" in model.members
     internal_prop = model.members["InternalValue"]
+    assert isinstance(internal_prop, Property)
     assert internal_prop.Access == AccessKind.private
 
 

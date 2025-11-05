@@ -599,13 +599,13 @@ class TestEnumerationAdvanced:
         """Test enumeration with value."""
         enum = Enumeration(name="MyValue", filepath=Path("/path/to/MyEnum.m"))
         # Enumerations can have values
-        enum.value = "42"
+        enum.value = "42"  # type: ignore[assignment]
         assert str(enum.value) == "42"
 
     def test_enumeration_str_representation(self):
         """Test string representation of enumeration."""
         enum = Enumeration(name="EnumValue", filepath=Path("/path/to/Enum.m"))
-        enum.value = "100"
+        enum.value = "100"  # type: ignore[assignment]
         str_repr = str(enum)
         assert "EnumValue" in str_repr or str_repr is not None
 

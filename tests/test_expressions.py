@@ -15,7 +15,7 @@ class TestExpr:
         mock_node2 = Mock()
         mock_node2.text = b"value"
 
-        expr = Expr(nodes=[mock_node1, mock_node2], encoding="utf-8")
+        expr = Expr(nodes=[mock_node1, mock_node2], encoding="utf-8")  # type: ignore[arg-type]
         result = list(expr.iterate())
 
         assert result == ["test", "value"]
@@ -27,7 +27,7 @@ class TestExpr:
         mock_node2 = Mock()
         mock_node2.text = None
 
-        expr = Expr(nodes=[mock_node1, mock_node2], encoding="utf-8")
+        expr = Expr(nodes=[mock_node1, mock_node2], encoding="utf-8")  # type: ignore[arg-type]
         result = list(expr.iterate())
 
         assert result == ["test"]
@@ -41,7 +41,7 @@ class TestExpr:
         mock_node3 = Mock()
         mock_node3.text = b"world"
 
-        expr = Expr(nodes=[mock_node1, mock_node2, mock_node3], encoding="utf-8")
+        expr = Expr(nodes=[mock_node1, mock_node2, mock_node3], encoding="utf-8")  # type: ignore[arg-type]
 
         assert str(expr) == "hello world"
 
@@ -52,7 +52,7 @@ class TestExpr:
         mock_node2 = Mock()
         mock_node2.text = b"second"
 
-        expr = Expr(nodes=[mock_node1, mock_node2], encoding="utf-8")
+        expr = Expr(nodes=[mock_node1, mock_node2], encoding="utf-8")  # type: ignore[arg-type]
         result = list(iter(expr))
 
         assert result == ["first", "second"]
@@ -67,7 +67,7 @@ class TestExpr:
             mock_node = Mock()
             mock_node.text = builtin_name.encode("utf-8")
 
-            expr = Expr(nodes=[mock_node], encoding="utf-8")
+            expr = Expr(nodes=[mock_node], encoding="utf-8")  # type: ignore[arg-type]
             expected_doc = f"{MATHWORKS_DOC_URL}/{builtin_url}"
 
             assert expr.doc == expected_doc
@@ -77,7 +77,7 @@ class TestExpr:
         mock_node = Mock()
         mock_node.text = b"not_a_builtin_function_xyz123"
 
-        expr = Expr(nodes=[mock_node], encoding="utf-8")
+        expr = Expr(nodes=[mock_node], encoding="utf-8")  # type: ignore[arg-type]
 
         assert expr.doc == ""
 
@@ -93,7 +93,7 @@ class TestExpr:
             mock_node2 = Mock()
             mock_node2.text = builtin_name.encode("utf-8")
 
-            expr = Expr(nodes=[mock_node1, mock_node2], encoding="utf-8")
+            expr = Expr(nodes=[mock_node1, mock_node2], encoding="utf-8")  # type: ignore[arg-type]
             expected_doc = f"{MATHWORKS_DOC_URL}/{builtin_url}"
 
             # Should find the builtin in the second node

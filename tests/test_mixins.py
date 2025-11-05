@@ -75,7 +75,7 @@ class TestDelMembersMixin:
                 self.inherited_members = {}
 
         obj = TestClass()
-        del obj["foo"]
+        del obj["foo"]  # type: ignore[misc]
         assert "foo" not in obj.members
         assert "bar" in obj.members
 
@@ -88,7 +88,7 @@ class TestDelMembersMixin:
                 self.inherited_members = {"inherited": MockObject("inherited")}
 
         obj = TestClass()
-        del obj["inherited"]
+        del obj["inherited"]  # type: ignore[misc]
         assert "inherited" not in obj.inherited_members
 
     def test_delitem_nested_member(self):
@@ -107,7 +107,7 @@ class TestDelMembersMixin:
         obj.members["child"].__class__ = type(
             "MockObjectWithDel", (MockObject, DelMembersMixin), {}
         )
-        del obj["child", "nested"]
+        del obj["child", "nested"]  # type: ignore[misc]
         assert "nested" not in obj.members["child"].members
 
     def test_del_member_single(self):
@@ -129,7 +129,7 @@ class TestDelMembersMixin:
             def __init__(self):
                 child = MockObject("child")
                 child.members = {"nested": MockObject("nested")}
-                child.del_member = lambda key: child.members.pop(
+                child.del_member = lambda key: child.members.pop(  # type: ignore[attr-defined]
                     key[0] if isinstance(key, list) else key
                 )  # noqa: E501
                 self.members = {"child": child}
@@ -193,7 +193,7 @@ class TestGetMembersMixin:
                 child = MockObject("child")
                 nested = MockObject("nested")
                 child.members = {"nested": nested}
-                child.get_member = lambda key: child.members[
+                child.get_member = lambda key: child.members[  # type: ignore[attr-defined]
                     key[0] if isinstance(key, list) else key
                 ]
                 self.members = {"child": child}
@@ -215,7 +215,7 @@ class TestSetMembersMixin:
 
         obj = TestClass()
         new_member = MockObject("new")
-        obj["new"] = new_member
+        obj["new"] = new_member  # type: ignore[index]
         assert "new" in obj.members
         assert obj.members["new"] is new_member
         assert new_member.parent is obj
@@ -233,7 +233,7 @@ class TestSetMembersMixin:
 
         obj = TestClass()
         new_member = MockObject("nested")
-        obj["child", "nested"] = new_member
+        obj["child", "nested"] = new_member  # type: ignore[index]
         assert "nested" in obj.members["child"].members
 
     def test_set_member_single(self):
@@ -245,7 +245,7 @@ class TestSetMembersMixin:
 
         obj = TestClass()
         new_member = MockObject("new")
-        obj.set_member("new", new_member)
+        obj.set_member("new", new_member)  # type: ignore[arg-type]
         assert "new" in obj.members
         assert obj.members["new"] is new_member
         assert new_member.parent is obj
@@ -257,14 +257,14 @@ class TestSetMembersMixin:
             def __init__(self):
                 child = MockObject("child")
                 child.members = {}
-                child.set_member = lambda key, value: child.members.__setitem__(
+                child.set_member = lambda key, value: child.members.__setitem__(  # type: ignore[attr-defined]
                     key[0] if isinstance(key, list) else key, value
                 )
                 self.members = {"child": child}
 
         obj = TestClass()
         new_member = MockObject("nested")
-        obj.set_member(["child", "nested"], new_member)
+        obj.set_member(["child", "nested"], new_member)  # type: ignore[arg-type]
         assert "nested" in obj.members["child"].members
 
 
