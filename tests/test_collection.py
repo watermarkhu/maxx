@@ -81,6 +81,9 @@ class TestPathsCollection:
         """Test that the members property returns all collected objects."""
         members = self.paths_collection.members
         expected_keys = {
+            "@double",
+            "@ClassFolder",
+            "inv",
             "MyClass",
             "MyEnum",
             "ClassFolder",
