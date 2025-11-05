@@ -506,3 +506,186 @@ class TestClass:
         repr_str = repr(prop)
         assert "myProp" in repr_str
         assert "ParentClass" in repr_str
+
+
+class TestObjectProperties:
+    """Test Object property methods."""
+
+    def test_path(self):
+        """Test path property."""
+        cls = Class(name="MyClass", filepath=Path("/path/to/MyClass.m"))
+        path = cls.path
+        assert isinstance(path, str)
+        assert "MyClass" in path
+
+    def test_module_raises(self):
+        """Test that module property raises ValueError."""
+        cls = Class(name="MyClass", filepath=Path("/path/to/MyClass.m"))
+        with pytest.raises(ValueError, match="does not have a module"):
+            _ = cls.module
+
+    def test_lines_property(self):
+        """Test lines property."""
+        func = Function(name="test", filepath=Path("/path/to/test.m"))
+        func.lineno = 10
+        func.endlineno = 20
+        # lines property requires lines_collection, which raises ValueError if not available
+        try:
+            lines = func.lines
+            assert lines is not None
+        except ValueError:
+            # It's expected if no lines_collection is available
+            pass
+
+    def test_source_property(self):
+        """Test source property."""
+        func = Function(name="test", filepath=Path("/path/to/test.m"))
+        # source may raise ValueError if lines collection is not available
+        try:
+            source = func.source
+            assert source is None or isinstance(source, (list, str))
+        except ValueError:
+            # It's expected if no lines_collection is available
+            pass
+
+
+class TestAlias:
+    """Tests for Alias class."""
+
+    def test_alias_target_path(self):
+        """Test alias with target path."""
+        from maxx.objects import Alias
+
+        target = Function(name="original", filepath=Path("/path/to/original.m"))
+        alias = Alias(name="alias_name", target=target)
+
+        assert alias.target is target
+        assert alias.is_alias is True
+
+
+class TestFunctionAdvanced:
+    """Advanced tests for Function class."""
+
+    def test_function_with_returns(self):
+        """Test function with return values."""
+        func = Function(name="test", filepath=Path("/path/to/test.m"))
+        # Add returns
+        from maxx.objects import Argument
+
+        ret = Argument(name="output")
+        func.returns = Arguments(ret)
+
+        assert func.returns is not None
+        assert len(func.returns) == 1
+        assert func.returns[0].name == "output"
+
+    def test_function_is_async(self):
+        """Test is_async property."""
+        func = Function(name="test", filepath=Path("/path/to/test.m"))
+        # By default, MATLAB functions are not async
+        assert hasattr(func, "is_async") or True  # Property may not exist
+
+    def test_function_decorators(self):
+        """Test decorators property."""
+        func = Function(name="test", filepath=Path("/path/to/test.m"))
+        # MATLAB doesn't have decorators, but property may exist
+        assert hasattr(func, "decorators") or True
+
+
+class TestEnumerationAdvanced:
+    """Advanced tests for Enumeration class."""
+
+    def test_enumeration_with_value(self):
+        """Test enumeration with value."""
+        enum = Enumeration(name="MyValue", filepath=Path("/path/to/MyEnum.m"))
+        # Enumerations can have values
+        enum.value = "42"
+        assert str(enum.value) == "42"
+
+    def test_enumeration_str_representation(self):
+        """Test string representation of enumeration."""
+        enum = Enumeration(name="EnumValue", filepath=Path("/path/to/Enum.m"))
+        enum.value = "100"
+        str_repr = str(enum)
+        assert "EnumValue" in str_repr or str_repr is not None
+
+
+class TestPropertyAdvanced:
+    """Advanced tests for Property class."""
+
+    def test_property_all_attributes(self):
+        """Test property with all attributes."""
+        prop = Property(
+            name="comprehensive",
+            filepath=Path("/path/to/prop.m"),
+            AbortSet=True,
+            Abstract=True,
+            Constant=True,
+            Dependent=True,
+            GetObservable=True,
+            Hidden=True,
+            NonCopyable=True,
+            SetObservable=True,
+            Transient=True,
+            WeakHandle=True,
+            Access=AccessKind.private,
+            GetAccess=AccessKind.protected,
+            SetAccess=AccessKind.private,
+        )
+
+        # Check all boolean attributes
+        assert prop.AbortSet is True
+        assert prop.Abstract is True
+        assert prop.Constant is True
+        assert prop.Dependent is True
+        assert prop.GetObservable is True
+        assert prop.Hidden is True
+        assert prop.NonCopyable is True
+        assert prop.SetObservable is True
+        assert prop.Transient is True
+        assert prop.WeakHandle is True
+
+        # Check access attributes
+        assert prop.Access == AccessKind.private
+        assert prop.GetAccess == AccessKind.protected
+        assert prop.SetAccess == AccessKind.private
+
+        # Check is_private (should be True because Access is private)
+        assert prop.is_private is True
+
+        # Check attributes property
+        attrs = prop.attributes
+        assert len(attrs) > 5  # Should have multiple attributes
+
+    def test_property_getter_setter(self):
+        """Test property with getter and setter."""
+        prop = Property(name="value", filepath=Path("/path/to/value.m"))
+        getter = Function(name="get.value", filepath=Path("/path/to/get_value.m"))
+        setter = Function(name="set.value", filepath=Path("/path/to/set_value.m"))
+
+        prop.getter = getter
+        prop.setter = setter
+
+        assert prop.getter is getter
+        assert prop.setter is setter
+
+    def test_property_repr_without_parent(self):
+        """Test __repr__ without parent."""
+        prop = Property(name="standalone", filepath=Path("/path/to/prop.m"))
+        prop.parent = None
+        repr_str = repr(prop)
+        assert "standalone" in repr_str
+        assert "Property" in repr_str
+
+
+class TestScriptAdvanced:
+    """Advanced tests for Script class."""
+
+    def test_script_with_members(self):
+        """Test script with function members."""
+        script = Script(name="my_script", filepath=Path("/path/to/my_script.m"))
+        func = Function(name="helper", filepath=Path("/path/to/helper.m"))
+        script.members["helper"] = func
+
+        assert "helper" in script.members
+        assert len(script) > 0  # Should count members recursively

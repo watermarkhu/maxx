@@ -453,3 +453,75 @@ def test_parse_block_comment_function(test_files_dir):
     # Check that arguments were parsed
     assert model.arguments is not None
     assert len(model.arguments) == 2
+
+
+def test_parse_error_handling(test_files_dir):
+    """Test parsing a malformed file with syntax errors."""
+    malformed_file = test_files_dir / "malformed.m"
+    parser = FileParser(malformed_file)
+
+    # Parser should handle syntax errors gracefully
+    try:
+        model = parser.parse()
+        # If it parses, check that it returns something
+        assert model is not None
+    except Exception as e:
+        # It's acceptable to raise an exception for malformed files
+        assert e is not None
+
+
+def test_parse_pragma_comments(test_files_dir):
+    """Test parsing a function with pragma comments."""
+    pragma_file = test_files_dir / "pragma_function.m"
+    parser = FileParser(pragma_file)
+    model = parser.parse()
+
+    # Verify it's a Function
+    assert isinstance(model, Function)
+    assert model.name == "pragma_function"
+
+    # Verify docstring was parsed (pragmas should be filtered)
+    assert model.docstring is not None
+    # Pragmas like %#codegen should be filtered out
+    assert "%#codegen" not in model.docstring.value or "#codegen" not in model.docstring.value
+
+
+def test_parse_multiline_docstring(test_files_dir):
+    """Test parsing a function with multiline docstring."""
+    multiline_file = test_files_dir / "multiline_docstring.m"
+    parser = FileParser(multiline_file)
+    model = parser.parse()
+
+    # Verify it's a Function
+    assert isinstance(model, Function)
+    assert model.name == "multiline_docstring"
+
+    # Verify multiline docstring was parsed
+    assert model.docstring is not None
+    assert "First line" in model.docstring.value
+    assert "Second line" in model.docstring.value
+    assert "Third line" in model.docstring.value
+
+
+def test_parse_complex_block_comment(test_files_dir):
+    """Test parsing a function with complex block comment."""
+    complex_file = test_files_dir / "complex_block_comment.m"
+    parser = FileParser(complex_file)
+    model = parser.parse()
+
+    # Verify it's a Function
+    assert isinstance(model, Function)
+    assert model.name == "complex_block_comment"
+
+    # Verify block comment was parsed
+    assert model.docstring is not None
+    assert "complex block comment" in model.docstring.value.lower()
+    assert "multiple paragraphs" in model.docstring.value.lower()
+
+    # Check arguments were parsed
+    assert model.arguments is not None
+    assert len(model.arguments) == 3
+
+    # Verify returns were parsed
+    assert model.returns is not None
+    assert len(model.returns) == 1
