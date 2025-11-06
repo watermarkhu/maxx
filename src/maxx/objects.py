@@ -837,6 +837,45 @@ class Class(PathMixin, Object):
         return inherited_members
 
 
+class ClassFolder(Folder):
+    kind: Kind = Kind.CLASS
+
+    def __init__(self, *args, classfile: Class | None = None, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        self.classfile: Class | None = classfile
+
+    def __repr__(self) -> str:
+        return f"ClassFolder({self.path!r})"
+
+    @property
+    def arguments(self) -> Arguments:
+        """The arguments of this class' constructor"""
+        if self.classfile is None:
+            return Arguments()
+        return self.classfile.arguments
+
+    @property
+    def constructor(self) -> Function | None:
+        """The constructor of this class."""
+        if self.classfile is None:
+            return None
+        return self.classfile.constructor
+
+    @property
+    def resolved_bases(self) -> list[Object]:
+        """The resolved bases of this class."""
+        if self.classfile is None:
+            return []
+        return self.classfile.resolved_bases
+
+    @property
+    def inherited_members(self) -> dict[str, Alias]:
+        """The inherited members of this class."""
+        if self.classfile is None:
+            return {}
+        return self.classfile.inherited_members
+
+
 class Enumeration(PathMixin, Object):
     """This class represents a MATLAB enumeration."""
 

@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 from maxx.collection import LinesCollection, PathsCollection
-from maxx.objects import Class, Function, Script
+from maxx.objects import Class, ClassFolder, Function, Script
 
 # Base directory for test files
 TEST_FILES_DIR = Path(__file__).parent / "files"
@@ -32,9 +32,9 @@ class TestPathsCollection:
     def test_classfolder_collection(self):
         """Test that ClassFolder is properly collected."""
         classfolder = self.paths_collection.get_member("ClassFolder")
-        assert isinstance(classfolder, Class)
+        assert isinstance(classfolder, ClassFolder)
         assert classfolder.name == "ClassFolder"
-        assert classfolder.filepath.name == "ClassFolder.m"
+        assert classfolder.filepath.name == "@ClassFolder"
 
     def test_classfolder_analyze_method(self):
         """Test that ClassFolder.analyze method is properly collected."""
@@ -81,6 +81,8 @@ class TestPathsCollection:
         """Test that the members property returns all collected objects."""
         members = self.paths_collection.members
         expected_keys = {
+            "double",
+            "inv",
             "MyClass",
             "MyEnum",
             "ClassFolder",

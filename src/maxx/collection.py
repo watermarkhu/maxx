@@ -11,6 +11,7 @@ from loguru import logger
 from maxx.objects import (
     Alias,
     Class,
+    ClassFolder,
     Docstring,
     Folder,
     Function,
@@ -167,9 +168,7 @@ class _PathResolver:
         self._paths_collection.lines_collection[path] = file.content.split("\n")
         return object
 
-    def _collect_directory(
-        self, path: Path, object: PathType, set_parent: bool = False
-    ) -> PathType:
+    def _collect_directory(self, path: Path, object: PathType, set_parent: bool = False) -> None:
         for item in path.iterdir():
             if item.is_dir() and item.name[0] in FOLDER_PREFIXES:
                 if item not in self._paths_collection._objects:
@@ -195,17 +194,15 @@ class _PathResolver:
                             subobject.parent = object
         if object.docstring is None:
             object.docstring = self._collect_readme_md(path, object)
-        return object
 
-    def _collect_classfolder(self, path: Path) -> Class | None:
-        classfile = path / (path.name[1:] + MFILE_SUFFIX)
-        if not classfile.exists():
-            logger.warning(f"Class file does not exist in class folder: {classfile}")
-            return None
-        object = self._collect_path(classfile)
-        if not isinstance(object, Class):
-            logger.error(f"Object parsed from class file is not a Class: {classfile}")
-            return None
+    def _collect_classfolder(self, path: Path) -> ClassFolder | None:
+        object = ClassFolder(path.stem[1:], filepath=path, paths_collection=self._paths_collection)
+        self._collect_directory(path, object, set_parent=True)
+        classname = path.stem[1:]
+        classfile = object.members.get(classname, None)
+        if isinstance(classfile, Alias):
+            classfile = classfile.target
+
         for member in path.iterdir():
             if member.is_file() and member.suffix == MFILE_SUFFIX and member != classfile:
                 if member.name == CONTENTS_FILE and object.docstring is None:
@@ -217,21 +214,38 @@ class _PathResolver:
                         raise KeyError(f"Path not found in collection: {member}")
                     method = self._paths_collection._objects[member].target
                     if method is not None and isinstance(method, Function):
-                        method.parent = object
+                        method.parent = classfile
                         object.members[method.name] = method
         if object.docstring is None:
             object.docstring = self._collect_readme_md(path, object)
+
+        if classfile is not None:
+            classfile.parent = None
+            if not isinstance(classfile, Class):
+                raise TypeError(f"Class folder class {classfile.path} must be a Class object")
+            object.classfile = classfile
+            classfile_members = {k: m for k, m in classfile.members.items()}
+            classfile.members.update(
+                {k: m for k, m in object.members.items() if m is not classfile}
+            )
+            object.members.update(classfile_members)
+            if classfile.docstring is not None:
+                object.docstring = classfile.docstring
+            elif object.docstring is not None:
+                classfile.docstring = object.docstring
         return object
 
     def _collect_namespace(self, path: Path) -> Namespace:
         name = self.name[1:].split(".")[-1]
         object = Namespace(name, filepath=path, paths_collection=self._paths_collection)
-        return self._collect_directory(path, object, set_parent=True)
+        self._collect_directory(path, object, set_parent=True)
+        return object
 
     def _collect_folder(self, path: Path) -> Folder:
         name = path.stem
         object = Folder("/" + name, filepath=path, paths_collection=self._paths_collection)
-        return self._collect_directory(path, object, set_parent=False)
+        self._collect_directory(path, object, set_parent=False)
+        return object
 
     def _collect_readme_md(self, path, parent: PathType) -> Docstring | None:
         if (path / "README.md").exists():
@@ -518,6 +532,10 @@ class PathsCollection:
             self._objects[member] = object
 
         for member, object in self._objects.items():
+            if (CLASSFOLDER_PREFIX + member.stem) == member.parent.name:
+                # skip class file in class folder, this member is added via the class folder
+                continue
+
             self._mapping[object.path].append(member)
             self._members[path].append((object.name, member))
 
