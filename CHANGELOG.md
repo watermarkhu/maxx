@@ -1,9 +1,12 @@
 # CHANGELOG
 
 
-## v0.5.2 (2025-11-03)
+## v0.5.2 (2025-11-05)
 
 ### Chores
+
+- Add coverage files to .gitignore ([#39](https://github.com/watermarkhu/maxx/pull/39),
+  [`14fc56d`](https://github.com/watermarkhu/maxx/commit/14fc56dad7d5fd381b6193fff3c33d2a888e046f))
 
 - **deps**: Update dependency tree-sitter-matlab to ~=1.2.4,<1.2.5
   ([#38](https://github.com/watermarkhu/maxx/pull/38),
@@ -12,6 +15,20 @@
 - **deps**: Update dependency tree-sitter-matlab to ~=1.2.5
   ([#38](https://github.com/watermarkhu/maxx/pull/38),
   [`758bdce`](https://github.com/watermarkhu/maxx/commit/758bdceb7f27c0c140babc73eae1d5798f4531b2))
+
+### Testing
+
+- Achieve 82% test coverage (65% → 82%, +17%) ([#39](https://github.com/watermarkhu/maxx/pull/39),
+  [`14fc56d`](https://github.com/watermarkhu/maxx/commit/14fc56dad7d5fd381b6193fff3c33d2a888e046f))
+
+- Boost test coverage from 77% to 81% (+4%) ([#39](https://github.com/watermarkhu/maxx/pull/39),
+  [`14fc56d`](https://github.com/watermarkhu/maxx/commit/14fc56dad7d5fd381b6193fff3c33d2a888e046f))
+
+- Improve coverage ([#39](https://github.com/watermarkhu/maxx/pull/39),
+  [`14fc56d`](https://github.com/watermarkhu/maxx/commit/14fc56dad7d5fd381b6193fff3c33d2a888e046f))
+
+- Improve test coverage from 65% to 77% ([#39](https://github.com/watermarkhu/maxx/pull/39),
+  [`14fc56d`](https://github.com/watermarkhu/maxx/commit/14fc56dad7d5fd381b6193fff3c33d2a888e046f))
 
 
 ## v0.5.1 (2025-11-01)
