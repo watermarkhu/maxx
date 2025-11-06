@@ -196,7 +196,7 @@ class _PathResolver:
             object.docstring = self._collect_readme_md(path, object)
 
     def _collect_classfolder(self, path: Path) -> ClassFolder | None:
-        object = ClassFolder(path.stem, filepath=path, paths_collection=self._paths_collection)
+        object = ClassFolder(path.stem[1:], filepath=path, paths_collection=self._paths_collection)
         self._collect_directory(path, object, set_parent=True)
         classname = path.stem[1:]
         classfile = object.members.get(classname, None)
@@ -224,9 +224,11 @@ class _PathResolver:
             if not isinstance(classfile, Class):
                 raise TypeError(f"Class folder class {classfile.path} must be a Class object")
             object.classfile = classfile
+            classfile_members = {k: m for k, m in classfile.members.items()}
             classfile.members.update(
                 {k: m for k, m in object.members.items() if m is not classfile}
             )
+            object.members.update(classfile_members)
             if classfile.docstring is not None:
                 object.docstring = classfile.docstring
             elif object.docstring is not None:
@@ -530,6 +532,11 @@ class PathsCollection:
             self._objects[member] = object
 
         for member, object in self._objects.items():
+
+            if (CLASSFOLDER_PREFIX + member.stem) == member.parent.name:
+                # skip class file in class folder, this member is added via the class folder
+                continue
+
             self._mapping[object.path].append(member)
             self._members[path].append((object.name, member))
 
