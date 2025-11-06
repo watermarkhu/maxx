@@ -168,9 +168,7 @@ class _PathResolver:
         self._paths_collection.lines_collection[path] = file.content.split("\n")
         return object
 
-    def _collect_directory(
-        self, path: Path, object: PathType, set_parent: bool = False
-    ) -> None:
+    def _collect_directory(self, path: Path, object: PathType, set_parent: bool = False) -> None:
         for item in path.iterdir():
             if item.is_dir() and item.name[0] in FOLDER_PREFIXES:
                 if item not in self._paths_collection._objects:
@@ -198,10 +196,7 @@ class _PathResolver:
             object.docstring = self._collect_readme_md(path, object)
 
     def _collect_classfolder(self, path: Path) -> ClassFolder | None:
-
-        object = ClassFolder(
-            path.stem, filepath=path, paths_collection=self._paths_collection
-        )
+        object = ClassFolder(path.stem, filepath=path, paths_collection=self._paths_collection)
         self._collect_directory(path, object, set_parent=True)
         classname = path.stem[1:]
         classfile = object.members.get(classname, None)
@@ -229,7 +224,9 @@ class _PathResolver:
             if not isinstance(classfile, Class):
                 raise TypeError(f"Class folder class {classfile.path} must be a Class object")
             object.classfile = classfile
-            classfile.members.update({k: m for k, m in object.members.items() if m is not classfile})
+            classfile.members.update(
+                {k: m for k, m in object.members.items() if m is not classfile}
+            )
             if classfile.docstring is not None:
                 object.docstring = classfile.docstring
             elif object.docstring is not None:
