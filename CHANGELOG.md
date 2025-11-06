@@ -1,6 +1,17 @@
 # CHANGELOG
 
 
+## v0.5.3 (2025-11-06)
+
+### Bug Fixes
+
+- Classfolder without class file ([#40](https://github.com/watermarkhu/maxx/pull/40),
+  [`436862d`](https://github.com/watermarkhu/maxx/commit/436862d6ebcae41ea2af14e0419a177a0c42d50b))
+
+- Set same behavior as in MATLAB ([#40](https://github.com/watermarkhu/maxx/pull/40),
+  [`436862d`](https://github.com/watermarkhu/maxx/commit/436862d6ebcae41ea2af14e0419a177a0c42d50b))
+
+
 ## v0.5.2 (2025-11-05)
 
 ### Chores
