@@ -532,7 +532,6 @@ class PathsCollection:
             self._objects[member] = object
 
         for member, object in self._objects.items():
-
             if (CLASSFOLDER_PREFIX + member.stem) == member.parent.name:
                 # skip class file in class folder, this member is added via the class folder
                 continue
