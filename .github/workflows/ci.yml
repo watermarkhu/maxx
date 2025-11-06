@@ -135,7 +135,7 @@ jobs:
       - name: Set up MATLAB
         uses: matlab-actions/setup-matlab@v2
         with:
-          release: R2025a
+          release: R2025b
 
       - name: Set up uv
         uses: astral-sh/setup-uv@v7
