@@ -220,6 +220,7 @@ class _PathResolver:
             object.docstring = self._collect_readme_md(path, object)
 
         if classfile is not None:
+            # Copy classfile members into class folder and vice versa
             classfile.parent = None
             if not isinstance(classfile, Class):
                 raise TypeError(f"Class folder class {classfile.path} must be a Class object")
@@ -229,6 +230,7 @@ class _PathResolver:
                 {k: m for k, m in object.members.items() if m is not classfile}
             )
             object.members.update(classfile_members)
+            object.members.pop(classfile.path)
             if classfile.docstring is not None:
                 object.docstring = classfile.docstring
             elif object.docstring is not None:
