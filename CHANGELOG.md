@@ -1,6 +1,33 @@
 # CHANGELOG
 
 
+## v0.5.4 (2025-11-10)
+
+### Bug Fixes
+
+- Classfolder classfile member ([#43](https://github.com/watermarkhu/maxx/pull/43),
+  [`30192a7`](https://github.com/watermarkhu/maxx/commit/30192a7a966526d690e516f476a63d9aebce045d))
+
+### Build System
+
+- **deps**: Update dependency pytest to v9 ([#41](https://github.com/watermarkhu/maxx/pull/41),
+  [`36d4b67`](https://github.com/watermarkhu/maxx/commit/36d4b6751ebbb8c99556e0a700b105d36d1dcd3f))
+
+- **deps**: Update dependency python-semantic-release to ~=10.5.0
+  ([#42](https://github.com/watermarkhu/maxx/pull/42),
+  [`4d4a284`](https://github.com/watermarkhu/maxx/commit/4d4a284132803961f4fbeabe25a8ccff59248e63))
+
+### Continuous Integration
+
+- Uv hash ([#43](https://github.com/watermarkhu/maxx/pull/43),
+  [`30192a7`](https://github.com/watermarkhu/maxx/commit/30192a7a966526d690e516f476a63d9aebce045d))
+
+### Refactoring
+
+- Cast types ([#43](https://github.com/watermarkhu/maxx/pull/43),
+  [`30192a7`](https://github.com/watermarkhu/maxx/commit/30192a7a966526d690e516f476a63d9aebce045d))
+
+
 ## v0.5.3 (2025-11-06)
 
 ### Bug Fixes
