@@ -65,9 +65,9 @@ class MockObject:
         return self.kind == Kind.CLASS
 
     @staticmethod
-    def casted(*args, **kwargs):
+    def cast(*args, **kwargs):
         """A static method to mimic casting behavior."""
-        return cast(Alias, MockObject.casted(*args, **kwargs))
+        return cast(Alias, MockObject.cast(*args, **kwargs))
 
 
 class TestDelMembersMixin:
@@ -78,7 +78,7 @@ class TestDelMembersMixin:
 
         class TestClass(DelMembersMixin):
             def __init__(self):
-                self.members = {"foo": MockObject.casted("foo"), "bar": MockObject.casted("bar")}
+                self.members = {"foo": MockObject.cast("foo"), "bar": MockObject.cast("bar")}
                 self.inherited_members = {}
 
         obj = TestClass()
@@ -92,7 +92,7 @@ class TestDelMembersMixin:
         class TestClass(DelMembersMixin):
             def __init__(self):
                 self.members = {}
-                self.inherited_members = {"inherited": MockObject.casted("inherited")}
+                self.inherited_members = {"inherited": MockObject.cast("inherited")}
 
         obj = TestClass()
         del obj["inherited"]  # type: ignore[misc]
@@ -103,8 +103,8 @@ class TestDelMembersMixin:
 
         class TestClass(DelMembersMixin):
             def __init__(self):
-                child = MockObject.casted("child")
-                child.members = {"nested": MockObject.casted("nested")}
+                child = MockObject.cast("child")
+                child.members = {"nested": MockObject.cast("nested")}
                 self.members = {"child": child}
                 self.inherited_members = {}
                 self.all_members = self.members
@@ -122,7 +122,7 @@ class TestDelMembersMixin:
 
         class TestClass(DelMembersMixin):
             def __init__(self):
-                self.members = {"foo": MockObject.casted("foo"), "bar": MockObject.casted("bar")}
+                self.members = {"foo": MockObject.cast("foo"), "bar": MockObject.cast("bar")}
 
         obj = TestClass()
         obj.del_member("foo")
@@ -134,8 +134,8 @@ class TestDelMembersMixin:
 
         class TestClass(DelMembersMixin):
             def __init__(self):
-                child = MockObject.casted("child")
-                child.members = {"nested": MockObject.casted("nested")}
+                child = MockObject.cast("child")
+                child.members = {"nested": MockObject.cast("nested")}
                 child.del_member = lambda key: child.members.pop(  # type: ignore[attr-defined]
                     key[0] if isinstance(key, list) else key
                 )  # noqa: E501
@@ -154,7 +154,7 @@ class TestGetMembersMixin:
 
         class TestClass(GetMembersMixin):
             def __init__(self):
-                self.members = {"foo": MockObject.casted("foo")}
+                self.members = {"foo": MockObject.cast("foo")}
                 self.inherited_members = {}
                 self.all_members = self.members
 
@@ -171,7 +171,7 @@ class TestGetMembersMixin:
         class TestClass(GetMembersMixin):
             def __init__(self):
                 child = MockObjectWithGet("child")
-                child.members = {"nested": MockObject.casted("nested")}
+                child.members = {"nested": MockObject.cast("nested")}
                 child.inherited_members = {}
                 self.members = {"child": child}
                 self.inherited_members = {}
@@ -186,7 +186,7 @@ class TestGetMembersMixin:
 
         class TestClass(GetMembersMixin):
             def __init__(self):
-                self.members = {"foo": MockObject.casted("foo")}
+                self.members = {"foo": MockObject.cast("foo")}
 
         obj = TestClass()
         result = obj.get_member("foo")
@@ -197,8 +197,8 @@ class TestGetMembersMixin:
 
         class TestClass(GetMembersMixin):
             def __init__(self):
-                child = MockObject.casted("child")
-                nested = MockObject.casted("nested")
+                child = MockObject.cast("child")
+                nested = MockObject.cast("nested")
                 child.members = {"nested": nested}
                 child.get_member = lambda key: child.members[  # type: ignore[attr-defined]
                     key[0] if isinstance(key, list) else key
@@ -221,7 +221,7 @@ class TestSetMembersMixin:
                 self.members = {}
 
         obj = TestClass()
-        new_member = MockObject.casted("new")
+        new_member = MockObject.cast("new")
         obj["new"] = new_member  # type: ignore[index]
         assert "new" in obj.members
         assert obj.members["new"] is new_member
@@ -232,14 +232,14 @@ class TestSetMembersMixin:
 
         class TestClass(SetMembersMixin):
             def __init__(self):
-                child = MockObject.casted("child")
+                child = MockObject.cast("child")
                 child.members = {}
                 # Make child support __setitem__
                 child.__class__ = type("MockObjectWithSet", (MockObject, SetMembersMixin), {})
                 self.members = {"child": child}
 
         obj = TestClass()
-        new_member = MockObject.casted("nested")
+        new_member = MockObject.cast("nested")
         obj["child", "nested"] = new_member  # type: ignore[index]
         assert "nested" in obj.members["child"].members
 
@@ -251,7 +251,7 @@ class TestSetMembersMixin:
                 self.members = {}
 
         obj = TestClass()
-        new_member = MockObject.casted("new")
+        new_member = MockObject.cast("new")
         obj.set_member("new", new_member)  # type: ignore[arg-type]
         assert "new" in obj.members
         assert obj.members["new"] is new_member
@@ -262,7 +262,7 @@ class TestSetMembersMixin:
 
         class TestClass(SetMembersMixin):
             def __init__(self):
-                child = MockObject.casted("child")
+                child = MockObject.cast("child")
                 child.members = {}
                 child.set_member = lambda key, value: child.members.__setitem__(  # type: ignore[attr-defined]
                     key[0] if isinstance(key, list) else key, value
@@ -270,7 +270,7 @@ class TestSetMembersMixin:
                 self.members = {"child": child}
 
         obj = TestClass()
-        new_member = MockObject.casted("nested")
+        new_member = MockObject.cast("nested")
         obj.set_member(["child", "nested"], new_member)  # type: ignore[arg-type]
         assert "nested" in obj.members["child"].members
 
@@ -413,8 +413,8 @@ class TestObjectAliasMixin:
 
         class TestClass(ObjectAliasMixin):
             def __init__(self):
-                self.members = {"foo": MockObject.casted("foo")}
-                self.inherited_members = {"bar": MockObject.casted("bar")}
+                self.members = {"foo": MockObject.cast("foo")}
+                self.inherited_members = {"bar": MockObject.cast("bar")}
                 self.is_class = True
 
         obj = TestClass()
@@ -427,8 +427,8 @@ class TestObjectAliasMixin:
 
         class TestClass(ObjectAliasMixin):
             def __init__(self):
-                self.members = {"foo": MockObject.casted("foo")}
-                self.inherited_members = {"bar": MockObject.casted("bar")}
+                self.members = {"foo": MockObject.cast("foo")}
+                self.inherited_members = {"bar": MockObject.cast("bar")}
                 self.is_class = False
 
         obj = TestClass()
@@ -443,8 +443,8 @@ class TestObjectAliasMixin:
         class TestClass(ObjectAliasMixin):
             def __init__(self):
                 self.members = {
-                    "folder1": MockObject.casted("folder1", Kind.FOLDER),
-                    "class1": MockObject.casted("class1", Kind.CLASS),
+                    "folder1": MockObject.cast("folder1", Kind.FOLDER),
+                    "class1": MockObject.cast("class1", Kind.CLASS),
                 }
                 self.inherited_members = {}
                 self.is_class = False
@@ -460,8 +460,8 @@ class TestObjectAliasMixin:
         class TestClass(ObjectAliasMixin):
             def __init__(self):
                 self.members = {
-                    "namespace1": MockObject.casted("namespace1", Kind.NAMESPACE),
-                    "class1": MockObject.casted("class1", Kind.CLASS),
+                    "namespace1": MockObject.cast("namespace1", Kind.NAMESPACE),
+                    "class1": MockObject.cast("class1", Kind.CLASS),
                 }
                 self.inherited_members = {}
                 self.is_class = False
@@ -477,8 +477,8 @@ class TestObjectAliasMixin:
         class TestClass(ObjectAliasMixin):
             def __init__(self):
                 self.members = {
-                    "script1": MockObject.casted("script1", Kind.SCRIPT),
-                    "class1": MockObject.casted("class1", Kind.CLASS),
+                    "script1": MockObject.cast("script1", Kind.SCRIPT),
+                    "class1": MockObject.cast("class1", Kind.CLASS),
                 }
                 self.inherited_members = {}
                 self.is_class = False
@@ -494,8 +494,8 @@ class TestObjectAliasMixin:
         class TestClass(ObjectAliasMixin):
             def __init__(self):
                 self.members = {
-                    "class1": MockObject.casted("class1", Kind.CLASS),
-                    "script1": MockObject.casted("script1", Kind.SCRIPT),
+                    "class1": MockObject.cast("class1", Kind.CLASS),
+                    "script1": MockObject.cast("script1", Kind.SCRIPT),
                 }
                 self.inherited_members = {}
                 self.is_class = False
@@ -511,8 +511,8 @@ class TestObjectAliasMixin:
         class TestClass(ObjectAliasMixin):
             def __init__(self):
                 self.members = {
-                    "function1": MockObject.casted("function1", Kind.FUNCTION),
-                    "class1": MockObject.casted("class1", Kind.CLASS),
+                    "function1": MockObject.cast("function1", Kind.FUNCTION),
+                    "class1": MockObject.cast("class1", Kind.CLASS),
                 }
                 self.inherited_members = {}
                 self.is_class = False
@@ -528,8 +528,8 @@ class TestObjectAliasMixin:
         class TestClass(ObjectAliasMixin):
             def __init__(self):
                 self.members = {
-                    "property1": MockObject.casted("property1", Kind.PROPERTY),
-                    "class1": MockObject.casted("class1", Kind.CLASS),
+                    "property1": MockObject.cast("property1", Kind.PROPERTY),
+                    "class1": MockObject.cast("class1", Kind.CLASS),
                 }
                 self.inherited_members = {}
                 self.is_class = False
@@ -546,8 +546,8 @@ class TestObjectAliasMixin:
         # so we use FUNCTION to test the filtering
         class TestClass(ObjectAliasMixin):
             def __init__(self):
-                enum_obj = MockObject.casted("enum1", Kind.ENUMERATION)
-                function_obj = MockObject.casted("func1", Kind.FUNCTION)
+                enum_obj = MockObject.cast("enum1", Kind.ENUMERATION)
+                function_obj = MockObject.cast("func1", Kind.FUNCTION)
                 self.members = {
                     "enum1": enum_obj,
                     "func1": function_obj,
