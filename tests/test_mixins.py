@@ -67,7 +67,7 @@ class MockObject:
     @staticmethod
     def cast(*args, **kwargs):
         """A static method to mimic casting behavior."""
-        return cast(Object, MockObject.cast(*args, **kwargs))
+        return cast(Object, MockObject(*args, **kwargs))
 
 
 class TestDelMembersMixin:
