@@ -74,7 +74,7 @@ jobs:
     - name: Install dependencies
       if: steps.cache-uv.outputs.cache-hit != 'true'
       run: |
-        uv sync --dev --python ${{ matrix.python-version }}
+        uv sync --dev --python ${{ matrix.python-version }} --frozen
 
     - name: Run ruff linting
       run: |
@@ -160,7 +160,7 @@ jobs:
       - name: Install dependencies
         if: steps.cache-uv.outputs.cache-hit != 'true'
         run: |
-          uv sync --all-groups --python 3.12 # MATLAB supports up to Python 3.12
+          uv sync --all-groups --python 3.12 --frozen # MATLAB supports up to Python 3.12
 
       - name: Run tests
         uses: matlab-actions/run-tests@v2
@@ -199,7 +199,7 @@ jobs:
       if: steps.cache-uv.outputs.cache-hit != 'true'
       shell: pwsh
       run: |
-        uv sync --dev --python 3.14
+        uv sync --dev --python 3.14 --frozen
 
     - name: Run tests
       shell: pwsh
