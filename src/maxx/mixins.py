@@ -3,12 +3,22 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Sequence
+from typing import TYPE_CHECKING, Any, Sequence, cast
 
 from maxx.enums import Kind
 
 if TYPE_CHECKING:
-    from maxx.objects import Class, Enumeration, Folder, Function, Namespace, Property, Script
+    from maxx.objects import (
+        Alias,
+        Class,
+        Enumeration,
+        Folder,
+        Function,
+        Namespace,
+        Object,
+        Property,
+        Script,
+    )
 
 
 def _get_parts(key: str | Sequence[str]) -> Sequence[str]:
@@ -31,6 +41,12 @@ class DelMembersMixin:
         __delitem__: Same as `del_member`, with the item syntax `[]`.
     """
 
+    if TYPE_CHECKING:
+        # Type stubs for attributes that must be provided by subclasses
+        members: dict[str, Any]
+        all_members: dict[str, Any]
+        inherited_members: dict[str, Any]
+
     def __delitem__(self, key: str | Sequence[str]) -> None:
         """Delete a member with its name or path.
 
@@ -44,11 +60,11 @@ class DelMembersMixin:
         if len(parts) == 1:
             name = parts[0]
             try:
-                del self.members[name]  # ty: ignore[unresolved-attribute]
+                del self.members[name]
             except KeyError:
-                del self.inherited_members[name]  # ty: ignore[unresolved-attribute]
+                del self.inherited_members[name]
         else:
-            del self.all_members[parts[0]][parts[1:]]  # ty: ignore[unresolved-attribute]
+            del self.all_members[parts[0]][parts[1:]]
 
     def del_member(self, key: str | Sequence[str]) -> None:
         """Delete a member with its name or path.
@@ -61,9 +77,9 @@ class DelMembersMixin:
         parts = _get_parts(key)
         if len(parts) == 1:
             name = parts[0]
-            del self.members[name]  # ty: ignore[unresolved-attribute]
+            del self.members[name]
         else:
-            self.members[parts[0]].del_member(parts[1:])  # ty: ignore[unresolved-attribute]
+            self.members[parts[0]].del_member(parts[1:])
 
 
 class GetMembersMixin:
@@ -73,6 +89,12 @@ class GetMembersMixin:
         get_member: Get a member with its name or path.
         __getitem__: Same as `get_member`, with the item syntax `[]`.
     """
+
+    if TYPE_CHECKING:
+        # Type stubs for attributes that must be provided by subclasses
+        members: dict[str, Any]
+        all_members: dict[str, Any]
+        parent: Any
 
     def __getitem__(self, key: str | Sequence[str]) -> Any:
         """Get a member with its name or path.
@@ -85,8 +107,8 @@ class GetMembersMixin:
         """
         parts = _get_parts(key)
         if len(parts) == 1:
-            return self.all_members[parts[0]]  # ty: ignore[unresolved-attribute]
-        return self.all_members[parts[0]][parts[1:]]  # ty: ignore[unresolved-attribute]
+            return self.all_members[parts[0]]
+        return self.all_members[parts[0]][parts[1:]]
 
     def get_member(self, key: str | Sequence[str]) -> Any:
         """Get a member with its name or path.
@@ -98,8 +120,8 @@ class GetMembersMixin:
         """
         parts = _get_parts(key)
         if len(parts) == 1:
-            return self.members[parts[0]]  # ty: ignore[unresolved-attribute]
-        return self.members[parts[0]].get_member(parts[1:])  # ty: ignore[unresolved-attribute]
+            return self.members[parts[0]]
+        return self.members[parts[0]].get_member(parts[1:])
 
 
 class SetMembersMixin:
@@ -109,6 +131,11 @@ class SetMembersMixin:
         set_member: Set a member with its name or path.
         __setitem__: Same as `set_member`, with the item syntax `[]`.
     """
+
+    if TYPE_CHECKING:
+        # Type stubs for attributes that must be provided by subclasses
+        members: dict
+        parent: Any
 
     def __setitem__(self, key: str | Sequence[str], value: ObjectAliasMixin) -> None:
         """Set a member with its name or path.
@@ -120,10 +147,10 @@ class SetMembersMixin:
         parts = _get_parts(key)
         if len(parts) == 1:
             name = parts[0]
-            self.members[name] = value  # ty: ignore[unresolved-attribute]
-            value.parent = self  # ty: ignore[unresolved-attribute]
+            self.members[name] = value
+            value.parent = self
         else:
-            self.members[parts[0]][parts[1:]] = value  # ty: ignore[unresolved-attribute]
+            self.members[parts[0]][parts[1:]] = value
 
     def set_member(self, key: str | Sequence[str], value: ObjectAliasMixin) -> None:
         """Set a member with its name or path.
@@ -144,10 +171,10 @@ class SetMembersMixin:
         parts = _get_parts(key)
         if len(parts) == 1:
             name = parts[0]
-            self.members[name] = value  # ty: ignore[unresolved-attribute]
-            value.parent = self  # ty: ignore[unresolved-attribute]
+            self.members[name] = value
+            value.parent = self
         else:
-            self.members[parts[0]].set_member(parts[1:], value)  # ty: ignore[unresolved-attribute]
+            self.members[parts[0]].set_member(parts[1:], value)
 
 
 class PathMixin:
@@ -158,12 +185,16 @@ class PathMixin:
         filepath (Path | None): The file path associated with the object. It can be None if no file path is provided.
     """
 
+    if TYPE_CHECKING:
+        # Type stubs for attributes that must be provided by subclasses
+        name: str
+
     def __init__(self, *args: Any, filepath: Path | None = None, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self._filepath: Path | None = filepath
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}({self.name})"  # ty: ignore[unresolved-attribute]
+        return f"{self.__class__.__name__}({self.name})"
 
     @property
     def is_private(self) -> bool:
@@ -208,8 +239,15 @@ class ObjectAliasMixin(GetMembersMixin, SetMembersMixin, DelMembersMixin):
         properties: The property members.
     """
 
+    if TYPE_CHECKING:
+        # Type stubs for attributes that must be provided by subclasses
+        members: dict[str, Object | Alias]
+        inherited_members: dict[str, Alias]
+        kind: Kind
+        is_class: bool
+
     @property
-    def all_members(self) -> dict[str, ObjectAliasMixin]:
+    def all_members(self) -> dict[str, Object | Alias]:
         """All members (declared and inherited)."""
         if self.is_class:
             return {**self.inherited_members, **self.members}
@@ -218,52 +256,77 @@ class ObjectAliasMixin(GetMembersMixin, SetMembersMixin, DelMembersMixin):
     @property
     def folders(self) -> "dict[str, Folder]":
         """Thefolder members."""
-        return {
-            name: member for name, member in self.all_members.items() if member.kind is Kind.FOLDER
-        }
+        return cast(
+            "dict[str, Folder]",
+            {
+                name: member
+                for name, member in self.all_members.items()
+                if member.kind is Kind.FOLDER
+            },
+        )
 
     @property
     def namespaces(self) -> "dict[str, Namespace]":
         """The namespace members."""
-        return {
-            name: member
-            for name, member in self.all_members.items()
-            if member.kind is Kind.NAMESPACE
-        }
+        return cast(
+            "dict[str, Namespace]",
+            {
+                name: member
+                for name, member in self.all_members.items()
+                if member.kind is Kind.NAMESPACE
+            },
+        )
 
     @property
     def scripts(self) -> "dict[str, Script]":
         """The script members."""
-        return {name: member for name, member in self.members.items() if member.kind is Kind.SCRIPT}
+        return cast(
+            "dict[str, Script]",
+            {name: member for name, member in self.members.items() if member.kind is Kind.SCRIPT},
+        )
 
     @property
     def classes(self) -> "dict[str, Class]":
         """The class members."""
-        return {
-            name: member for name, member in self.all_members.items() if member.kind is Kind.CLASS
-        }
+        return cast(
+            "dict[str, Class]",
+            {
+                name: member
+                for name, member in self.all_members.items()
+                if member.kind is Kind.CLASS
+            },
+        )
 
     @property
     def functions(self) -> "dict[str, Function]":
         """The function members."""
-        return {
-            name: member
-            for name, member in self.all_members.items()
-            if member.kind is Kind.FUNCTION
-        }
+        return cast(
+            "dict[str, Function]",
+            {
+                name: member
+                for name, member in self.all_members.items()
+                if member.kind is Kind.FUNCTION
+            },
+        )
 
     @property
     def properties(self) -> "dict[str, Property]":
-        return {
-            name: member
-            for name, member in self.all_members.items()
-            if member.kind is Kind.PROPERTY
-        }
+        return cast(
+            "dict[str, Property]",
+            {
+                name: member
+                for name, member in self.all_members.items()
+                if member.kind is Kind.PROPERTY
+            },
+        )
 
     @property
     def enumerations(self) -> "dict[str, Enumeration]":
-        return {
-            name: member
-            for name, member in self.all_members.items()
-            if member.kind is Kind.ENUMERATION
-        }
+        return cast(
+            "dict[str, Enumeration]",
+            {
+                name: member
+                for name, member in self.all_members.items()
+                if member.kind is Kind.ENUMERATION
+            },
+        )
