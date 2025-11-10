@@ -1,6 +1,15 @@
 # CHANGELOG
 
 
+## v0.5.5 (2025-11-10)
+
+### Chores
+
+- **deps**: Update dependency griffe to ~=1.15.0
+  ([#44](https://github.com/watermarkhu/maxx/pull/44),
+  [`c65862a`](https://github.com/watermarkhu/maxx/commit/c65862a15fd7815d8d61377bd0d3e42972541482))
+
+
 ## v0.5.4 (2025-11-10)
 
 ### Bug Fixes
