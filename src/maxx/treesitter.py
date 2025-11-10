@@ -12,6 +12,7 @@ import charset_normalizer
 import tree_sitter_matlab as tsmatlab
 from loguru import logger
 from tree_sitter import Language, Node, Parser, Query, QueryCursor, Tree, TreeCursor
+from tscolor.languages import register_language
 
 from maxx.enums import AccessKind, ArgumentKind
 from maxx.expressions import Expr
@@ -35,7 +36,10 @@ __all__ = ["FileParser"]
 
 with warnings.catch_warnings():
     warnings.simplefilter("ignore", DeprecationWarning)
-    LANGUAGE = Language(tsmatlab.language())
+    language = tsmatlab.language()
+    LANGUAGE = Language(language)
+
+register_language("matlab", language)
 PARSER = Parser(LANGUAGE)
 
 FILE_QUERY = QueryCursor(
@@ -348,13 +352,15 @@ class FileParser(object):
                 object: Function | Class | Script | None = None
             if "function" in captures:
                 logger.debug(f"Parsing function in file: {self.filepath}")
-                object = self._parse_function(captures["function"][0], **kwargs)
+                object = self._parse_function(captures["function"][0], tree=tree, **kwargs)
             elif "type" in captures:
                 logger.debug(f"Parsing class in file: {self.filepath}")
-                object = self._parse_class(captures["type"][0], **kwargs)
+                object = self._parse_class(captures["type"][0], tree=tree, **kwargs)
             else:
                 logger.debug(f"Parsing script in file: {self.filepath}")
-                object = Script(self.filepath.stem, filepath=self.filepath, node=node, **kwargs)
+                object = Script(
+                    self.filepath.stem, filepath=self.filepath, node=node, tree=tree, **kwargs
+                )
 
             if not object.docstring:
                 object.docstring = self._comment_docstring(
@@ -378,7 +384,7 @@ class FileParser(object):
                 syntax_error.end_offset = self._node.end_point.column + 1
             raise syntax_error from ex
 
-    def _parse_class(self, node: Node, **kwargs: Any) -> Class:
+    def _parse_class(self, node: Node, tree: Tree, **kwargs: Any) -> Class:
         """
         Parse a class node and return a Class or Class object.
 
@@ -410,6 +416,7 @@ class FileParser(object):
             lineno=node.range.start_point.row + 1,
             endlineno=node.range.end_point.row + 1,
             node=node,
+            tree=tree,
             bases=bases,
             docstring=docstring,
             filepath=self.filepath,
@@ -521,7 +528,7 @@ class FileParser(object):
                         method_kwargs[key] = AccessKind.private
             for method_node in method_captures.get("methods", []):
                 method = self._parse_function(
-                    method_node, method=True, parent=object, **method_kwargs
+                    method_node, tree=tree, method=True, parent=object, **method_kwargs
                 )
                 if method.name != self.filepath.stem and not method.Static and method.arguments:
                     # Remove self from first method capture_argument
@@ -572,7 +579,9 @@ class FileParser(object):
 
         return (key, value)
 
-    def _parse_function(self, node: Node, method: bool = False, **kwargs: Any) -> Function:
+    def _parse_function(
+        self, node: Node, tree: Tree, method: bool = False, **kwargs: Any
+    ) -> Function:
         """
         Parse a function node and return a Function object.
 
@@ -621,6 +630,7 @@ class FileParser(object):
             getter="getter" in captures,
             setter="setter" in captures,
             node=node,
+            tree=tree,
             **kwargs,
         )
 

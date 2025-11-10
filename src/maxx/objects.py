@@ -14,7 +14,7 @@ from tree_sitter import Node
 from maxx.enums import AccessKind, ArgumentKind, Kind
 from maxx.exceptions import CyclicAliasError, FilePathError, NameResolutionError
 from maxx.expressions import Expr
-from maxx.mixins import ObjectAliasMixin, PathMixin
+from maxx.mixins import HighlighterMixin, ObjectAliasMixin, PathMixin
 
 if TYPE_CHECKING:
     from maxx.collection import LinesCollection, PathsCollection
@@ -723,7 +723,7 @@ class Namespace(PathMixin, Object):
         return "+" + self.canonical_path
 
 
-class Class(PathMixin, Object):
+class Class(PathMixin, HighlighterMixin, Object):
     kind: Kind = Kind.CLASS
 
     def __init__(
@@ -904,7 +904,7 @@ class Enumeration(PathMixin, Object):
         return self.name == value.name and self.parent == value.parent
 
 
-class Function(PathMixin, Object):
+class Function(PathMixin, HighlighterMixin, Object):
     """The class representing a MATLAB function."""
 
     kind: Kind = Kind.FUNCTION
@@ -987,7 +987,7 @@ class Function(PathMixin, Object):
         pass
 
 
-class Script(PathMixin, Object):
+class Script(PathMixin, HighlighterMixin, Object):
     """The class representing a MATLAB script."""
 
     kind: Kind = Kind.SCRIPT

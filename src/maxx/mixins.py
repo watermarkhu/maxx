@@ -5,9 +5,15 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Sequence, cast
 
+from tscolor import Highlighter, get_theme
+from tscolor.formatters.ansi import AnsiFormatter
+from tscolor.languages import get_configuration
+
 from maxx.enums import Kind
 
 if TYPE_CHECKING:
+    from tree_sitter import Node, Tree
+
     from maxx.objects import (
         Alias,
         Class,
@@ -31,6 +37,26 @@ def _get_parts(key: str | Sequence[str]) -> Sequence[str]:
     if not parts:
         raise ValueError("Empty tuples are not supported")
     return parts
+
+
+class HighlighterMixin:
+    _highlighter: Highlighter = Highlighter()
+
+    if TYPE_CHECKING:
+        node: Node
+        _tree: Tree
+
+    def print(self, theme: str = "dracula") -> str:
+        formatter = AnsiFormatter(get_theme(theme))
+        config = get_configuration("matlab")
+        events = self._highlighter.highlight_node(config, self.node, self._tree)
+        source = self._tree.root_node.text
+        if isinstance(source, bytes):
+            formatted = formatter.format(source, events, config)
+        else:
+            formatted = ""
+        print(formatted)
+        return formatted
 
 
 class DelMembersMixin:
@@ -189,9 +215,12 @@ class PathMixin:
         # Type stubs for attributes that must be provided by subclasses
         name: str
 
-    def __init__(self, *args: Any, filepath: Path | None = None, **kwargs: Any) -> None:
+    def __init__(
+        self, *args: Any, filepath: Path | None = None, tree: Tree | None = None, **kwargs: Any
+    ) -> None:
         super().__init__(*args, **kwargs)
         self._filepath: Path | None = filepath
+        self._tree: Tree | None = tree
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({self.name})"
