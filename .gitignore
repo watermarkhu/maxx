@@ -17,4 +17,3 @@ coverage.xml
 # Virtual environments
 .venv
 .python-version
-uv.lock
