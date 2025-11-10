@@ -14,7 +14,7 @@ from maxx.mixins import (
     SetMembersMixin,
     _get_parts,
 )
-from maxx.objects import Alias
+from maxx.objects import Object
 
 
 class TestGetParts:
@@ -67,7 +67,7 @@ class MockObject:
     @staticmethod
     def cast(*args, **kwargs):
         """A static method to mimic casting behavior."""
-        return cast(Alias, MockObject.cast(*args, **kwargs))
+        return cast(Object, MockObject.cast(*args, **kwargs))
 
 
 class TestDelMembersMixin:
