@@ -51,6 +51,14 @@ class _PathGlobber:
                 and member.name[0] not in FOLDER_PREFIXES
                 and member.stem != PRIVATE_FOLDER
             ):
+                # Check if this directory contains any .m files in subdirectories
+                has_mfiles = any(
+                    subfile.suffix == MFILE_SUFFIX
+                    for subfile in member.rglob("*")
+                    if subfile.is_file()
+                )
+                if has_mfiles:
+                    self._paths.append(member)
                 self._glob(member, recursive=True)
             elif member.is_dir() and member.stem[0] in FOLDER_PREFIXES:
                 self._paths.append(member)
@@ -170,16 +178,7 @@ class _PathResolver:
 
     def _collect_directory(self, path: Path, object: PathType, set_parent: bool = False) -> None:
         for item in path.iterdir():
-            if item.is_dir() and item.name[0] in FOLDER_PREFIXES:
-                if item not in self._paths_collection._objects:
-                    logger.warning(f"Path not found in collection (dir): {item}")
-                    raise KeyError(f"Path not found in collection: {item}")
-                subobject = self._paths_collection._objects[item].target
-                if subobject is not None:
-                    object.members[subobject.name] = subobject
-                    if set_parent:
-                        subobject.parent = object
-            elif item.is_file() and item.suffix == MFILE_SUFFIX:
+            if item.is_file() and item.suffix == MFILE_SUFFIX:
                 if item.name == CONTENTS_FILE:
                     contentsfile = self._collect_path(item)
                     object.docstring = contentsfile.docstring
@@ -192,6 +191,22 @@ class _PathResolver:
                         object.members[subobject.name] = subobject
                         if set_parent:
                             subobject.parent = object
+            elif item.is_dir() and item.name[0] in FOLDER_PREFIXES:
+                if item not in self._paths_collection._objects:
+                    logger.warning(f"Path not found in collection (dir): {item}")
+                    raise KeyError(f"Path not found in collection: {item}")
+                subobject = self._paths_collection._objects[item].target
+                if subobject is not None:
+                    object.members[subobject.name] = subobject
+                    if set_parent:
+                        subobject.parent = object
+            elif item.is_dir() and object.is_folder:
+                if item not in self._paths_collection._objects:
+                    continue
+                subobject = self._paths_collection._objects[item].target
+                if subobject is not None:
+                    object.members[subobject.name] = subobject
+                    subobject.parent = object
         if object.docstring is None:
             object.docstring = self._collect_readme_md(path, object)
 
@@ -529,7 +544,7 @@ class PathsCollection:
             self._path.appendleft(path)
             logger.info(f"Added path to start: {path}")
 
-        for member in list(_PathGlobber(path, recursive=recursive)):
+        for member in _PathGlobber(path, recursive=recursive):
             object = Alias(member.stem, target=_PathResolver(member, self))
             self._objects[member] = object
 
@@ -538,13 +553,11 @@ class PathsCollection:
                 # skip class file in class folder, this member is added via the class folder
                 continue
 
-            self._mapping[object.path].append(member)
-            self._members[path].append((object.name, member))
-
-            if member.parent not in self._folders:
-                self._folders[member.parent] = Alias(
-                    str(member.parent), target=_PathResolver(member.parent, self)
-                )
+            if member.is_dir() and member.stem[0] not in FOLDER_PREFIXES:
+                self._folders[member] = object
+            else:
+                self._mapping[object.path].append(member)
+                self._members[path].append((object.name, member))
 
             if not self._local and member.is_file():
                 if member.parent not in self._local_collections:

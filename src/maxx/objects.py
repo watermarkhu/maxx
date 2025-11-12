@@ -418,6 +418,8 @@ class Object(ObjectAliasMixin):
         """
         if self.parent is None:
             return self.name
+        if self.parent.is_folder:
+            return f"{self.parent.canonical_path}{self.name}"
         return f"{self.parent.canonical_path}.{self.name}"
 
     @property
