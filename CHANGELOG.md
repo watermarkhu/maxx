@@ -1,6 +1,20 @@
 # CHANGELOG
 
 
+## v0.6.0 (2025-11-12)
+
+### Build System
+
+- **deps**: Update dependency playwright to ~=1.56.0
+  ([#45](https://github.com/watermarkhu/maxx/pull/45),
+  [`1b43f65`](https://github.com/watermarkhu/maxx/commit/1b43f65a0bd6020187c439864ec78e38dc409deb))
+
+### Features
+
+- Fully capture folder objects ([#46](https://github.com/watermarkhu/maxx/pull/46),
+  [`edec947`](https://github.com/watermarkhu/maxx/commit/edec947384fe9a1e884862d9b34c6a62ba72a1c8))
+
+
 ## v0.5.5 (2025-11-10)
 
 ### Chores
