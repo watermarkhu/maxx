@@ -101,8 +101,12 @@ class TestPathsCollection:
             "pragma_function",
             "multiline_docstring",
             "complex_block_comment",
+            "subdir_function",
+            "nested_function",
         }
-        assert set(members.keys()) == expected_keys
+        assert set(members.keys()) == expected_keys, (
+            f"Missing: {expected_keys - set(members.keys())}, Extra: {set(members.keys()) - expected_keys}"
+        )
 
     def test_getitem_access(self):
         """Test that objects can be accessed using [] syntax."""
@@ -171,6 +175,18 @@ class TestPathsCollection:
         )
         assert namespace.members["test_namespace_function"] is self.paths_collection.get_member(
             "namespace.test_namespace_function"
+        )
+
+    def test_folder_subfolder_members_property(self):
+        """Test that folder.members contains the same objects as paths collection."""
+        folder = self.paths_collection.get_member("./subdir")
+
+        # Check that members property contains expected items
+        assert "subdir_function" in folder.members
+        assert "/subsubdir" in folder.members
+
+        assert folder.members["/subsubdir"] is self.paths_collection.get_member(
+            "./subdir/subsubdir"
         )
 
     def test_classfolder_members_property(self):
