@@ -104,7 +104,9 @@ class TestPathsCollection:
             "subdir_function",
             "nested_function",
         }
-        assert set(members.keys()) == expected_keys, f"Missing: {expected_keys - set(members.keys())}, Extra: {set(members.keys()) - expected_keys}"
+        assert set(members.keys()) == expected_keys, (
+            f"Missing: {expected_keys - set(members.keys())}, Extra: {set(members.keys()) - expected_keys}"
+        )
 
     def test_getitem_access(self):
         """Test that objects can be accessed using [] syntax."""
