@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import tree_sitter_matlab as tsmatlab
@@ -179,6 +180,15 @@ class LintEngine:
             )
             violations.append(violation)
 
+            # Log the violation with loguru
+            log_msg = f"{filepath}:{violation.line}:{violation.column + 1} - {rule.severity.upper()}[{rule.id}] {message}"
+            if rule.severity == "error":
+                logger.error(log_msg)
+            elif rule.severity == "warning":
+                logger.warning(log_msg)
+            else:  # info
+                logger.info(log_msg)
+
         return violations
 
     def _apply_custom_validation(
@@ -236,6 +246,49 @@ class LintEngine:
             # For now, report all functions for manual review
             # Full implementation would require counting parameters in the AST
             pass
+
+        # Line length validation (MW-L001)
+        elif rule.id == "MW-L001":
+            # Check line length from source
+            import re
+
+            source_lines = source_bytes.decode("utf-8", errors="replace").split("\n")
+            for line_num, line in enumerate(source_lines, 1):
+                if len(line) > 120:
+                    message_vars["line"] = line_num
+                    message_vars["length"] = len(line)
+                    # Return True to report this specific line
+                    # Note: This will only report the first long line
+                    return True
+            return False  # No long lines found
+
+        # Naming casing validation (MW-N007 - MW-N010)
+        elif rule.id in ("MW-N007", "MW-N008", "MW-N009", "MW-N010"):
+            import re
+
+            name_key = {
+                "MW-N007": "var_name",
+                "MW-N008": "function_name",
+                "MW-N009": "property_name",
+                "MW-N010": "method_name",
+            }.get(rule.id)
+
+            if name_key and name_key in message_vars:
+                name = str(message_vars[name_key])
+
+                # Check casing based on rule
+                if rule.id in ("MW-N007", "MW-N008", "MW-N010"):
+                    # lowerCamelCase or lowercase
+                    # Valid: lowercase, lowerCamelCase
+                    # Invalid: UpperCamelCase, snake_case, UPPERCASE
+                    if re.match(r"^[a-z][a-zA-Z0-9]*$", name):
+                        return False  # Valid casing
+                elif rule.id == "MW-N009":
+                    # UpperCamelCase for properties
+                    # Valid: UpperCamelCase
+                    # Invalid: lowerCamelCase, snake_case
+                    if re.match(r"^[A-Z][a-zA-Z0-9]*$", name):
+                        return False  # Valid casing
 
         # Special rules that need custom handling
         elif rule.id == "MW-S001":
@@ -323,3 +376,45 @@ class LintEngine:
         total = len(violations)
         files = len(by_file)
         print(f"\nFound {total} violation(s) in {files} file(s)")
+
+    def export_violations_to_json(
+        self,
+        violations: list[Violation],
+        output_path: Path,
+    ) -> None:
+        """Export violations to a JSON file.
+
+        Args:
+            violations: List of violations to export
+            output_path: Path to the output JSON file
+        """
+        # Convert violations to dictionaries
+        violations_data = [v.to_dict() for v in violations]
+
+        # Create summary data
+        summary = {
+            "total_violations": len(violations),
+            "total_files": len(set(v.filepath for v in violations)),
+            "by_severity": {},
+            "by_rule": {},
+        }
+
+        # Count violations by severity and rule
+        for violation in violations:
+            severity = violation.rule.severity
+            rule_id = violation.rule.id
+
+            summary["by_severity"][severity] = summary["by_severity"].get(severity, 0) + 1
+            summary["by_rule"][rule_id] = summary["by_rule"].get(rule_id, 0) + 1
+
+        # Create output structure
+        output = {
+            "summary": summary,
+            "violations": violations_data,
+        }
+
+        # Write to file
+        with open(output_path, "w") as f:
+            json.dump(output, f, indent=2)
+
+        logger.info(f"Exported {len(violations)} violations to {output_path}")

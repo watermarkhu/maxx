@@ -1,0 +1,26 @@
+# Rule MW-N008: Use lowerCamelCase for function names
+# Reference: https://github.com/mathworks/MATLAB-Coding-Guidelines/blob/main/MATLAB-Coding-Guidelines.md#functions
+
+[rule]
+id = "MW-N008"
+name = "function-casing"
+description = "Function should use lowerCamelCase or lowercase naming convention"
+severity = "info"
+enabled = false
+
+[query]
+# Match function definitions
+pattern = """
+(function_definition
+  name: (identifier) @function_name
+) @function
+"""
+
+[message]
+template = "Function '{function_name}' should use lowerCamelCase or lowercase naming convention"
+
+[metadata]
+reference = "https://github.com/mathworks/MATLAB-Coding-Guidelines/blob/main/MATLAB-Coding-Guidelines.md#functions"
+guideline = "naming.function.casing"
+motivation = "Readability - consistent casing distinguishes functions from other identifier types"
+note = "Disabled by default - enable if you want strict casing enforcement"

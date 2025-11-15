@@ -1,0 +1,24 @@
+# Rule MW-L001: Limit code line length to 120 characters
+# Reference: https://github.com/mathworks/MATLAB-Coding-Guidelines/blob/main/MATLAB-Coding-Guidelines.md#lines-in-code-files
+
+[rule]
+id = "MW-L001"
+name = "line-length-limit"
+description = "Code line exceeds 120 characters"
+severity = "warning"
+enabled = true
+
+[query]
+# Match all nodes to check line lengths
+# The engine will need to check actual line lengths from source
+pattern = """
+(source_file) @file
+"""
+
+[message]
+template = "Line {line} exceeds 120 character limit (length: {length})"
+
+[metadata]
+reference = "https://github.com/mathworks/MATLAB-Coding-Guidelines/blob/main/MATLAB-Coding-Guidelines.md#lines-in-code-files"
+guideline = "LLMNC"
+motivation = "Readability - shorter lines easier to read, minimize scrolling"

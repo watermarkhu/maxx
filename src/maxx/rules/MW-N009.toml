@@ -1,0 +1,28 @@
+# Rule MW-N009: Use UpperCamelCase for property names
+# Reference: https://github.com/mathworks/MATLAB-Coding-Guidelines/blob/main/MATLAB-Coding-Guidelines.md#classes
+
+[rule]
+id = "MW-N009"
+name = "property-casing"
+description = "Property should use UpperCamelCase naming convention"
+severity = "info"
+enabled = false
+
+[query]
+# Match property definitions within classes
+pattern = """
+(properties
+  (property
+    (identifier) @property_name
+  )
+)
+"""
+
+[message]
+template = "Property '{property_name}' should use UpperCamelCase naming convention"
+
+[metadata]
+reference = "https://github.com/mathworks/MATLAB-Coding-Guidelines/blob/main/MATLAB-Coding-Guidelines.md#classes"
+guideline = "naming.property.casing"
+motivation = "Readability - consistent casing identifies class properties distinctly"
+note = "Disabled by default - enable if you want strict casing enforcement"

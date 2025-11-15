@@ -1,0 +1,28 @@
+# Rule MW-N010: Use lowerCamelCase for method names
+# Reference: https://github.com/mathworks/MATLAB-Coding-Guidelines/blob/main/MATLAB-Coding-Guidelines.md#classes
+
+[rule]
+id = "MW-N010"
+name = "method-casing"
+description = "Method should use lowerCamelCase or lowercase naming convention"
+severity = "info"
+enabled = false
+
+[query]
+# Match method definitions within classes
+pattern = """
+(methods
+  (function_definition
+    name: (identifier) @method_name
+  )
+)
+"""
+
+[message]
+template = "Method '{method_name}' should use lowerCamelCase or lowercase naming convention"
+
+[metadata]
+reference = "https://github.com/mathworks/MATLAB-Coding-Guidelines/blob/main/MATLAB-Coding-Guidelines.md#classes"
+guideline = "naming.method.casing"
+motivation = "Readability - consistent casing identifies methods and functions"
+note = "Disabled by default - enable if you want strict casing enforcement"

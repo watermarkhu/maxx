@@ -1,0 +1,26 @@
+# Rule MW-N007: Use lowerCamelCase for variable names
+# Reference: https://github.com/mathworks/MATLAB-Coding-Guidelines/blob/main/MATLAB-Coding-Guidelines.md#variables
+
+[rule]
+id = "MW-N007"
+name = "variable-casing"
+description = "Variable should use lowerCamelCase naming convention"
+severity = "info"
+enabled = false
+
+[query]
+# Match variable assignments
+pattern = """
+(assignment
+  (identifier) @var_name
+)
+"""
+
+[message]
+template = "Variable '{var_name}' should use lowerCamelCase naming convention"
+
+[metadata]
+reference = "https://github.com/mathworks/MATLAB-Coding-Guidelines/blob/main/MATLAB-Coding-Guidelines.md#variables"
+guideline = "naming.variable.regularExpression"
+motivation = "Readability - consistent casing distinguishes variables from other identifiers"
+note = "Disabled by default - enable if you want strict casing enforcement"

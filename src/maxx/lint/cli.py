@@ -71,6 +71,12 @@ def create_parser() -> argparse.ArgumentParser:
         type=str,
         help="Comma-separated list of rule IDs to ignore (e.g., 'W001,W002')",
     )
+    lint_parser.add_argument(
+        "--output",
+        "-o",
+        type=Path,
+        help="Export violations to JSON file",
+    )
 
     # Rules command
     rules_parser = subparsers.add_parser(
@@ -124,8 +130,13 @@ def cmd_lint(args: argparse.Namespace) -> int:
         recursive=not args.no_recursive,
     )
 
-    # Print violations
-    engine.print_violations(violations, verbose=args.verbose)
+    # Export to JSON if requested
+    if args.output:
+        engine.export_violations_to_json(violations, args.output)
+        logger.info(f"Results exported to {args.output}")
+    else:
+        # Print violations to stdout
+        engine.print_violations(violations, verbose=args.verbose)
 
     # Return appropriate exit code
     if args.check and violations:
