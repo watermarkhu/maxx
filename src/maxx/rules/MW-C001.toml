@@ -9,6 +9,9 @@ severity = "error"
 enabled = true
 
 [query]
+# Only check classdef nodes (trigger optimization)
+trigger = ['classdef']
+
 # Match class definitions to check against filename
 pattern = """
 (class_definition

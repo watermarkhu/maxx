@@ -9,6 +9,9 @@ severity = "info"
 enabled = false
 
 [query]
+# Only check function_definition nodes (trigger optimization)
+trigger = ['function_definition']
+
 # Match function definitions to check for end keyword
 pattern = """
 (function_definition

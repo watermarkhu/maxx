@@ -9,6 +9,9 @@ severity = "info"
 enabled = false
 
 [query]
+# Only check for_statement, while_statement, if_statement nodes (trigger optimization)
+trigger = ['for_statement', 'while_statement', 'if_statement']
+
 # Match deeply nested control structures
 # This pattern will match any control structure; depth checking needs to be done in the engine
 pattern = """

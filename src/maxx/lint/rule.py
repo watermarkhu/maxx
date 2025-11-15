@@ -26,6 +26,7 @@ class Rule(BaseModel):
         name: Rule name (e.g., "unused-variable")
         description: Human-readable description
         severity: Severity level ("error", "warning", "info")
+        trigger_node_types: List of node types that trigger this rule (e.g., ["function_definition"])
         query: Tree-sitter query for pattern matching
         message_template: Template for violation messages
         enabled: Whether the rule is enabled by default
@@ -39,6 +40,10 @@ class Rule(BaseModel):
     description: str = Field(min_length=1, description="Human-readable description")
     severity: Literal["error", "warning", "info"] = Field(
         default="warning", description="Severity level"
+    )
+    trigger_node_types: list[str] = Field(
+        default_factory=list,
+        description="Node types that trigger this rule (empty = check all nodes)",
     )
     query: QueryCursor = Field(description="Tree-sitter query for pattern matching")
     message_template: str = Field(min_length=1, description="Template for violation messages")
@@ -110,6 +115,7 @@ class Rule(BaseModel):
                 "name": rule_data["name"],
                 "description": rule_data["description"],
                 "severity": rule_data.get("severity", "warning"),
+                "trigger_node_types": query_data.get("trigger", []),
                 "query": query,
                 "message_template": message_data["template"],
                 "enabled": rule_data.get("enabled", True),

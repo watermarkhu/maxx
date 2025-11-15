@@ -9,6 +9,9 @@ severity = "warning"
 enabled = true
 
 [query]
+# Only check function definitions (trigger optimization)
+trigger = ["function_definition"]
+
 # Match function definitions with return values
 pattern = """
 (function_definition .

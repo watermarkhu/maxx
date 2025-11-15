@@ -9,6 +9,9 @@ severity = "info"
 enabled = false
 
 [query]
+# Only check for_statement, while_statement, if_statement nodes (trigger optimization)
+trigger = ['for_statement', 'while_statement', 'if_statement']
+
 # Match for loops to detect potential iterator modification
 pattern = """
 (for_statement

@@ -96,16 +96,81 @@ class LintEngine:
         tree = self.parser.parse(source_bytes)
         root_node = tree.root_node
 
-        # Check against all enabled rules
+        # Build index of rules by trigger node type
         enabled_rules = self.registry.get_enabled_rules()
         logger.debug(f"Checking {filepath} against {len(enabled_rules)} rules")
 
+        rules_by_trigger: dict[str, list[object]] = {}
+        rules_for_all_nodes: list[object] = []
+
         for rule in enabled_rules:
+            if not rule.trigger_node_types:  # type: ignore[attr-defined]
+                # No trigger specified, run on all nodes
+                rules_for_all_nodes.append(rule)
+            else:
+                # Index by each trigger node type
+                for node_type in rule.trigger_node_types:  # type: ignore[attr-defined]
+                    if node_type not in rules_by_trigger:
+                        rules_by_trigger[node_type] = []
+                    rules_by_trigger[node_type].append(rule)
+
+        # Walk the AST and check rules at each node
+        violations.extend(
+            self._visit_node(
+                root_node, source_bytes, filepath, rules_by_trigger, rules_for_all_nodes
+            )
+        )
+
+        return violations
+
+    def _visit_node(
+        self,
+        node: object,
+        source_bytes: bytes,
+        filepath: Path,
+        rules_by_trigger: dict[str, list[object]],
+        rules_for_all_nodes: list[object],
+    ) -> list[Violation]:
+        """Visit a node and its children, checking applicable rules.
+
+        Args:
+            node: Tree-sitter node to visit
+            source_bytes: Source code as bytes
+            filepath: Path to the file being checked
+            rules_by_trigger: Dictionary mapping node types to rules
+            rules_for_all_nodes: Rules that run on all nodes
+
+        Returns:
+            List of violations found in this node and its children
+        """
+        from tree_sitter import Node
+
+        assert isinstance(node, Node)
+
+        violations: list[Violation] = []
+
+        # Get rules that should check this node
+        node_type = node.type
+        rules_to_check = rules_for_all_nodes.copy()
+
+        if node_type in rules_by_trigger:
+            rules_to_check.extend(rules_by_trigger[node_type])
+
+        # Check each applicable rule against this node
+        for rule in rules_to_check:
             try:
-                rule_violations = self._check_rule(rule, root_node, source_bytes, filepath)
+                rule_violations = self._check_rule(rule, node, source_bytes, filepath)
                 violations.extend(rule_violations)
             except Exception as e:
-                logger.error(f"Error checking rule {rule.id} on {filepath}: {e}")
+                logger.error(f"Error checking rule {rule.id} on {filepath}: {e}")  # type: ignore[attr-defined]
+
+        # Recursively visit children
+        for child in node.children:
+            violations.extend(
+                self._visit_node(
+                    child, source_bytes, filepath, rules_by_trigger, rules_for_all_nodes
+                )
+            )
 
         return violations
 
