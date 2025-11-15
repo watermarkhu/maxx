@@ -1,0 +1,20 @@
+# Rule W004: Detect eval usage (security risk)
+
+[rule]
+id = "W004"
+name = "eval-usage"
+description = "Use of eval() is discouraged due to security and performance concerns"
+severity = "warning"
+enabled = true
+
+[query]
+# Match eval function calls
+pattern = """
+(function_call
+  name: (identifier) @func_name
+  (#eq? @func_name "eval")
+) @eval_call
+"""
+
+[message]
+template = "Use of eval() at line {line} is discouraged"

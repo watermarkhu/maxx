@@ -1,0 +1,19 @@
+# Rule W003: Detect global variable usage
+
+[rule]
+id = "W003"
+name = "global-variable"
+description = "Use of global variables detected"
+severity = "warning"
+enabled = true
+
+[query]
+# Match global declarations
+pattern = """
+(global_operator
+  (identifier) @variable_name
+) @global
+"""
+
+[message]
+template = "Global variable '{variable_name}' used at line {line}"

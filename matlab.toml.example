@@ -1,0 +1,31 @@
+# Example matlab.toml configuration file for maxx linting
+#
+# Place this file in your project root and rename it to matlab.toml
+
+[lint]
+# Enable or disable linting globally
+enabled = true
+
+# Select which rules to enable
+# Use wildcards: ["*"] for all, ["W*"] for all warnings, ["E*"] for all errors
+# Or specify individual rules: ["W001", "W002", "E001"]
+select = ["*"]
+
+# Ignore specific rules
+ignore = []
+
+# Exclude files or directories from linting
+# Supports glob patterns
+exclude = [
+    "tests/*",
+    "examples/*",
+    "build/*",
+    "dist/*",
+]
+
+# Per-rule configuration (optional)
+# You can override rule settings here
+
+[lint.rules.W001]
+# Rule-specific settings go here
+# These are rule-dependent

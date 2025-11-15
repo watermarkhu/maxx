@@ -1,0 +1,17 @@
+# Rule E001: Detect ERROR nodes from tree-sitter (syntax errors)
+
+[rule]
+id = "E001"
+name = "syntax-error"
+description = "Syntax error detected by parser"
+severity = "error"
+enabled = true
+
+[query]
+# Match ERROR nodes which indicate parsing failures
+pattern = """
+(ERROR) @error
+"""
+
+[message]
+template = "Syntax error at line {line}: '{error}'"

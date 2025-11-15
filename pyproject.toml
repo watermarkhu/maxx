@@ -32,6 +32,7 @@ dependencies = [
     "tree-sitter-matlab~=1.2.5",
     "loguru~=0.7.3",
     "typing-extensions~=4.0; python_version < '3.11'",
+    "tomli~=2.0; python_version < '3.11'",
 ]
 
 [dependency-groups]
@@ -41,6 +42,7 @@ dev = [
     "pytest-cov~=7.0.0",
     "ty~=0.0.1a24",
     "prek~=0.2.3",
+    "tomli~=2.0",
 ]
 release = [
     "python-semantic-release~=10.5.0; python_version < '3.14'",
@@ -59,6 +61,9 @@ allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/maxx"]
+
+[project.scripts]
+maxx = "maxx.lint.cli:main"
 
 [tool.uv]
 managed = true

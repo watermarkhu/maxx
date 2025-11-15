@@ -1,0 +1,19 @@
+# Rule W001: Detect function definitions without docstrings
+
+[rule]
+id = "W001"
+name = "missing-docstring"
+description = "Function definition is missing a docstring"
+severity = "warning"
+enabled = true
+
+[query]
+# Match function definitions that don't have a preceding comment
+pattern = """
+(function_definition
+  name: (identifier) @function_name
+) @function
+"""
+
+[message]
+template = "Function '{function_name}' is missing a docstring"

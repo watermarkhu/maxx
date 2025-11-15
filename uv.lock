@@ -540,12 +540,13 @@ wheels = [
 
 [[package]]
 name = "maxx"
-version = "0.5.5"
+version = "0.6.0"
 source = { editable = "." }
 dependencies = [
     { name = "charset-normalizer" },
     { name = "griffe" },
     { name = "loguru" },
+    { name = "tomli", marker = "python_full_version < '3.11'" },
     { name = "tree-sitter" },
     { name = "tree-sitter-matlab" },
     { name = "typing-extensions", marker = "python_full_version < '3.11'" },
@@ -557,6 +558,7 @@ dev = [
     { name = "pytest" },
     { name = "pytest-cov" },
     { name = "ruff" },
+    { name = "tomli" },
     { name = "ty" },
 ]
 reference = [
@@ -572,6 +574,7 @@ requires-dist = [
     { name = "charset-normalizer", specifier = "~=3.4" },
     { name = "griffe", specifier = "~=1.15.0" },
     { name = "loguru", specifier = "~=0.7.3" },
+    { name = "tomli", marker = "python_full_version < '3.11'", specifier = "~=2.0" },
     { name = "tree-sitter", specifier = "~=0.25.1" },
     { name = "tree-sitter-matlab", specifier = "~=1.2.5" },
     { name = "typing-extensions", marker = "python_full_version < '3.11'", specifier = "~=4.0" },
@@ -583,6 +586,7 @@ dev = [
     { name = "pytest", specifier = "~=9.0.0" },
     { name = "pytest-cov", specifier = "~=7.0.0" },
     { name = "ruff", specifier = "~=0.14.0" },
+    { name = "tomli", specifier = "~=2.0" },
     { name = "ty", specifier = "~=0.0.1a24" },
 ]
 reference = [
