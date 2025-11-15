@@ -2,16 +2,16 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING
+
+from pydantic import BaseModel, ConfigDict, Field
 
 if TYPE_CHECKING:
     from maxx.lint.rule import Rule
 
 
-@dataclass
-class Violation:
+class Violation(BaseModel):
     """Represents a single linting violation.
 
     Attributes:
@@ -23,12 +23,14 @@ class Violation:
         node_text: The text of the violating node (optional)
     """
 
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     rule: Rule
     filepath: Path
-    line: int
-    column: int
-    message: str
-    node_text: str | None = None
+    line: int = Field(ge=1, description="Line number (1-indexed)")
+    column: int = Field(ge=0, description="Column number (0-indexed)")
+    message: str = Field(min_length=1, description="Violation message")
+    node_text: str | None = Field(default=None, description="The violating node text")
 
     def __str__(self) -> str:
         """Format violation for display."""

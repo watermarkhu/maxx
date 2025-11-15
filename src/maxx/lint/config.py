@@ -4,8 +4,9 @@ from __future__ import annotations
 
 import fnmatch
 import sys
-from dataclasses import dataclass, field
 from pathlib import Path
+
+from pydantic import BaseModel, Field
 
 if sys.version_info >= (3, 11):
     import tomllib
@@ -13,8 +14,7 @@ else:
     import tomli as tomllib
 
 
-@dataclass
-class LintConfig:
+class LintConfig(BaseModel):
     """Configuration for MATLAB linting.
 
     Attributes:
@@ -25,11 +25,15 @@ class LintConfig:
         rule_config: Per-rule configuration overrides
     """
 
-    enabled: bool = True
-    select: list[str] = field(default_factory=lambda: ["*"])
-    ignore: list[str] = field(default_factory=list)
-    exclude: list[str] = field(default_factory=list)
-    rule_config: dict[str, dict[str, object]] = field(default_factory=dict)
+    enabled: bool = Field(default=True, description="Whether linting is enabled globally")
+    select: list[str] = Field(default_factory=lambda: ["*"], description="Rule patterns to select")
+    ignore: list[str] = Field(default_factory=list, description="Rule IDs to ignore")
+    exclude: list[str] = Field(
+        default_factory=list, description="File/directory patterns to exclude"
+    )
+    rule_config: dict[str, dict[str, object]] = Field(
+        default_factory=dict, description="Per-rule configuration overrides"
+    )
 
     @classmethod
     def from_toml(cls, filepath: Path) -> LintConfig:
@@ -40,6 +44,9 @@ class LintConfig:
 
         Returns:
             LintConfig instance
+
+        Raises:
+            ValidationError: If the configuration is invalid
         """
         if not filepath.exists():
             return cls()
@@ -57,12 +64,15 @@ class LintConfig:
         if "rules" in lint_data:
             rule_config = lint_data.pop("rules")
 
-        return cls(
-            enabled=lint_data.get("enabled", True),
-            select=lint_data.get("select", ["*"]),
-            ignore=lint_data.get("ignore", []),
-            exclude=lint_data.get("exclude", []),
-            rule_config=rule_config,
+        # Use Pydantic's model_validate to validate the data
+        return cls.model_validate(
+            {
+                "enabled": lint_data.get("enabled", True),
+                "select": lint_data.get("select", ["*"]),
+                "ignore": lint_data.get("ignore", []),
+                "exclude": lint_data.get("exclude", []),
+                "rule_config": rule_config,
+            }
         )
 
     @classmethod

@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 import sys
-from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 from tree_sitter import Language, Node, Query, QueryCursor
 
 if sys.version_info >= (3, 11):
@@ -18,8 +18,7 @@ else:
 import tree_sitter_matlab as tsmatlab
 
 
-@dataclass
-class Rule:
+class Rule(BaseModel):
     """Represents a single linting rule.
 
     Attributes:
@@ -33,14 +32,26 @@ class Rule:
         filepath: Path to the TOML file defining this rule
     """
 
-    id: str
-    name: str
-    description: str
-    severity: str
-    query: QueryCursor
-    message_template: str
-    enabled: bool = True
-    filepath: Path | None = None
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    id: str = Field(min_length=1, description="Unique rule identifier")
+    name: str = Field(min_length=1, description="Rule name")
+    description: str = Field(min_length=1, description="Human-readable description")
+    severity: Literal["error", "warning", "info"] = Field(
+        default="warning", description="Severity level"
+    )
+    query: QueryCursor = Field(description="Tree-sitter query for pattern matching")
+    message_template: str = Field(min_length=1, description="Template for violation messages")
+    enabled: bool = Field(default=True, description="Whether the rule is enabled by default")
+    filepath: Path | None = Field(default=None, description="Path to the TOML file")
+
+    @field_validator("severity")
+    @classmethod
+    def validate_severity(cls, v: str) -> str:
+        """Validate severity level."""
+        if v not in ("error", "warning", "info"):
+            raise ValueError(f"Invalid severity: {v}. Must be 'error', 'warning', or 'info'")
+        return v
 
     @classmethod
     def from_toml(cls, filepath: Path) -> Rule:
@@ -54,6 +65,7 @@ class Rule:
 
         Raises:
             ValueError: If the TOML file is malformed or missing required fields
+            ValidationError: If the rule data fails validation
         """
         with open(filepath, "rb") as f:
             data = tomllib.load(f)
@@ -91,15 +103,18 @@ class Rule:
         except Exception as e:
             raise ValueError(f"Invalid tree-sitter query in {filepath}: {e}") from e
 
-        return cls(
-            id=rule_data["id"],
-            name=rule_data["name"],
-            description=rule_data["description"],
-            severity=rule_data.get("severity", "warning"),
-            query=query,
-            message_template=message_data["template"],
-            enabled=rule_data.get("enabled", True),
-            filepath=filepath,
+        # Use Pydantic's model_validate to create and validate the rule
+        return cls.model_validate(
+            {
+                "id": rule_data["id"],
+                "name": rule_data["name"],
+                "description": rule_data["description"],
+                "severity": rule_data.get("severity", "warning"),
+                "query": query,
+                "message_template": message_data["template"],
+                "enabled": rule_data.get("enabled", True),
+                "filepath": filepath,
+            }
         )
 
     def check_node(self, node: Node, source_bytes: bytes) -> list[dict[str, Node]]:
