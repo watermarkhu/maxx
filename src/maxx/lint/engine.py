@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import tree_sitter_matlab as tsmatlab
 from tree_sitter import Language, Parser
@@ -13,6 +14,9 @@ from maxx.lint.config import LintConfig
 from maxx.lint.rule import RuleRegistry
 from maxx.lint.violation import Violation
 from maxx.logger import logger
+
+if TYPE_CHECKING:
+    from tree_sitter import Node
 
 
 class LintEngine:
@@ -194,7 +198,7 @@ class LintEngine:
     def _apply_custom_validation(
         self,
         rule: object,
-        match: object,
+        match: dict[str, Node],
         source_bytes: bytes,
         filepath: Path,
         message_vars: dict[str, object],
@@ -243,9 +247,53 @@ class LintEngine:
 
         # Function input/output count validation (MW-F002, MW-F003)
         elif rule.id in ("MW-F002", "MW-F003"):
-            # For now, report all functions for manual review
-            # Full implementation would require counting parameters in the AST
-            pass
+            from tree_sitter import Node
+
+            # Count parameters based on rule type
+            if rule.id == "MW-F002":
+                # Count input arguments
+                if "params" in match:
+                    params_node = match["params"]
+                    assert isinstance(params_node, Node)
+
+                    # Count identifier children in function_arguments
+                    param_count = sum(
+                        1 for child in params_node.children if child.type == "identifier"
+                    )
+
+                    if param_count <= 6:
+                        return False  # Within limit, don't report
+                    message_vars["count"] = param_count
+                else:
+                    # No parameters, don't report
+                    return False
+
+            elif rule.id == "MW-F003":
+                # Count output arguments
+                if "returns" in match:
+                    returns_node = match["returns"]
+                    assert isinstance(returns_node, Node)
+
+                    # Count outputs - can be single identifier or multioutput_variable
+                    output_count = 0
+                    for child in returns_node.children:
+                        if child.type == "identifier":
+                            # Single output
+                            output_count = 1
+                            break
+                        elif child.type == "multioutput_variable":
+                            # Multiple outputs - count identifiers
+                            output_count = sum(
+                                1 for subchild in child.children if subchild.type == "identifier"
+                            )
+                            break
+
+                    if output_count <= 4:
+                        return False  # Within limit, don't report
+                    message_vars["count"] = output_count
+                else:
+                    # No return values, don't report
+                    return False
 
         # Line length validation (MW-L001)
         elif rule.id == "MW-L001":
@@ -392,20 +440,25 @@ class LintEngine:
         violations_data = [v.to_dict() for v in violations]
 
         # Create summary data
-        summary = {
+        summary: dict[str, object] = {
             "total_violations": len(violations),
             "total_files": len(set(v.filepath for v in violations)),
             "by_severity": {},
             "by_rule": {},
         }
+        by_severity: dict[str, int] = {}
+        by_rule: dict[str, int] = {}
 
         # Count violations by severity and rule
         for violation in violations:
             severity = violation.rule.severity
             rule_id = violation.rule.id
 
-            summary["by_severity"][severity] = summary["by_severity"].get(severity, 0) + 1
-            summary["by_rule"][rule_id] = summary["by_rule"].get(rule_id, 0) + 1
+            by_severity[severity] = by_severity.get(severity, 0) + 1
+            by_rule[rule_id] = by_rule.get(rule_id, 0) + 1
+
+        summary["by_severity"] = by_severity
+        summary["by_rule"] = by_rule
 
         # Create output structure
         output = {

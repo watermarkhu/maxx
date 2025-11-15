@@ -5,20 +5,21 @@
 id = "MW-F003"
 name = "function-output-limit"
 description = "Function has too many output arguments (limit: 4)"
-severity = "info"
-enabled = false
+severity = "warning"
+enabled = true
 
 [query]
 # Match function definitions with return values
 pattern = """
-(function_definition
-  name: (identifier) @function_name
+(function_definition .
+  ("function")
   (function_output) @returns
+  (identifier) @function_name
 ) @function
 """
 
 [message]
-template = "Function '{function_name}' may have too many output arguments (recommended limit: 4)"
+template = "Function '{function_name}' has {count} output arguments (recommended limit: 4)"
 
 [metadata]
 reference = "https://github.com/mathworks/MATLAB-Coding-Guidelines/blob/main/MATLAB-Coding-Guidelines.md#outputs"

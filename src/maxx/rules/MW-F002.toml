@@ -5,8 +5,8 @@
 id = "MW-F002"
 name = "function-input-limit"
 description = "Function has too many input arguments (limit: 6)"
-severity = "info"
-enabled = false
+severity = "warning"
+enabled = true
 
 [query]
 # Match function definitions with input parameters
@@ -18,7 +18,7 @@ pattern = """
 """
 
 [message]
-template = "Function '{function_name}' may have too many input arguments (recommended limit: 6)"
+template = "Function '{function_name}' has {count} input arguments (recommended limit: 6)"
 
 [metadata]
 reference = "https://github.com/mathworks/MATLAB-Coding-Guidelines/blob/main/MATLAB-Coding-Guidelines.md#inputs"

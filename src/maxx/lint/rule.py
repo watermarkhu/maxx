@@ -112,23 +112,22 @@ class Rule:
         Returns:
             List of matches, where each match is a dict of capture names to a single node
         """
-        # Use captures() method which returns a dict of capture names to list of nodes
-        captures = self.query.captures(node)
-        if not captures:
+        # Use matches() method to get properly grouped captures
+        # matches() returns list of (pattern_index, captures_dict) tuples
+        query_matches = self.query.matches(node)  # type: ignore[attr-defined]
+        if not query_matches:
             return []
 
-        # Find the maximum number of captures for any capture name
-        max_captures = max(len(nodes) for nodes in captures.values())
-
-        # Create a match for each captured instance
-        matches = []
-        for i in range(max_captures):
-            match: dict[str, Node] = {}
-            for capture_name, nodes in captures.items():
-                if i < len(nodes):
-                    match[capture_name] = nodes[i]
-            if match:
-                matches.append(match)
+        matches: list[dict[str, Node]] = []
+        for _, captures_dict in query_matches:
+            # captures_dict maps capture names to lists of nodes
+            # We want a single dict mapping capture names to the first node
+            match_dict: dict[str, Node] = {}
+            for capture_name, node_list in captures_dict.items():
+                if node_list:
+                    match_dict[capture_name] = node_list[0]
+            if match_dict:
+                matches.append(match_dict)
 
         return matches
 
