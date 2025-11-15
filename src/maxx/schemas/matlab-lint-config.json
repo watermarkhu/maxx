@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "Configuration schema for maxx MATLAB linter (matlab.toml [lint] section)",
+  "properties": {
+    "enabled": {
+      "default": true,
+      "description": "Whether linting is enabled globally",
+      "title": "Enabled",
+      "type": "boolean"
+    },
+    "select": {
+      "description": "Rule patterns to select",
+      "items": {
+        "type": "string"
+      },
+      "title": "Select",
+      "type": "array"
+    },
+    "ignore": {
+      "description": "Rule IDs to ignore",
+      "items": {
+        "type": "string"
+      },
+      "title": "Ignore",
+      "type": "array"
+    },
+    "exclude": {
+      "description": "File/directory patterns to exclude",
+      "items": {
+        "type": "string"
+      },
+      "title": "Exclude",
+      "type": "array"
+    },
+    "rule_config": {
+      "additionalProperties": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "description": "Per-rule configuration overrides",
+      "title": "Rule Config",
+      "type": "object"
+    }
+  },
+  "title": "MATLAB Linting Configuration",
+  "type": "object"
+}

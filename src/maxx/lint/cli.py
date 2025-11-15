@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 from pathlib import Path
 
@@ -88,6 +89,19 @@ def create_parser() -> argparse.ArgumentParser:
         "--all",
         action="store_true",
         help="Show all rules including disabled ones",
+    )
+
+    # Schema command
+    schema_parser = subparsers.add_parser(
+        "schema",
+        help="Generate JSON schema for matlab.toml configuration",
+        description="Generate JSON schema for matlab.toml configuration validation",
+    )
+    schema_parser.add_argument(
+        "--output",
+        "-o",
+        type=Path,
+        help="Output file path for the schema (default: print to stdout)",
     )
 
     # Version command
@@ -195,6 +209,43 @@ def cmd_rules(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_schema(args: argparse.Namespace) -> int:
+    """Execute the schema command.
+
+    Args:
+        args: Parsed command-line arguments
+
+    Returns:
+        Exit code (always 0)
+    """
+    # Generate the schema
+    schema = LintConfig.get_json_schema()
+
+    # Override title and description
+    schema["title"] = "MATLAB Linting Configuration"
+    schema["description"] = (
+        "Configuration schema for maxx MATLAB linter (matlab.toml [lint] section)"
+    )
+
+    # Add metadata
+    schema_with_metadata = {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        **schema,
+    }
+
+    # Format as JSON
+    schema_json = json.dumps(schema_with_metadata, indent=2)
+
+    # Output to file or stdout
+    if args.output:
+        args.output.write_text(schema_json)
+        logger.info(f"Schema written to {args.output}")
+    else:
+        print(schema_json)
+
+    return 0
+
+
 def main() -> int:
     """Main entry point for the CLI.
 
@@ -215,6 +266,8 @@ def main() -> int:
             return cmd_lint(args)
         elif args.command == "rules":
             return cmd_rules(args)
+        elif args.command == "schema":
+            return cmd_schema(args)
         else:
             parser.print_help()
             return 0

@@ -18,6 +18,8 @@
 - 🎯 **Type information** - Extract argument types, validation functions, and return types
 - 🌳 **Tree-sitter based** - Fast and accurate parsing using tree-sitter-matlab
 - 🔗 **Integration ready** - Built for documentation generators like MkDocs
+- ⚡ **MATLAB Linting** - Comprehensive linting based on MathWorks MATLAB Coding Guidelines
+- ✅ **Schema Validation** - IDE autocomplete and validation for configuration files
 
 ## Installation
 
@@ -78,6 +80,65 @@ print(f"Properties: {list(matlab_class.members.keys())}")
 constructor = matlab_class.constructor
 properties = [m for m in matlab_class.members.values() if m.is_property]
 ```
+
+## MATLAB Linting
+
+**maxx** includes a powerful linting engine for MATLAB code based on the MathWorks MATLAB Coding Guidelines.
+
+### Quick Start
+
+```bash
+# Lint all MATLAB files in current directory
+maxx lint
+
+# Lint specific files or directories
+maxx lint src/ tests/myfile.m
+
+# List available rules
+maxx rules
+
+# Export results to JSON
+maxx lint --output results.json
+```
+
+### Configuration
+
+Create a `matlab.toml` file in your project root:
+
+```toml
+[lint]
+enabled = true
+select = ["MW-*", "E001"]  # Enable MathWorks rules and syntax errors
+ignore = ["MW-F001"]        # Disable specific rules
+exclude = ["tests/**"]      # Exclude directories
+
+# Customize rule settings
+[lint.rule_config.MW-L001]
+max_length = 120
+```
+
+### Schema Validation for IDE Support
+
+Get autocomplete and validation in your editor when editing `matlab.toml`:
+
+```bash
+# Generate JSON schema
+maxx schema -o matlab-lint-schema.json
+```
+
+See [docs/SCHEMA_VALIDATION.md](docs/SCHEMA_VALIDATION.md) for detailed setup instructions for VSCode, IntelliJ, Vim, and other editors.
+
+### Available Rules
+
+- **MW-N001-N010**: Naming conventions (length limits, casing rules)
+- **MW-F001-F004**: Function authoring (parameter limits, documentation)
+- **MW-S001-S002**: Statement and loop constructs
+- **MW-C001**: Class naming
+- **MW-G001-G002**: Global variables and eval usage
+- **MW-L001**: Line length limits
+- **E001**: Syntax errors
+
+Run `maxx rules --all` to see all available rules.
 
 ## Supported MATLAB Constructs
 

@@ -169,3 +169,15 @@ class LintConfig(BaseModel):
             Dictionary of configuration overrides
         """
         return self.rule_config.get(rule_id, {})
+
+    @classmethod
+    def get_json_schema(cls) -> dict[str, object]:
+        """Generate JSON schema for the lint configuration.
+
+        This schema can be used by IDEs and editors for validation and autocomplete
+        when editing matlab.toml files.
+
+        Returns:
+            JSON schema as a dictionary
+        """
+        return cls.model_json_schema()
