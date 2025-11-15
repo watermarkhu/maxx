@@ -1,0 +1,30 @@
+# Rule S002: Limit nesting depth of loops and conditionals
+# Reference: https://github.com/mathworks/MATLAB-Coding-Guidelines/blob/main/MATLAB-Coding-Guidelines.md#loops-and-conditionals
+
+[rule]
+id = "MW-S002"
+name = "nesting-depth"
+description = "Nesting of loops and conditionals should be limited to 5 levels"
+severity = "info"
+enabled = false
+
+[query]
+# Match deeply nested control structures
+# This pattern will match any control structure; depth checking needs to be done in the engine
+pattern = """
+[
+  (if_statement) @control
+  (for_statement) @control
+  (while_statement) @control
+  (switch_statement) @control
+]
+"""
+
+[message]
+template = "Control structure may be deeply nested - limit nesting to 5 levels"
+
+[metadata]
+reference = "https://github.com/mathworks/MATLAB-Coding-Guidelines/blob/main/MATLAB-Coding-Guidelines.md#loops-and-conditionals"
+guideline = "MNCSN"
+motivation = "Readability - deep nesting adds visual complexity; Maintainability - deeply nested code prone to subtle errors"
+note = "Manual review required to determine actual nesting depth"

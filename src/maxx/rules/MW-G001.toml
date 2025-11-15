@@ -1,0 +1,24 @@
+# Rule G001: Detect use of global variables
+# Reference: https://github.com/mathworks/MATLAB-Coding-Guidelines/blob/main/MATLAB-Coding-Guidelines.md
+
+[rule]
+id = "MW-G001"
+name = "global-variable"
+description = "Use of global variables should be avoided"
+severity = "warning"
+enabled = true
+
+[query]
+# Match global variable declarations
+pattern = """
+(global_operator
+  (identifier) @variable_name
+) @global
+"""
+
+[message]
+template = "Global variable '{variable_name}' used - consider alternative approaches"
+
+[metadata]
+reference = "https://github.com/mathworks/MATLAB-Coding-Guidelines/blob/main/MATLAB-Coding-Guidelines.md"
+motivation = "Maintainability - global variables make code harder to understand and debug"

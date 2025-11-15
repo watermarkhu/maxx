@@ -1,0 +1,27 @@
+# Rule N006: Limit property name length to <= 32 characters
+# Reference: https://github.com/mathworks/MATLAB-Coding-Guidelines/blob/main/MATLAB-Coding-Guidelines.md#functions
+
+[rule]
+id = "MW-N006"
+name = "property-name-length"
+description = "Property name exceeds 32 characters"
+severity = "warning"
+enabled = true
+
+[query]
+# Match property definitions within classes
+pattern = """
+(properties
+  (property
+    (identifier) @property_name
+  )
+)
+"""
+
+[message]
+template = "Property '{property_name}' exceeds recommended 32 character limit"
+
+[metadata]
+reference = "https://github.com/mathworks/MATLAB-Coding-Guidelines/blob/main/MATLAB-Coding-Guidelines.md#functions"
+guideline = "naming.property.maxLength"
+motivation = "Understandability - shorter names facilitate code review"

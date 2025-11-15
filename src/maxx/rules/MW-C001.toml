@@ -1,0 +1,25 @@
+# Rule C001: Class file name should match class name
+# Reference: https://github.com/mathworks/MATLAB-Coding-Guidelines/blob/main/MATLAB-Coding-Guidelines.md#class-authoring-guidelines
+
+[rule]
+id = "MW-C001"
+name = "class-name-matches-file"
+description = "Class name should match the file name"
+severity = "error"
+enabled = true
+
+[query]
+# Match class definitions to check against filename
+pattern = """
+(class_definition
+  name: (identifier) @class_name
+) @class
+"""
+
+[message]
+template = "Class '{class_name}' does not match file name"
+
+[metadata]
+reference = "https://github.com/mathworks/MATLAB-Coding-Guidelines/blob/main/MATLAB-Coding-Guidelines.md#class-authoring-guidelines"
+guideline = "MCFIL"
+motivation = "Maintainability - matching names aid code location and modification"

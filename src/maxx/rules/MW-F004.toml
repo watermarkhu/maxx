@@ -1,0 +1,26 @@
+# Rule F004: Use commas to separate function outputs
+# Reference: https://github.com/mathworks/MATLAB-Coding-Guidelines/blob/main/MATLAB-Coding-Guidelines.md#outputs
+
+[rule]
+id = "MW-F004"
+name = "function-output-commas"
+description = "Function outputs should be separated by commas"
+severity = "info"
+enabled = false
+
+[query]
+# Match function definitions with multiple return values
+pattern = """
+(function_definition
+  name: (identifier) @function_name
+  (function_output) @returns
+) @function
+"""
+
+[message]
+template = "Function '{function_name}' return values should be separated by commas"
+
+[metadata]
+reference = "https://github.com/mathworks/MATLAB-Coding-Guidelines/blob/main/MATLAB-Coding-Guidelines.md#outputs"
+guideline = "NCOMMA"
+motivation = "Readability - commas clearly indicate distinct outputs"

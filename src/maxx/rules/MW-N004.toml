@@ -1,0 +1,25 @@
+# Rule N004: Limit class name length to <= 32 characters
+# Reference: https://github.com/mathworks/MATLAB-Coding-Guidelines/blob/main/MATLAB-Coding-Guidelines.md#functions
+
+[rule]
+id = "MW-N004"
+name = "class-name-length"
+description = "Class name exceeds 32 characters"
+severity = "warning"
+enabled = true
+
+[query]
+# Match class definitions with long names
+pattern = """
+(class_definition
+  name: (identifier) @class_name
+) @class
+"""
+
+[message]
+template = "Class '{class_name}' exceeds recommended 32 character limit"
+
+[metadata]
+reference = "https://github.com/mathworks/MATLAB-Coding-Guidelines/blob/main/MATLAB-Coding-Guidelines.md#functions"
+guideline = "naming.class.maxLength"
+motivation = "Understandability - shorter names facilitate code review"

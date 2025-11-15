@@ -154,6 +154,14 @@ class LintEngine:
                 )
                 message_vars[capture_name] = capture_text
 
+            # Apply custom validation logic for specific rules
+            should_report = self._apply_custom_validation(
+                rule, match, source_bytes, filepath, message_vars
+            )
+
+            if not should_report:
+                continue
+
             try:
                 message = rule.format_message(**message_vars)
             except KeyError as e:
@@ -172,6 +180,70 @@ class LintEngine:
             violations.append(violation)
 
         return violations
+
+    def _apply_custom_validation(
+        self,
+        rule: object,
+        match: object,
+        source_bytes: bytes,
+        filepath: Path,
+        message_vars: dict[str, object],
+    ) -> bool:
+        """Apply custom validation logic for specific rules.
+
+        Args:
+            rule: Rule being checked
+            match: Matched nodes from query
+            source_bytes: Source code as bytes
+            filepath: Path to the file being checked
+            message_vars: Variables for message formatting (will be updated)
+
+        Returns:
+            True if violation should be reported, False otherwise
+        """
+        from maxx.lint.rule import Rule
+
+        assert isinstance(rule, Rule)
+
+        # Name length validation rules (MW-N001, MW-N003 - MW-N006)
+        if rule.id in ("MW-N001", "MW-N003", "MW-N004", "MW-N005", "MW-N006"):
+            # Get the name from the appropriate capture
+            name_key = {
+                "MW-N001": "var_name",
+                "MW-N003": "function_name",
+                "MW-N004": "class_name",
+                "MW-N005": "method_name",
+                "MW-N006": "property_name",
+            }.get(rule.id)
+
+            if name_key and name_key in message_vars:
+                name = str(message_vars[name_key])
+                if len(name) <= 32:
+                    return False  # Name is within limit, don't report
+                message_vars["length"] = len(name)
+
+        # File name matching validation (MW-N002, MW-C001)
+        elif rule.id in ("MW-N002", "MW-C001"):
+            name_key = "function_name" if rule.id == "MW-N002" else "class_name"
+            if name_key in message_vars:
+                name = str(message_vars[name_key])
+                filename = filepath.stem
+                if name.lower() == filename.lower():
+                    return False  # Names match, don't report
+
+        # Function input/output count validation (MW-F002, MW-F003)
+        elif rule.id in ("MW-F002", "MW-F003"):
+            # For now, report all functions for manual review
+            # Full implementation would require counting parameters in the AST
+            pass
+
+        # Special rules that need custom handling
+        elif rule.id == "MW-S001":
+            # Loop iterator modification - requires manual review
+            # Keep this as an informational warning
+            pass
+
+        return True  # Report the violation
 
     def lint_paths(
         self,

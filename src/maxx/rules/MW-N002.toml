@@ -1,0 +1,25 @@
+# Rule N002: Function name should match file name
+# Reference: https://github.com/mathworks/MATLAB-Coding-Guidelines/blob/main/MATLAB-Coding-Guidelines.md#function-authoring-guidelines
+
+[rule]
+id = "MW-N002"
+name = "function-name-matches-file"
+description = "Function name should match the file name"
+severity = "error"
+enabled = true
+
+[query]
+# Match function definitions to check against filename
+pattern = """
+(function_definition
+  name: (identifier) @function_name
+) @function
+"""
+
+[message]
+template = "Function '{function_name}' does not match file name"
+
+[metadata]
+reference = "https://github.com/mathworks/MATLAB-Coding-Guidelines/blob/main/MATLAB-Coding-Guidelines.md#function-authoring-guidelines"
+guideline = "FNDEF"
+motivation = "Understandability - matching names prevent confusion"

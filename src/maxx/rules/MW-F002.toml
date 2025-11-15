@@ -1,0 +1,27 @@
+# Rule F002: Limit number of function input arguments to 6
+# Reference: https://github.com/mathworks/MATLAB-Coding-Guidelines/blob/main/MATLAB-Coding-Guidelines.md#inputs
+
+[rule]
+id = "MW-F002"
+name = "function-input-limit"
+description = "Function has too many input arguments (limit: 6)"
+severity = "info"
+enabled = false
+
+[query]
+# Match function definitions with input parameters
+pattern = """
+(function_definition
+  name: (identifier) @function_name
+  (function_arguments) @params
+) @function
+"""
+
+[message]
+template = "Function '{function_name}' may have too many input arguments (recommended limit: 6)"
+
+[metadata]
+reference = "https://github.com/mathworks/MATLAB-Coding-Guidelines/blob/main/MATLAB-Coding-Guidelines.md#inputs"
+guideline = "FCNIL"
+motivation = "Readability - functions with fewer arguments easier to understand"
+note = "Use name-value arguments for optional information"

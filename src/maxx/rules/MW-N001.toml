@@ -1,0 +1,25 @@
+# Rule N001: Limit variable name length to <= 32 characters
+# Reference: https://github.com/mathworks/MATLAB-Coding-Guidelines/blob/main/MATLAB-Coding-Guidelines.md#variables
+
+[rule]
+id = "MW-N001"
+name = "variable-name-length"
+description = "Variable name exceeds 32 characters"
+severity = "warning"
+enabled = true
+
+[query]
+# Match variable assignments where identifier is too long
+pattern = """
+(assignment
+  (identifier) @var_name
+)
+"""
+
+[message]
+template = "Variable '{var_name}' exceeds recommended 32 character limit (length: {length})"
+
+[metadata]
+reference = "https://github.com/mathworks/MATLAB-Coding-Guidelines/blob/main/MATLAB-Coding-Guidelines.md#variables"
+guideline = "naming.variable.maxLength"
+motivation = "Readability - long names reduce code readability by extending line length"

@@ -1,0 +1,28 @@
+# Rule S001: Detect loop iterator modification inside for loop
+# Reference: https://github.com/mathworks/MATLAB-Coding-Guidelines/blob/main/MATLAB-Coding-Guidelines.md#loops-and-conditionals
+
+[rule]
+id = "MW-S001"
+name = "loop-iterator-modification"
+description = "Loop iterator should not be modified inside for loop"
+severity = "info"
+enabled = false
+
+[query]
+# Match for loops to detect potential iterator modification
+pattern = """
+(for_statement
+  (iterator
+    (identifier) @iterator_name
+  )
+) @for_loop
+"""
+
+[message]
+template = "For loop uses iterator '{iterator_name}' - ensure it is not modified in the loop body"
+
+[metadata]
+reference = "https://github.com/mathworks/MATLAB-Coding-Guidelines/blob/main/MATLAB-Coding-Guidelines.md#loops-and-conditionals"
+guideline = "FXSET"
+motivation = "Maintainability - predictable loop logic reduces errors"
+note = "This rule flags all for loops for manual review. Static analysis cannot reliably detect iterator modification in the loop body."

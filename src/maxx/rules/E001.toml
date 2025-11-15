@@ -1,4 +1,6 @@
-# Rule E001: Detect ERROR nodes from tree-sitter (syntax errors)
+# Rule E001: Detect syntax errors from tree-sitter parser
+# Reference: MathWorks recommends fixing all Code Analyzer warnings
+# https://github.com/mathworks/MATLAB-Coding-Guidelines/blob/main/MATLAB-Coding-Guidelines.md
 
 [rule]
 id = "E001"
@@ -15,3 +17,7 @@ pattern = """
 
 [message]
 template = "Syntax error at line {line}: '{error}'"
+
+[metadata]
+reference = "https://github.com/mathworks/MATLAB-Coding-Guidelines/blob/main/MATLAB-Coding-Guidelines.md"
+motivation = "Code quality - syntax errors must be fixed before submitting code"

@@ -1,0 +1,25 @@
+# Rule F001: Functions should end with 'end' keyword
+# Reference: https://github.com/mathworks/MATLAB-Coding-Guidelines/blob/main/MATLAB-Coding-Guidelines.md#function-authoring-guidelines
+
+[rule]
+id = "MW-F001"
+name = "function-end-keyword"
+description = "Functions should be terminated with 'end' keyword"
+severity = "info"
+enabled = false
+
+[query]
+# Match function definitions to check for end keyword
+pattern = """
+(function_definition
+  name: (identifier) @function_name
+) @function
+"""
+
+[message]
+template = "Function '{function_name}' should end with 'end' keyword"
+
+[metadata]
+reference = "https://github.com/mathworks/MATLAB-Coding-Guidelines/blob/main/MATLAB-Coding-Guidelines.md#function-authoring-guidelines"
+motivation = "Readability - explicitly marks function boundaries"
+note = "Tree-sitter always includes end keyword in AST, so this rule serves as a reminder"

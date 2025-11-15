@@ -1,0 +1,25 @@
+# Rule G002: Detect use of eval() function
+# Reference: https://github.com/mathworks/MATLAB-Coding-Guidelines/blob/main/MATLAB-Coding-Guidelines.md
+
+[rule]
+id = "MW-G002"
+name = "eval-usage"
+description = "Use of eval() is discouraged due to security and performance concerns"
+severity = "warning"
+enabled = true
+
+[query]
+# Match eval function calls
+pattern = """
+(function_call
+  name: (identifier) @func_name
+  (#eq? @func_name "eval")
+) @eval_call
+"""
+
+[message]
+template = "Use of eval() at line {line} is discouraged - consider alternatives"
+
+[metadata]
+reference = "https://github.com/mathworks/MATLAB-Coding-Guidelines/blob/main/MATLAB-Coding-Guidelines.md"
+motivation = "Security and performance - eval() poses security risks and reduces performance"

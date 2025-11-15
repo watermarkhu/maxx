@@ -1,0 +1,26 @@
+# Rule F003: Limit number of function output arguments to 4
+# Reference: https://github.com/mathworks/MATLAB-Coding-Guidelines/blob/main/MATLAB-Coding-Guidelines.md#outputs
+
+[rule]
+id = "MW-F003"
+name = "function-output-limit"
+description = "Function has too many output arguments (limit: 4)"
+severity = "info"
+enabled = false
+
+[query]
+# Match function definitions with return values
+pattern = """
+(function_definition
+  name: (identifier) @function_name
+  (function_output) @returns
+) @function
+"""
+
+[message]
+template = "Function '{function_name}' may have too many output arguments (recommended limit: 4)"
+
+[metadata]
+reference = "https://github.com/mathworks/MATLAB-Coding-Guidelines/blob/main/MATLAB-Coding-Guidelines.md#outputs"
+guideline = "FCNOL"
+motivation = "Readability - too many outputs obscure function purpose; Reusability - fewer outputs increase flexibility"
