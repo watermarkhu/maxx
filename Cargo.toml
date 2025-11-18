@@ -1,0 +1,39 @@
+[package]
+name = "malt"
+version = "0.6.0"
+edition = "2021"
+authors = ["Mark Hu <watermarkhu@gmail.com>"]
+description = "MALT (MATLAB Language Tools) - Rust implementation for parsing and analyzing MATLAB code"
+license = "GPL-3.0"
+
+[lib]
+name = "malt"
+crate-type = ["cdylib", "rlib"]
+
+[features]
+default = []
+python = ["pyo3"]
+
+[dependencies]
+# Core dependencies (always required)
+tree-sitter = "0.25"
+tree-sitter-matlab = "1.2"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+toml = "0.8"
+regex = "1.11"
+walkdir = "2.5"
+glob = "0.3"
+thiserror = "2.0"
+log = "0.4"
+
+# Optional Python bindings
+pyo3 = { version = "0.22", features = ["extension-module", "abi3-py310"], optional = true }
+
+[dev-dependencies]
+criterion = "0.5"
+
+[profile.release]
+lto = true
+codegen-units = 1
+opt-level = 3

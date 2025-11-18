@@ -17,3 +17,8 @@ coverage.xml
 # Virtual environments
 .venv
 .python-version
+
+
+# Added by cargo
+
+/target

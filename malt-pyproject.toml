@@ -1,0 +1,70 @@
+[build-system]
+requires = ["maturin>=1.0,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "malt"
+version = "0.6.0"
+description = "MALT (MATLAB Language Tools) - Rust-powered MATLAB parsing and analysis"
+readme = "README_MALT.md"
+authors = [
+    { name = "Mark Hu", email = "watermarkhu@gmail.com" }
+]
+license = {text = "GPL-3.0"}
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Rust",
+    "Topic :: Documentation",
+    "Topic :: Software Development",
+    "Topic :: Software Development :: Documentation",
+    "Topic :: Utilities",
+    "Typing :: Typed",
+]
+requires-python = ">=3.10"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=9.0.0",
+    "pytest-cov>=7.0.0",
+    "ruff>=0.14.0",
+]
+
+[tool.maturin]
+python-source = "python"
+module-name = "malt"
+bindings = "pyo3"
+compatibility = "linux"
+features = ["pyo3/extension-module"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+indent-width = 4
+
+[tool.ruff.lint]
+select = [
+    "E",  # Python specific errors
+    "W",  # Warnings
+    "F",  # Pyflakes (code complexity)
+    "I",  # isort
+]
+ignore = [
+    "E501",  # Line too long
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.pytest.ini_options]
+addopts = "--color=yes"
+testpaths = ["tests"]
