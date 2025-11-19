@@ -1,18 +1,14 @@
 //! Tree-sitter based MATLAB parser - pure Rust
 
-use std::path::{Path, PathBuf};
-use tree_sitter::{Language, Parser, Tree};
+use std::path::PathBuf;
+use tree_sitter::{Language, Parser};
 
 use super::errors::{MaltError, Result};
 use super::objects::*;
 
-extern "C" {
-    fn tree_sitter_matlab() -> Language;
-}
-
 /// Get the MATLAB tree-sitter language
 pub fn get_matlab_language() -> Language {
-    unsafe { tree_sitter_matlab() }
+    tree_sitter_matlab::LANGUAGE.into()
 }
 
 /// File parser for MATLAB files
