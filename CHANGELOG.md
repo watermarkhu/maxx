@@ -1,6 +1,20 @@
 # CHANGELOG
 
 
+## v0.6.1 (2025-11-20)
+
+### Bug Fixes
+
+- Fix tree-sitter-matlab to 1.2.8 ([#48](https://github.com/watermarkhu/maxx/pull/48),
+  [`5ba3d29`](https://github.com/watermarkhu/maxx/commit/5ba3d29c9fcd8bae8837c32b079282dff16e8ac6))
+
+### Continuous Integration
+
+- **deps**: Update actions/checkout action to v6
+  ([#47](https://github.com/watermarkhu/maxx/pull/47),
+  [`0c68108`](https://github.com/watermarkhu/maxx/commit/0c68108accfdd2cf1197883aa7a9d63faf01f080))
+
+
 ## v0.6.0 (2025-11-12)
 
 ### Build System
