@@ -1,6 +1,20 @@
 # CHANGELOG
 
 
+## v0.6.2 (2025-11-22)
+
+### Bug Fixes
+
+- Changes to comments and newline in grammar ([#49](https://github.com/watermarkhu/maxx/pull/49),
+  [`73df5e7`](https://github.com/watermarkhu/maxx/commit/73df5e7aa95089d0138fa4ee178dfcd8e3b63202))
+
+### Chores
+
+- **deps**: Update dependency tree-sitter-matlab to v1.2.10
+  ([#49](https://github.com/watermarkhu/maxx/pull/49),
+  [`73df5e7`](https://github.com/watermarkhu/maxx/commit/73df5e7aa95089d0138fa4ee178dfcd8e3b63202))
+
+
 ## v0.6.1 (2025-11-20)
 
 ### Bug Fixes
