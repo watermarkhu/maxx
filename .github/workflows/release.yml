@@ -21,8 +21,8 @@ jobs:
     permissions:
       pull-requests: write
     outputs:
-      released: ${{ steps.get-version.outputs.released == 'true' }}
-      next-tag: ${{ steps.get-version.outputs.next-tag }}
+      release: ${{ steps.get-version.outputs.release == 'true' }}
+      tag: ${{ steps.get-version.outputs.tag }}
 
     steps:
     - uses: actions/create-github-app-token@v2
@@ -63,22 +63,9 @@ jobs:
       run: |
         uv sync --group release --no-dev --python "3.13"
 
-    - name: Get check version
+    - name: Get semantic version
+      uses: RonaldPhilipsen/semVersie@v1.3.0
       id: get-version
-      shell: bash
-      env:
-        GH_TOKEN: ${{ steps.app-token.outputs.token }}
-      run: |
-        LAST_TAG=$(uv run semantic-release --noop version --print-last-released-tag)
-        NEXT_TAG=$(uv run semantic-release --noop version --print-tag)
-        if [ "$LAST_TAG" == "$NEXT_TAG" ] || [ -z "$NEXT_TAG" ]; then
-          RELEASED=false
-        else
-          RELEASED=true
-        fi
-        echo "last-tag=$LAST_TAG" >> $GITHUB_OUTPUT
-        echo "next-tag=$NEXT_TAG" >> $GITHUB_OUTPUT
-        echo "released=$RELEASED" >> $GITHUB_OUTPUT
 
     - name: Find Comment
       id: fc
@@ -89,24 +76,25 @@ jobs:
         body-includes: This comment was written by a bot!
 
     - name: Create comment
-      if: steps.fc.outputs.comment-id == '' && steps.get-version.outputs.released == 'true'
+      if: steps.fc.outputs.comment-id == '' && steps.get-version.outputs.release == 'true'
       uses: peter-evans/create-or-update-comment@v5
       with:
         issue-number: ${{ github.event.pull_request.number }}
         body: |
-          Next release: `${{ steps.get-version.outputs.next-tag }}`
+          Next release: `${{ steps.get-version.outputs.tag }}`
           <!-- This comment was written by a bot! -->
           
     - name: Update comment
-      if: steps.fc.outputs.comment-id != '' && steps.get-version.outputs.released == 'true'
+      if: steps.fc.outputs.comment-id != '' && steps.get-version.outputs.release == 'true'
       uses: peter-evans/create-or-update-comment@v5
       with:
         comment-id: ${{ steps.fc.outputs.comment-id }}
         edit-mode: replace
         body: |
-          Next release: `${{ steps.get-version.outputs.next-tag }}`
+          Next release: `${{ steps.get-version.outputs.tag }}`
           <!-- This comment was written by a bot! -->
 
+<<<<<<< HEAD
     - name: Configure Git LFS
       if: github.event.pull_request.merged && steps.get-version.outputs.released == 'true'
       run: |
@@ -120,10 +108,12 @@ jobs:
       run: |
         uv run semantic-release -v version --commit --tag --push --changelog --vcs-release --skip-build
 
+=======
+>>>>>>> d33ccc6 (refactor: python-semantic-release -> semversie)
   deploy: 
     name: Deploy package distributions
     needs: release
-    if: needs.release.outputs.released == 'true' && github.event.pull_request.merged
+    if: needs.release.outputs.release == 'true' && github.event.pull_request.merged
     runs-on: ubuntu-latest
     environment: release
     permissions:
@@ -133,7 +123,7 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v6
       with:
-        ref: ${{ needs.release.outputs.next-tag }}
+        ref: ${{ needs.release.outputs.tag }}
 
     - name: Install the latest version of uv
       uses: astral-sh/setup-uv@v7
@@ -150,7 +140,7 @@ jobs:
       id: publish-dist
       uses: softprops/action-gh-release@v2
       with:
-        tag_name: ${{ needs.release.outputs.next-tag }}
+        tag_name: ${{ needs.release.outputs.tag }}
         files: |
           dist/*.whl
           dist/*.tar.gz
