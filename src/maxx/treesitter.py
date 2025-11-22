@@ -41,7 +41,8 @@ PARSER = Parser(LANGUAGE)
 FILE_QUERY = QueryCursor(
     Query(
         LANGUAGE,
-        """(source_file .
+        """
+(source_file .
     (comment)* @header .
     [
         (function_definition) @function
@@ -56,7 +57,8 @@ FILE_QUERY = QueryCursor(
 FUNCTION_QUERY = QueryCursor(
     Query(
         LANGUAGE,
-        """(function_definition .
+        """
+(function_definition .
     ("function")
     (function_output .
         [
@@ -90,14 +92,19 @@ FUNCTION_QUERY = QueryCursor(
 ARGUMENTS_QUERY = QueryCursor(
     Query(
         LANGUAGE,
-        """(arguments_statement .
+        """
+(arguments_statement .
     ("arguments")
     (attributes
         (identifier) @attributes
     )?
     (comment)?
     ("\\n")?
-    (property)+ @arguments
+    [
+        (property) @arguments_items
+        (comment) @arguments_items
+        ("\\n")
+    ]+
 )""",
     )
 )
@@ -106,7 +113,8 @@ ARGUMENTS_QUERY = QueryCursor(
 PROPERTY_QUERY = QueryCursor(
     Query(
         LANGUAGE,
-        """(property .
+        """
+(property .
     [
         (identifier) @name
         (property_name
@@ -131,7 +139,6 @@ PROPERTY_QUERY = QueryCursor(
         ("=")
         _+ @default
     )?
-    (comment)* @comment
 )""",
     )
 )
@@ -140,7 +147,8 @@ PROPERTY_QUERY = QueryCursor(
 ATTRIBUTE_QUERY = QueryCursor(
     Query(
         LANGUAGE,
-        """(attribute
+        """
+(attribute
     (identifier) @name
     (
         ("=")
@@ -154,7 +162,8 @@ ATTRIBUTE_QUERY = QueryCursor(
 CLASS_QUERY = QueryCursor(
     Query(
         LANGUAGE,
-        """("classdef" .
+        """
+("classdef" .
     (attributes
         (attribute) @attributes
     )?
@@ -169,6 +178,7 @@ CLASS_QUERY = QueryCursor(
         (methods) @methods
         (properties) @properties
         (enumeration) @enumeration
+        ("\\n")
     ]*
 )""",
     )
@@ -178,8 +188,12 @@ CLASS_QUERY = QueryCursor(
 METHODS_QUERY = QueryCursor(
     Query(
         LANGUAGE,
-        """("methods" .
-    (comment)* .
+        """
+(methods .
+    [
+        (comment)
+        ("\\n")
+    ]* .
     (attributes
         (attribute) @attributes
     )? .
@@ -187,7 +201,10 @@ METHODS_QUERY = QueryCursor(
     (
         ("\\n")* .
         (comment)* .
-        (function_definition)* @methods
+        [
+            (function_definition) @methods
+            ("\\n")
+        ]*
     )*
 )""",
     )
@@ -196,7 +213,8 @@ METHODS_QUERY = QueryCursor(
 PROPERTIES_QUERY = QueryCursor(
     Query(
         LANGUAGE,
-        """("properties" .
+        """
+("properties" .
     (comment)* .
     (attributes
         (attribute) @attributes
@@ -205,7 +223,11 @@ PROPERTIES_QUERY = QueryCursor(
     (
         ("\\n")* .
         (comment)* .
-        (property)* @properties
+        [
+            (property) @properties_items
+            (comment) @properties_items
+            ("\\n")
+        ]*
     )*
 )""",
     )
@@ -214,7 +236,8 @@ PROPERTIES_QUERY = QueryCursor(
 ENUMERATIONS_QUERY = QueryCursor(
     Query(
         LANGUAGE,
-        """("enumeration" .
+        """
+("enumeration" .
     (
         ("\\n")* .
         (comment)* .
@@ -405,8 +428,9 @@ class FileParser(object):
             if key in ["Sealed", "Abstract", "Hidden"]:
                 kwargs[key] = value
 
+        class_name = self.filepath.stem
         object = Class(
-            self.filepath.stem,
+            class_name,
             lineno=node.range.start_point.row + 1,
             endlineno=node.range.end_point.row + 1,
             node=node,
@@ -473,8 +497,19 @@ class FileParser(object):
                         property_kwargs[key] = AccessKind(value)
                     else:
                         property_kwargs[key] = AccessKind.private
-            for property_node in property_captures.get("properties", []):
-                property_captures = PROPERTY_QUERY.captures(property_node)
+
+            property_documented = False
+            prop = None
+            properties_items = _sort_nodes(property_captures.get("properties_items", []))
+            for properties_node in properties_items:
+                if properties_node.type == "comment" and not property_documented:
+                    docstring = self._comment_docstring(properties_node)
+                    if docstring and prop is not None:
+                        prop.docstring = docstring
+                    property_documented = True
+                    continue
+
+                property_captures = PROPERTY_QUERY.captures(properties_node)
 
                 prop = Property(
                     self._first_from_capture(property_captures, "name"),
@@ -494,7 +529,7 @@ class FileParser(object):
                         property_captures.get("comment", None), parent=object
                     ),
                     parent=object,
-                    node=property_node,
+                    node=properties_node,
                     **property_kwargs,
                 )
                 object.members[prop.name] = prop
@@ -630,17 +665,27 @@ class FileParser(object):
         for capture_arguments in captures_arguments:
             attributes = self._decode_from_capture(capture_arguments, "attributes")
             is_input = attributes is None or "Input" in attributes or "Output" not in attributes
-            # is_repeating = "Repeating" in attributes
 
-            for argument_node in _sort_nodes(capture_arguments["arguments"]):
-                capture_argument = PROPERTY_QUERY.captures(argument_node)
+            arguments_items = _sort_nodes(capture_arguments["arguments_items"])
+            argument_documented = False
+            argument = None
+            for arglist_node in arguments_items:
+                if arglist_node.type == "comment" and not argument_documented:
+                    docstring = self._comment_docstring(arglist_node)
+                    if docstring and argument is not None:
+                        argument.docstring = docstring
+                    argument_documented = True
+                    continue
+
+                capture_argument = PROPERTY_QUERY.captures(arglist_node)
                 arg_name = self._first_from_capture(capture_argument, "name")
+                argument_documented = False
 
                 if "options" in capture_argument:
                     options_name = self._first_from_capture(capture_argument, "options")
                     arguments.pop(options_name, None)
                     argument = arguments[arg_name] = Argument(
-                        arg_name, kind=ArgumentKind.keyword_only, node=argument_node
+                        arg_name, kind=ArgumentKind.keyword_only, node=arglist_node
                     )
                 else:
                     if is_input:
@@ -664,12 +709,6 @@ class FileParser(object):
 
                 if "default" in capture_argument:
                     argument.default = Expr(capture_argument["default"], self.encoding)
-
-                docstring = self._comment_docstring(
-                    capture_argument.get("comment", None), parent=object
-                )
-                if docstring:
-                    argument.docstring = docstring
 
         object.arguments = Arguments(*list(arguments.values()))
         if returns:
