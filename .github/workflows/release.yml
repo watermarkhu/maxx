@@ -48,20 +48,6 @@ jobs:
         ref: ${{ github.sha }}
         token: ${{ steps.app-token.outputs.token }}
         persist-credentials: true
-  
-    - name: Force correct release branch on workflow sha
-      run: |
-        git checkout -B ${{ github.ref_name }} ${{ github.sha }}
-
-    - name: Set up uv
-      uses: astral-sh/setup-uv@v7
-      with:
-        version: "latest"
-
-    - name: Install dependencies
-      shell: bash
-      run: |
-        uv sync --group release --no-dev --python "3.13"
 
     - name: Get semantic version
       uses: RonaldPhilipsen/semVersie@v1.3.0
