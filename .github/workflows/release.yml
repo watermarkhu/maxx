@@ -50,7 +50,7 @@ jobs:
         persist-credentials: true
 
     - name: Get semantic version
-      uses: RonaldPhilipsen/semVersie@v1.3.0
+      uses: RonaldPhilipsen/semVersie@v2.0.0
       id: get-version
 
     - name: Find Comment
