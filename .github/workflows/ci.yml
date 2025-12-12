@@ -66,7 +66,7 @@ jobs:
 
     - name: Cache uv
       id: cache-uv
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: .venv
         key: ${{ runner.os }}-qualify-uv-${{ hashFiles('uv.lock') }}
@@ -125,7 +125,7 @@ jobs:
 
     - name: Upload Test Results
       if: (!cancelled())
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         name: python${{ matrix.python-version }}
         path: "*.xml"
@@ -153,7 +153,7 @@ jobs:
 
       - name: Cache uv
         id: cache-uv
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: .venv
           key: ${{ runner.os }}-matlab-uv-${{ hashFiles('pyproject.toml') }}
@@ -173,7 +173,7 @@ jobs:
 
       - name: Upload Test Results
         if: (!cancelled())
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: matlab
           path: "*.xml"
@@ -196,7 +196,7 @@ jobs:
 
     - name: Cache uv
       id: cache-uv
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: .venv
         key: ${{ runner.os }}-qualify-uv-${{ hashFiles('uv.lock') }}
@@ -228,7 +228,7 @@ jobs:
 
     - name: Upload Test Results
       if: (!cancelled())
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         name: windows
         path: "*.xml"
@@ -249,7 +249,7 @@ jobs:
           fetch-depth: 2
 
       - name: Download Artifacts
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           path: results
 
