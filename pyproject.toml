@@ -1,6 +1,6 @@
 [project]
 name = "maxx"
-version = "0.6.2"
+version = "0.6.3"
 description = "Signatures for MATLAB projects"
 readme = "README.md"
 authors = [

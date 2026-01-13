@@ -1,6 +1,28 @@
 # CHANGELOG
 
 
+## v0.6.3 (2026-01-13)
+
+### Bug Fixes
+
+- Class parent ([#53](https://github.com/watermarkhu/maxx/pull/53),
+  [`2ea7352`](https://github.com/watermarkhu/maxx/commit/2ea735270958f8a15c0324ae7788ce43c6de223e))
+
+### Build System
+
+- **deps**: Update dependency playwright to ~=1.57.0
+  ([#51](https://github.com/watermarkhu/maxx/pull/51),
+  [`9873609`](https://github.com/watermarkhu/maxx/commit/98736092969e99087b9c141bc28c751f3abcf758))
+
+### Continuous Integration
+
+- **deps**: Update group-github-actions ([#52](https://github.com/watermarkhu/maxx/pull/52),
+  [`1e1afa7`](https://github.com/watermarkhu/maxx/commit/1e1afa7c4fb17c4875317628df2fda90fbadd746))
+
+- **deps**: Update group-github-actions (major) ([#52](https://github.com/watermarkhu/maxx/pull/52),
+  [`1e1afa7`](https://github.com/watermarkhu/maxx/commit/1e1afa7c4fb17c4875317628df2fda90fbadd746))
+
+
 ## v0.6.2 (2025-11-22)
 
 ### Bug Fixes
