@@ -72,7 +72,6 @@ jobs:
         key: ${{ runner.os }}-qualify-uv-${{ hashFiles('uv.lock') }}
 
     - name: Install dependencies
-      if: steps.cache-uv.outputs.cache-hit != 'true'
       run: |
         uv sync --dev --python ${{ matrix.python-version }} --frozen
 
@@ -159,7 +158,6 @@ jobs:
           key: ${{ runner.os }}-matlab-uv-${{ hashFiles('pyproject.toml') }}
       
       - name: Install dependencies
-        if: steps.cache-uv.outputs.cache-hit != 'true'
         run: |
           uv sync --all-groups --python 3.12 # MATLAB supports up to Python 3.12
 
@@ -202,7 +200,6 @@ jobs:
         key: ${{ runner.os }}-qualify-uv-${{ hashFiles('uv.lock') }}
 
     - name: Install dependencies
-      if: steps.cache-uv.outputs.cache-hit != 'true'
       shell: pwsh
       run: |
         uv sync --dev --python 3.14 --frozen
