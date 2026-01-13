@@ -200,6 +200,8 @@ class _PathResolver:
                     object.members[subobject.name] = subobject
                     if set_parent:
                         subobject.parent = object
+                        if isinstance(subobject, ClassFolder) and subobject.classfile:
+                            subobject.classfile.parent = object
             elif item.is_dir() and object.is_folder:
                 if item not in self._paths_collection._objects:
                     continue
