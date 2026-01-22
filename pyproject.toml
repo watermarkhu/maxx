@@ -40,7 +40,7 @@ dev = [
     "pytest~=9.0.0",
     "pytest-cov~=7.0.0",
     "ty~=0.0.1a24",
-    "prek~=0.2.3",
+    "prek~=0.3.0",
 ]
 release = [
     "python-semantic-release~=10.5.0; python_version < '3.14'",
