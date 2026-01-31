@@ -1,6 +1,24 @@
 # CHANGELOG
 
 
+## v0.6.4 (2026-01-31)
+
+### Build System
+
+- **deps**: Update dependency playwright to ~=1.58.0
+  ([#56](https://github.com/watermarkhu/maxx/pull/56),
+  [`a6c36dc`](https://github.com/watermarkhu/maxx/commit/a6c36dc2b04b95178529fc994ba3f5df3322f9bf))
+
+- **deps**: Update dependency prek to ~=0.3.0 ([#54](https://github.com/watermarkhu/maxx/pull/54),
+  [`3b58404`](https://github.com/watermarkhu/maxx/commit/3b58404cb5bc87d7ebec7bc6dcddfdc04d6eac84))
+
+### Chores
+
+- **deps**: Update dependency tree-sitter-matlab to v1.2.11
+  ([#57](https://github.com/watermarkhu/maxx/pull/57),
+  [`6be1ff4`](https://github.com/watermarkhu/maxx/commit/6be1ff4d3c7193ebc6e632b8f1e6a0a5365ad71e))
+
+
 ## v0.6.3 (2026-01-13)
 
 ### Bug Fixes
