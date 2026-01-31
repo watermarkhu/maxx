@@ -18,6 +18,10 @@
   ([#57](https://github.com/watermarkhu/maxx/pull/57),
   [`6be1ff4`](https://github.com/watermarkhu/maxx/commit/6be1ff4d3c7193ebc6e632b8f1e6a0a5365ad71e))
 
+- **deps**: Update dependency tree-sitter-matlab to v1.2.12
+  ([#58](https://github.com/watermarkhu/maxx/pull/58),
+  [`ac8e492`](https://github.com/watermarkhu/maxx/commit/ac8e492df50f9bb5119c7fa927a5b6ad04fcb5fc))
+
 
 ## v0.6.3 (2026-01-13)
 
