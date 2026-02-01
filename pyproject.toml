@@ -29,7 +29,7 @@ dependencies = [
     "charset-normalizer~=3.4",
     "griffe~=1.15.0",
     "tree-sitter~=0.25.1",
-    "tree-sitter-matlab==1.2.12",
+    "tree-sitter-matlab==1.2.13",
     "loguru~=0.7.3",
     "typing-extensions~=4.0; python_version < '3.11'",
 ]
