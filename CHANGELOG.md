@@ -1,7 +1,7 @@
 # CHANGELOG
 
 
-## v0.6.4 (2026-02-01)
+## v0.6.4 (2026-02-03)
 
 ### Build System
 
@@ -11,6 +11,9 @@
 
 - **deps**: Update dependency prek to ~=0.3.0 ([#54](https://github.com/watermarkhu/maxx/pull/54),
   [`3b58404`](https://github.com/watermarkhu/maxx/commit/3b58404cb5bc87d7ebec7bc6dcddfdc04d6eac84))
+
+- **deps**: Update dependency ruff to ~=0.15.0 ([#61](https://github.com/watermarkhu/maxx/pull/61),
+  [`3f90b59`](https://github.com/watermarkhu/maxx/commit/3f90b590429c5501dde4dcbf633ca64a80fda824))
 
 ### Chores
 
