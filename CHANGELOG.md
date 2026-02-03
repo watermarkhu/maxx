@@ -15,6 +15,10 @@
 - **deps**: Update dependency ruff to ~=0.15.0 ([#61](https://github.com/watermarkhu/maxx/pull/61),
   [`3f90b59`](https://github.com/watermarkhu/maxx/commit/3f90b590429c5501dde4dcbf633ca64a80fda824))
 
+- **deps**: Update pre-commit hook abravalheri/validate-pyproject to v0.25
+  ([#60](https://github.com/watermarkhu/maxx/pull/60),
+  [`98a96b7`](https://github.com/watermarkhu/maxx/commit/98a96b701ff6c1c3b975c73f493d510c113a5f59))
+
 ### Chores
 
 - **deps**: Update dependency tree-sitter-matlab to v1.2.11
