@@ -80,6 +80,10 @@ jobs:
         echo "next-tag=$NEXT_TAG" >> $GITHUB_OUTPUT
         echo "released=$RELEASED" >> $GITHUB_OUTPUT
 
+    - name: Configure Git LFS
+      run: |
+        git config lfs.locksverify false
+
     - name: Find Comment
       id: fc
       uses: peter-evans/find-comment@v4
