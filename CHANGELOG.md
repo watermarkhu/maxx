@@ -1,7 +1,7 @@
 # CHANGELOG
 
 
-## v0.6.4 (2026-02-03)
+## v0.6.4 (2026-02-04)
 
 ### Build System
 
@@ -32,6 +32,10 @@
 - **deps**: Update dependency tree-sitter-matlab to v1.2.13
   ([#59](https://github.com/watermarkhu/maxx/pull/59),
   [`2eec5c0`](https://github.com/watermarkhu/maxx/commit/2eec5c069dfb678eb19813be0b1426dc48e69620))
+
+- **deps**: Update dependency tree-sitter-matlab to v1.3.0
+  ([#62](https://github.com/watermarkhu/maxx/pull/62),
+  [`8e7a184`](https://github.com/watermarkhu/maxx/commit/8e7a1840e62d25fa3bee9be4932122b0e1ac484d))
 
 
 ## v0.6.3 (2026-01-13)
