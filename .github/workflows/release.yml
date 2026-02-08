@@ -80,10 +80,6 @@ jobs:
         echo "next-tag=$NEXT_TAG" >> $GITHUB_OUTPUT
         echo "released=$RELEASED" >> $GITHUB_OUTPUT
 
-    - name: Configure Git LFS
-      run: |
-        git config lfs.locksverify false
-
     - name: Find Comment
       id: fc
       uses: peter-evans/find-comment@v4
@@ -110,6 +106,11 @@ jobs:
         body: |
           Next release: `${{ steps.get-version.outputs.next-tag }}`
           <!-- This comment was written by a bot! -->
+
+    - name: Configure Git LFS
+      if: github.event.pull_request.merged && steps.get-version.outputs.released == 'true'
+      run: |
+        git config lfs.locksverify false
 
     - name: Create release
       if: github.event.pull_request.merged && steps.get-version.outputs.released == 'true'
