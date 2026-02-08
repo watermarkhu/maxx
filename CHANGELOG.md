@@ -1,7 +1,7 @@
 # CHANGELOG
 
 
-## v0.6.4 (2026-02-04)
+## v0.6.4 (2026-02-08)
 
 ### Build System
 
@@ -36,6 +36,12 @@
 - **deps**: Update dependency tree-sitter-matlab to v1.3.0
   ([#62](https://github.com/watermarkhu/maxx/pull/62),
   [`8e7a184`](https://github.com/watermarkhu/maxx/commit/8e7a1840e62d25fa3bee9be4932122b0e1ac484d))
+
+### Continuous Integration
+
+- Fix release workflow: disable Git LFS lock verification
+  ([#63](https://github.com/watermarkhu/maxx/pull/63),
+  [`1ba5e73`](https://github.com/watermarkhu/maxx/commit/1ba5e739a97d3e3d0479e80a7c0bbc11f523ba24))
 
 
 ## v0.6.3 (2026-01-13)
