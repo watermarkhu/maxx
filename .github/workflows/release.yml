@@ -107,6 +107,11 @@ jobs:
           Next release: `${{ steps.get-version.outputs.next-tag }}`
           <!-- This comment was written by a bot! -->
 
+    - name: Configure Git LFS
+      if: github.event.pull_request.merged && steps.get-version.outputs.released == 'true'
+      run: |
+        git config lfs.locksverify false
+
     - name: Create release
       if: github.event.pull_request.merged && steps.get-version.outputs.released == 'true'
       shell: bash
