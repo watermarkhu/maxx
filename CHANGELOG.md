@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.6.5 (2026-02-09)
+
+### Chores
+
+- **deps**: Update dependency griffe to v2 ([#64](https://github.com/watermarkhu/maxx/pull/64),
+  [`af40a45`](https://github.com/watermarkhu/maxx/commit/af40a45f6fce2efd878a2ab3184dfa6f332f47ce))
+
+
 ## v0.6.4 (2026-02-08)
 
 ### Build System
