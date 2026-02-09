@@ -65,6 +65,7 @@ jobs:
 
       - name: Set credentials for git
         env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
           APP_SLUG: ${{ steps.app-token.outputs.app-slug }}
           INSTALLATION_ID: ${{ steps.app-token.outputs.installation-id }}
         run: |
