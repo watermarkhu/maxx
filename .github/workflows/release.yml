@@ -24,6 +24,7 @@ jobs:
     outputs:
       release: ${{ steps.get-version.outputs.release }}
       tag: ${{ steps.get-version.outputs.tag }}
+      version: ${{ steps.get-version.outputs.version }}
     steps:
       - name: Get semantic version
         uses: RonaldPhilipsen/semVersie@v2.1.0
@@ -38,6 +39,9 @@ jobs:
     if: needs.release.outputs.release == 'true' && github.event.pull_request.merged
     runs-on: ubuntu-latest
     environment: release
+    defaults:
+      run:
+        shell: bash
     permissions:
       contents: write
       id-token: write
@@ -59,28 +63,40 @@ jobs:
           ref: ${{ needs.release.outputs.tag }}
           token: ${{ steps.app-token.outputs.token }}
 
+      - name: Set credentials for git
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          APP_SLUG: ${{ steps.app-token.outputs.app-slug }}
+          INSTALLATION_ID: ${{ steps.app-token.outputs.installation-id }}
+        run: |
+          USER_ID=$(gh api "/users/${APP_SLUG}[bot]" --jq .id)"
+          git config --global user.name "${APP_SLUG}[bot]"
+          git config --global user.email "${INSTALLATION_ID}+${USER_ID}[bot]@users.noreply.github.com"
+
+      - name: Update version in pyproject.toml
+        env:
+          VERSION: ${{ needs.release.outputs.version }}
+          TAG: ${{ needs.release.outputs.tag }}
+        run: |
+          sed -i 's/version = "0.0.0"/version = "${VERSION}"/' pyproject.toml
+          git add pyproject.toml
+          git commit -m "chore: bump version to ${VERSION}"
+          git tag -a ${TAG} -m "Release ${VERSION}"
+          git push -f origin ${TAG}
+
       - name: Build and publish package distributions
         run: |
           uv sync --no-dev
           uv build
           uv publish
 
-      - name: Publish package distributions to GitHub Releases
-        id: publish-dist
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ needs.release.outputs.tag }}
-          files: |
-            dist/*.whl
-            dist/*.tar.gz
-
       - name: Create release
-        if: github.event.pull_request.merged && steps.get-version.outputs.release == 'true'
-        shell: bash
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          TAG: ${{ needs.release.outputs.tag }}
         run: >
-          gh release create "${{ steps.get-version.outputs.tag }}"
+          gh release create "${TAG}"
           dist/*.whl
           dist/*.tar.gz
           --generate-notes
+          --verify-tag
