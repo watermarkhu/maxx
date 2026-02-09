@@ -2,7 +2,7 @@ name: Release
 
 on:
   pull_request:
-    types: 
+    types:
       - closed
       - opened
       - reopened
@@ -14,7 +14,6 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-
   release:
     name: Semantic version release
     runs-on: ubuntu-latest
@@ -25,78 +24,75 @@ jobs:
       tag: ${{ steps.get-version.outputs.tag }}
 
     steps:
-    - uses: actions/create-github-app-token@v2
-      id: app-token
-      with:
-        app-id: ${{ vars.APP_ID }}
-        private-key: ${{ secrets.APP_PRIVATE_KEY }}
+      - uses: actions/create-github-app-token@v2
+        id: app-token
+        with:
+          app-id: ${{ vars.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
 
-    - name: Get GitHub App User ID
-      id: get-user-id
-      env:
-        GH_TOKEN: ${{ steps.app-token.outputs.token }}
-      run: echo "user-id=$(gh api "/users/${{ steps.app-token.outputs.app-slug }}[bot]" --jq .id)" >> "$GITHUB_OUTPUT"
+      - name: Get GitHub App User ID
+        id: get-user-id
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: echo "user-id=$(gh api "/users/${{ steps.app-token.outputs.app-slug }}[bot]" --jq .id)" >> "$GITHUB_OUTPUT"
 
-    - run: |
-        git config --global user.name '${{ steps.app-token.outputs.app-slug }}[bot]'
-        git config --global user.email '${{ steps.get-user-id.outputs.user-id }}+${{ steps.app-token.outputs.app-slug }}[bot]@users.noreply.github.com'
+      - run: |
+          git config --global user.name '${{ steps.app-token.outputs.app-slug }}[bot]'
+          git config --global user.email '${{ steps.get-user-id.outputs.user-id }}+${{ steps.app-token.outputs.app-slug }}[bot]@users.noreply.github.com'
 
-    - name: Checkout repository
-      uses: actions/checkout@v6
-      with:
-        fetch-depth: 0
-        ref: ${{ github.sha }}
-        token: ${{ steps.app-token.outputs.token }}
-        persist-credentials: true
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          ref: ${{ github.sha }}
+          token: ${{ steps.app-token.outputs.token }}
+          persist-credentials: true
 
-    - name: Get semantic version
-      uses: RonaldPhilipsen/semVersie@v2.0.0
-      id: get-version
+      - name: Get semantic version
+        uses: RonaldPhilipsen/semVersie@v2.1.0
+        id: get-version
 
-    - name: Find Comment
-      id: fc
-      uses: peter-evans/find-comment@v4
-      with:
-        issue-number: ${{ github.event.pull_request.number }}
-        comment-author: 'github-actions[bot]'
-        body-includes: This comment was written by a bot!
+      - name: Find Comment
+        id: fc
+        uses: peter-evans/find-comment@v4
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: "github-actions[bot]"
+          body-includes: This comment was written by a bot!
 
-    - name: Create comment
-      if: steps.fc.outputs.comment-id == '' && steps.get-version.outputs.release == 'true'
-      uses: peter-evans/create-or-update-comment@v5
-      with:
-        issue-number: ${{ github.event.pull_request.number }}
-        body: |
-          Next release: `${{ steps.get-version.outputs.tag }}`
-          <!-- This comment was written by a bot! -->
-          
-    - name: Update comment
-      if: steps.fc.outputs.comment-id != '' && steps.get-version.outputs.release == 'true'
-      uses: peter-evans/create-or-update-comment@v5
-      with:
-        comment-id: ${{ steps.fc.outputs.comment-id }}
-        edit-mode: replace
-        body: |
-          Next release: `${{ steps.get-version.outputs.tag }}`
-          <!-- This comment was written by a bot! -->
+      - name: Create comment
+        if: steps.fc.outputs.comment-id == '' && steps.get-version.outputs.release == 'true'
+        uses: peter-evans/create-or-update-comment@v5
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            Next release: `${{ steps.get-version.outputs.tag }}`
+            <!-- This comment was written by a bot! -->
 
-<<<<<<< HEAD
-    - name: Configure Git LFS
-      if: github.event.pull_request.merged && steps.get-version.outputs.released == 'true'
-      run: |
-        git config lfs.locksverify false
+      - name: Update comment
+        if: steps.fc.outputs.comment-id != '' && steps.get-version.outputs.release == 'true'
+        uses: peter-evans/create-or-update-comment@v5
+        with:
+          comment-id: ${{ steps.fc.outputs.comment-id }}
+          edit-mode: replace
+          body: |
+            Next release: `${{ steps.get-version.outputs.tag }}`
+            <!-- This comment was written by a bot! -->
 
-    - name: Create release
-      if: github.event.pull_request.merged && steps.get-version.outputs.released == 'true'
-      shell: bash
-      env:
-        GH_TOKEN: ${{ steps.app-token.outputs.token }}
-      run: |
-        uv run semantic-release -v version --commit --tag --push --changelog --vcs-release --skip-build
+      - name: Configure Git LFS
+        if: github.event.pull_request.merged && steps.get-version.outputs.released == 'true'
+        run: |
+          git config lfs.locksverify false
 
-=======
->>>>>>> d33ccc6 (refactor: python-semantic-release -> semversie)
-  deploy: 
+      - name: Create release
+        if: github.event.pull_request.merged && steps.get-version.outputs.released == 'true'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          uv run semantic-release -v version --commit --tag --push --changelog --vcs-release --skip-build
+
+  deploy:
     name: Deploy package distributions
     needs: release
     if: needs.release.outputs.release == 'true' && github.event.pull_request.merged
@@ -106,27 +102,27 @@ jobs:
       contents: write
       id-token: write
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v6
-      with:
-        ref: ${{ needs.release.outputs.tag }}
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.release.outputs.tag }}
 
-    - name: Install the latest version of uv
-      uses: astral-sh/setup-uv@v7
-      with:
-        version: "latest"
+      - name: Install the latest version of uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          version: "latest"
 
-    - name: Build and publish package distributions
-      run: |
-        uv sync --no-dev
-        uv build
-        uv publish
+      - name: Build and publish package distributions
+        run: |
+          uv sync --no-dev
+          uv build
+          uv publish
 
-    - name: Publish package distributions to GitHub Releases
-      id: publish-dist
-      uses: softprops/action-gh-release@v2
-      with:
-        tag_name: ${{ needs.release.outputs.tag }}
-        files: |
-          dist/*.whl
-          dist/*.tar.gz
+      - name: Publish package distributions to GitHub Releases
+        id: publish-dist
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.release.outputs.tag }}
+          files: |
+            dist/*.whl
+            dist/*.tar.gz
