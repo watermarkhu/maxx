@@ -1,6 +1,6 @@
 [project]
 name = "maxx"
-version = "0.0.0" # Automatically patched during release
+version = "0.6.5" # Automatically patched during release
 description = "Signatures for MATLAB projects"
 readme = "README.md"
 authors = [
