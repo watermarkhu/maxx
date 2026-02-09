@@ -80,12 +80,12 @@ jobs:
             <!-- This comment was written by a bot! -->
 
       - name: Configure Git LFS
-        if: github.event.pull_request.merged && steps.get-version.outputs.released == 'true'
+        if: github.event.pull_request.merged && steps.get-version.outputs.release == 'true'
         run: |
           git config lfs.locksverify false
 
       - name: Create release
-        if: github.event.pull_request.merged && steps.get-version.outputs.released == 'true'
+        if: github.event.pull_request.merged && steps.get-version.outputs.release == 'true'
         shell: bash
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
