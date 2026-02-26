@@ -3,10 +3,8 @@ name = "maxx"
 version = "0.0.0" # Automatically patched during release
 description = "Signatures for MATLAB projects"
 readme = "README.md"
-authors = [
-    { name = "Mark Hu", email = "watermarkhu@gmail.com" }
-]
-license = {file = "LICENSE"}
+authors = [{ name = "Mark Hu", email = "watermarkhu@gmail.com" }]
+license = { file = "LICENSE" }
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
@@ -39,13 +37,10 @@ dev = [
     "ruff~=0.15.0",
     "pytest~=9.0.0",
     "pytest-cov~=7.0.0",
-    "ty~=0.0.1a24",
-    "prek~=0.3.0",
+    "ty~=0.0.18",
+    "prek~=0.3.3",
 ]
-reference = [
-    "beautifulsoup4~=4.14.2",
-    "playwright~=1.58.0",
-]
+reference = ["beautifulsoup4~=4.14.2", "playwright~=1.58.0"]
 
 [build-system]
 requires = ["hatchling"]
@@ -67,13 +62,13 @@ indent-width = 4
 
 [tool.ruff.lint]
 select = [
-    "E",  # Python specific errors
-    "W",  # Warnings
-    "F",  # Pyflakes (code complexity)
-    "I",  # isort
+    "E", # Python specific errors
+    "W", # Warnings
+    "F", # Pyflakes (code complexity)
+    "I", # isort
 ]
 ignore = [
-    "E501",  # Line too long
+    "E501", # Line too long
 ]
 
 [tool.ruff.format]

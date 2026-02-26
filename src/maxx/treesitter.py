@@ -533,6 +533,8 @@ class FileParser(object):
                     **property_kwargs,
                 )
                 object.members[prop.name] = prop
+                if not prop.docstring:
+                    property_documented = False
 
         for method_captures in [
             METHODS_QUERY.captures(n) for n in _sort_nodes(captures.get("methods", []))

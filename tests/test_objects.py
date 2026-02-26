@@ -454,7 +454,7 @@ class TestObjectAdvanced:
     def test_has_docstring(self):
         """Test has_docstring property."""
         func_with_doc = Function(name="test", filepath=Path("/path/to/test.m"))
-        func_with_doc.docstring = type("obj", (object,), {"value": "Some docstring"})()
+        func_with_doc.docstring = type("obj", (object,), {"value": "Some docstring"})()  # type: ignore[assignment]
         assert func_with_doc.has_docstring is True
 
         func_no_doc = Function(name="test2", filepath=Path("/path/to/test2.m"))

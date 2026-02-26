@@ -14,9 +14,9 @@ class MyClassParser:
     def setup(self, test_files_dir):
         """Set up the test by parsing the MyClass.m file."""
         class_file = test_files_dir / "MyClass.m"
-        self.class_obj: Class = FileParser(class_file).parse()
+        self.class_obj: Class = FileParser(class_file).parse()  # type: ignore[assignment]
         enum_file = test_files_dir / "MyEnum.m"
-        self.enum_obj: Enumeration = FileParser(enum_file).parse()
+        self.enum_obj: Enumeration = FileParser(enum_file).parse()  # type: ignore[assignment]
 
     def test_class_basic_properties(self):
         """Test basic class properties were parsed correctly."""
