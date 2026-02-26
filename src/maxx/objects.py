@@ -901,9 +901,11 @@ class Enumeration(PathMixin, Object):
     def __str__(self) -> str:
         return f"{self.parent.name}.{self.name}" if self.parent else self.name
 
-    def __eq__(self, value: Enumeration) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Arguments are equal if all their attributes except `docstring` and `function` are equal."""
-        return self.name == value.name and self.parent == value.parent
+        if not isinstance(other, Enumeration):
+            return False
+        return self.name == other.name and self.parent == other.parent
 
 
 class Function(PathMixin, Object):
