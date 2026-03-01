@@ -29,6 +29,8 @@ class Kind(str, Enum):
     """Aliases (imported objects)."""
     BUILTIN = "builtin"
     """Built-in objects."""
+    LIVE_SCRIPT = "live_script"
+    """Live scripts."""
 
 
 class ArgumentKind(str, Enum):
