@@ -119,8 +119,22 @@ def _parse_document_xml(xml_bytes: bytes) -> list[LiveScriptSection]:
 
     body = root.find(f"{_W}body")
     if body is None:
-        # Try without explicit namespace (some older releases omit it)
-        body = root.find("body")
+        # Fallback for documents that omit the explicit WordProcessingML namespace:
+        # normalise all unqualified tags so the rest of the parser, which expects
+        # namespaced tags, can operate unchanged.
+        legacy_body = root.find("body")
+        if legacy_body is not None:
+
+            def _namespacify(element: ET.Element) -> None:
+                if element.tag and not element.tag.startswith("{"):
+                    element.tag = f"{_W}{element.tag}"
+                for child in element:
+                    _namespacify(child)
+
+            _namespacify(root)
+            body = root.find(f"{_W}body")
+        else:
+            body = None
     if body is None:
         logger.warning("document.xml has no <body> element; returning empty sections")
         return []
@@ -295,9 +309,11 @@ class LiveScriptParser:
 
     Two formats are supported:
 
-    - Binary ``.mlx``: detected automatically via ZIP magic bytes.
-    - Plain-text live code (``.m`` with R2025a markup): opt-in via
-      :meth:`parse_plaintext`.
+    - Binary ``.mlx``: detected automatically via ZIP magic bytes and parsed
+      when :meth:`parse` is called on a ``.mlx`` file.
+    - Plain-text live code (R2025a-style markup, typically in ``.m`` files):
+      used by :meth:`parse` for non-binary files, and can be forced for any
+      extension via :meth:`parse_plaintext`.
 
     Example::
 

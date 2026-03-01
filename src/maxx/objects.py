@@ -1000,18 +1000,18 @@ class Script(PathMixin, Object):
 class LiveScriptSection:
     """A section in a MATLAB live script.
 
-    Each section has a kind (code, text, or output) and a content string.
+    Each section has a kind (``"code"`` or ``"text"``) and a content string.
     """
 
     def __init__(self, kind: str, content: str) -> None:
         """Initialize the live script section.
 
         Parameters:
-            kind: The section kind: ``"code"``, ``"text"``, or ``"output"``.
+            kind: The section kind: ``"code"`` or ``"text"``.
             content: The text content of the section.
         """
         self.kind: str = kind
-        """The section kind: ``"code"``, ``"text"``, or ``"output"``."""
+        """The section kind: ``"code"`` or ``"text"``."""
         self.content: str = content
         """The section content."""
 
@@ -1023,8 +1023,8 @@ class LiveScriptSection:
 class LiveScript(PathMixin, Object):
     """The class representing a MATLAB live script (.mlx or plain-text live code).
 
-    A live script is a sequence of sections, each being a code block,
-    a formatted text (description) block, or an output block.
+    A live script is a sequence of sections, each being a code block
+    or a formatted text (description) block.
     """
 
     kind: Kind = Kind.LIVE_SCRIPT
