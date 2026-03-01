@@ -7,11 +7,12 @@ import logging
 from griffe._internal.docstrings import google, numpy
 from griffe._internal.enumerations import DocstringSectionKind
 
-from maxx import collection, enums, objects, treesitter
+from maxx import collection, enums, livescript, objects, treesitter
 
 __all__: list = [
     "collection",
     "enums",
+    "livescript",
     "objects",
     "treesitter",
 ]

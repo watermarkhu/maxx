@@ -997,6 +997,61 @@ class Script(PathMixin, Object):
     kind: Kind = Kind.SCRIPT
 
 
+class LiveScriptSection:
+    """A section in a MATLAB live script.
+
+    Each section has a kind (``"code"`` or ``"text"``) and a content string.
+    """
+
+    def __init__(self, kind: str, content: str) -> None:
+        """Initialize the live script section.
+
+        Parameters:
+            kind: The section kind: ``"code"`` or ``"text"``.
+            content: The text content of the section.
+        """
+        self.kind: str = kind
+        """The section kind: ``"code"`` or ``"text"``."""
+        self.content: str = content
+        """The section content."""
+
+    def __repr__(self) -> str:
+        preview = self.content[:40].replace("\n", "\\n")
+        return f"LiveScriptSection(kind={self.kind!r}, content={preview!r})"
+
+
+class LiveScript(PathMixin, Object):
+    """The class representing a MATLAB live script (.mlx or plain-text live code).
+
+    A live script is a sequence of sections, each being a code block
+    or a formatted text (description) block.
+    """
+
+    kind: Kind = Kind.LIVE_SCRIPT
+
+    def __init__(
+        self,
+        *args: Any,
+        sections: list[LiveScriptSection] | None = None,
+        **kwargs: Any,
+    ) -> None:
+        """Initialize the live script.
+
+        Parameters:
+            *args: See :class:`Object`.
+            sections: The ordered list of sections in the live script.
+            **kwargs: See :class:`Object`.
+        """
+        super().__init__(*args, **kwargs)
+        self.sections: list[LiveScriptSection] = sections or []
+        """The ordered list of sections in the live script."""
+
+    @property
+    def is_live_script(self) -> bool:
+        """Whether this object is a live script."""
+        return True
+
+
 class Property(Validatable, Object):
     """The class representing a MATLAB class property."""
 

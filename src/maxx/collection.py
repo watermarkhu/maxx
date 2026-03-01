@@ -21,6 +21,7 @@ from maxx.objects import (
 from maxx.treesitter import FileParser
 
 MFILE_SUFFIX = ".m"
+MLX_SUFFIX = ".mlx"
 CLASSFOLDER_PREFIX = "@"
 NAMESPACE_PREFIX = "+"
 FOLDER_PREFIXES = (CLASSFOLDER_PREFIX, NAMESPACE_PREFIX)
@@ -38,9 +39,10 @@ class _PathGlobber:
     A class to recursively glob paths as MATLAB would do it.
     """
 
-    def __init__(self, path: Path, recursive: bool = False):
+    def __init__(self, path: Path, recursive: bool = False, parse_live_scripts: bool = False):
         self._idx = 0
         self._paths: list[Path] = []
+        self._parse_live_scripts = parse_live_scripts
         self._glob(path, recursive)
 
     def _glob(self, path: Path, recursive: bool = False):
@@ -66,6 +68,8 @@ class _PathGlobber:
             elif (
                 member.is_file() and member.suffix == MFILE_SUFFIX and member.name != CONTENTS_FILE
             ):
+                self._paths.append(member)
+            elif member.is_file() and member.suffix == MLX_SUFFIX and self._parse_live_scripts:
                 self._paths.append(member)
 
     def max_stem_length(self) -> int:
@@ -171,6 +175,11 @@ class _PathResolver:
         return self._object
 
     def _collect_path(self, path: Path, **kwargs: Any) -> Object:
+        if path.suffix == MLX_SUFFIX:
+            from maxx.livescript import LiveScriptParser
+
+            parser = LiveScriptParser(path, paths_collection=self._paths_collection)
+            return parser.parse()
         file = FileParser(path, paths_collection=self._paths_collection)
         object = file.parse(paths_collection=self._paths_collection, **kwargs)
         self._paths_collection.lines_collection[path] = file.content.split("\n")
@@ -366,6 +375,7 @@ class PathsCollection:
         matlab_path: Sequence[str | Path] = [],
         recursive: bool = False,
         working_directory: Path = Path.cwd(),
+        parse_live_scripts: bool = False,
         _local: bool = False,
     ):
         """
@@ -375,6 +385,11 @@ class PathsCollection:
             matlab_path (list[str | Path]): A list of strings or Path objects representing the MATLAB paths.
             recursive (bool): Whether to add the paths recursively
             working_directory: (Path | None)
+            parse_live_scripts (bool): If True, ``.mlx`` live script files are
+                included in the collection and parsed into
+                :class:`~maxx.objects.LiveScript` objects.  Defaults to
+                ``False`` because live scripts are not callable like functions
+                and may be large binary files.
         Raises:
             TypeError: If any element in matlab_path is not a string or Path object.
         """
@@ -399,6 +414,8 @@ class PathsCollection:
         # Indicator for whether the current collection is local
         self._working_directory: Path = working_directory
         # The working directory for the collection.
+        self._parse_live_scripts: bool = parse_live_scripts
+        # Whether to include .mlx live script files in the collection.
         self.lines_collection = LinesCollection()
 
         for path in matlab_path:
@@ -546,7 +563,9 @@ class PathsCollection:
             self._path.appendleft(path)
             logger.info(f"Added path to start: {path}")
 
-        for member in _PathGlobber(path, recursive=recursive):
+        for member in _PathGlobber(
+            path, recursive=recursive, parse_live_scripts=self._parse_live_scripts
+        ):
             object = Alias(member.stem, target=_PathResolver(member, self))
             self._objects[member] = object
 
