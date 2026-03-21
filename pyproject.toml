@@ -36,7 +36,7 @@ dependencies = [
 dev = [
     "ruff~=0.15.0",
     "pytest~=9.0.0",
-    "pytest-cov~=7.0.0",
+    "pytest-cov~=7.1.0",
     "ty~=0.0.18",
     "prek~=0.3.3",
 ]
