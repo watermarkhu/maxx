@@ -9,6 +9,14 @@ classdef TestDocstringBefore
         Prop2
     end
     
+    enumeration
+        % First enumeration member docstring
+        EnumMember1
+        
+        % Second enumeration member docstring
+        EnumMember2
+    end
+    
     methods
         function obj = TestDocstringBefore(arg1, arg2)
             % Constructor with arguments that have docstrings before

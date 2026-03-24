@@ -3,7 +3,7 @@
 import pytest
 
 from maxx.config import ParserConfig
-from maxx.objects import Class, Function, Property
+from maxx.objects import Class, Enumeration, Function, Property
 from maxx.treesitter import FileParser
 
 
@@ -87,3 +87,41 @@ class TestDocstringBefore:
         arg2 = constructor.arguments["arg2"]
         assert arg2.docstring is not None
         assert "Second argument docstring" in arg2.docstring.value
+
+    def test_enumerations_docstring_after_default(self, test_file):
+        """Test default behavior: comments after enumerations are used."""
+        config = ParserConfig(docstring_before_enumerations=False)
+        class_obj = FileParser(test_file).parse(config=config)
+
+        assert isinstance(class_obj, Class)
+
+        # With default behavior (comment after), comments attach to previous enumeration
+        # Comment before EnumMember1 has no previous enumeration, so EnumMember1 has no docstring
+        enum1 = class_obj.members["EnumMember1"]
+        assert isinstance(enum1, Enumeration)
+        # Comment before EnumMember2 attaches to EnumMember1 (original behavior)
+        assert enum1.docstring is not None
+        assert "Second enumeration member docstring" in enum1.docstring.value
+
+        enum2 = class_obj.members["EnumMember2"]
+        assert isinstance(enum2, Enumeration)
+        # No comment after EnumMember2, so no docstring
+        assert enum2.docstring is None
+
+    def test_enumerations_docstring_before_enabled(self, test_file):
+        """Test docstring_before_enumerations=True: comments before enumerations are used."""
+        config = ParserConfig(docstring_before_enumerations=True)
+        class_obj = FileParser(test_file).parse(config=config)
+
+        assert isinstance(class_obj, Class)
+
+        # With docstring_before enabled, comments before enumerations should be used
+        enum1 = class_obj.members["EnumMember1"]
+        assert isinstance(enum1, Enumeration)
+        assert enum1.docstring is not None
+        assert "First enumeration member docstring" in enum1.docstring.value
+
+        enum2 = class_obj.members["EnumMember2"]
+        assert isinstance(enum2, Enumeration)
+        assert enum2.docstring is not None
+        assert "Second enumeration member docstring" in enum2.docstring.value
