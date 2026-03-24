@@ -70,7 +70,7 @@ jobs:
         uses: actions/cache@v5
         with:
           path: .venv
-          key: ${{ runner.os }}-qualify-uv-${{ hashFiles('uv.lock') }}
+          key: ${{ runner.os }}-qualify-uv-${{ matrix.python-version }}-${{ matrix.resolution }}
 
       - name: Install dependencies
         env:
@@ -130,7 +130,7 @@ jobs:
         if: (!cancelled())
         uses: actions/upload-artifact@v7
         with:
-          name: python${{ matrix.python-version }}
+          name: python${{ matrix.python-version }}-${{ matrix.resolution }}
           path: "*.xml"
 
   matlab:
