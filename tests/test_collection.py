@@ -103,6 +103,7 @@ class TestPathsCollection:
             "complex_block_comment",
             "subdir_function",
             "nested_function",
+            "TestDocstringBefore",
         }
         assert set(members.keys()) == expected_keys, (
             f"Missing: {expected_keys - set(members.keys())}, Extra: {set(members.keys()) - expected_keys}"
