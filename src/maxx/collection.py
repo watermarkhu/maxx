@@ -8,6 +8,7 @@ from typing import Any, ItemsView, KeysView, Sequence, TypeVar, ValuesView
 
 from loguru import logger
 
+from maxx.config import ParserConfig
 from maxx.objects import (
     Alias,
     Class,
@@ -181,7 +182,11 @@ class _PathResolver:
             parser = LiveScriptParser(path, paths_collection=self._paths_collection)
             return parser.parse()
         file = FileParser(path, paths_collection=self._paths_collection)
-        object = file.parse(paths_collection=self._paths_collection, **kwargs)
+        object = file.parse(
+            config=self._paths_collection._parser_config,
+            paths_collection=self._paths_collection,
+            **kwargs,
+        )
         self._paths_collection.lines_collection[path] = file.content.split("\n")
         return object
 
@@ -377,6 +382,7 @@ class PathsCollection:
         working_directory: Path = Path.cwd(),
         parse_live_scripts: bool = False,
         _local: bool = False,
+        parser_config: ParserConfig | None = None,
     ):
         """
         Initialize an instance of PathsCollection.
@@ -390,6 +396,8 @@ class PathsCollection:
                 :class:`~maxx.objects.LiveScript` objects.  Defaults to
                 ``False`` because live scripts are not callable like functions
                 and may be large binary files.
+            parser_config (ParserConfig | None): Configuration for parsing MATLAB files.
+                If None, default configuration is used.
         Raises:
             TypeError: If any element in matlab_path is not a string or Path object.
         """
@@ -416,18 +424,26 @@ class PathsCollection:
         # The working directory for the collection.
         self._parse_live_scripts: bool = parse_live_scripts
         # Whether to include .mlx live script files in the collection.
+        self._parser_config: ParserConfig = (
+            parser_config if parser_config is not None else ParserConfig()
+        )
+        # Configuration for parsing MATLAB files.
         self.lines_collection = LinesCollection()
 
         for path in matlab_path:
             self.addpath(Path(path), to_end=True, recursive=recursive)
 
     @staticmethod
-    def as_local_collection(path: Path) -> PathsCollection:
+    def as_local_collection(
+        path: Path, parser_config: ParserConfig | None = None
+    ) -> PathsCollection:
         """
         Create a local PathsCollection for a given path.
 
         Args:
             path (Path): The path for which to create the local collection.
+            parser_config (ParserConfig | None): Configuration for parsing MATLAB files.
+                If None, default configuration is used.
 
         Returns:
             PathsCollection: A new PathsCollection instance for the given path.
@@ -435,7 +451,11 @@ class PathsCollection:
         private_dir = path / "private"
         local_collection_path = [private_dir] if private_dir.exists() else []
         collection = PathsCollection(
-            local_collection_path, recursive=False, working_directory=path, _local=True
+            local_collection_path,
+            recursive=False,
+            working_directory=path,
+            _local=True,
+            parser_config=parser_config,
         )
         collection._path.appendleft(path)
         return collection
@@ -583,7 +603,7 @@ class PathsCollection:
             if not self._local and member.is_file():
                 if member.parent not in self._local_collections:
                     self._local_collections[member.parent] = PathsCollection.as_local_collection(
-                        member.parent
+                        member.parent, parser_config=self._parser_config
                     )
                 local_collection = self._local_collections[member.parent]
                 local_collection._objects[member] = object

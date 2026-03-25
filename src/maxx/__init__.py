@@ -7,14 +7,17 @@ import logging
 from griffe._internal.docstrings import google, numpy
 from griffe._internal.enumerations import DocstringSectionKind
 
-from maxx import collection, enums, livescript, objects, treesitter
+from maxx import collection, config, enums, livescript, objects, treesitter
+from maxx.config import ParserConfig
 
 __all__: list = [
     "collection",
+    "config",
     "enums",
     "livescript",
     "objects",
     "treesitter",
+    "ParserConfig",
 ]
 
 

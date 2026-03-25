@@ -5,7 +5,7 @@ from typing import Literal
 
 from loguru import logger
 
-LogLevel = Literal["CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"]
+LogLevel = Literal["TRACE", "DEBUG", "INFO", "SUCCESS", "WARNING", "ERROR", "CRITICAL"]
 
 
 # Intercept standard logging messages and route them to Loguru

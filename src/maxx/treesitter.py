@@ -13,6 +13,7 @@ import tree_sitter_matlab as tsmatlab
 from loguru import logger
 from tree_sitter import Language, Node, Parser, Query, QueryCursor, Tree, TreeCursor
 
+from maxx.config import ParserConfig
 from maxx.enums import AccessKind, ArgumentKind
 from maxx.expressions import Expr
 from maxx.objects import (
@@ -222,7 +223,6 @@ PROPERTIES_QUERY = QueryCursor(
     (comment)* .
     (
         ("\\n")* .
-        (comment)* .
         [
             (property) @properties_items
             (comment) @properties_items
@@ -238,9 +238,8 @@ ENUMERATIONS_QUERY = QueryCursor(
         LANGUAGE,
         """
 ("enumeration" .
-    (
-        ("\\n")* .
-        (comment)* .
+    ("\\n")* .
+    [
         (enum
             (identifier) @content
             (
@@ -248,10 +247,10 @@ ENUMERATIONS_QUERY = QueryCursor(
                 (_)+ @content
                 (")")
             )?
-        ) .
-        ("\\n")* .
-        (comment)* @content
-    )*
+        )
+        (comment) @content
+        ("\\n")
+    ]*
 )""",
     )
 )
@@ -340,7 +339,7 @@ class FileParser(object):
         """
         return self._content.decode(self.encoding)
 
-    def parse(self, **kwargs: Any) -> Function | Class | Script:
+    def parse(self, config: ParserConfig | None = None, **kwargs: Any) -> Function | Class | Script:
         """
         Parse the content of the file and return a Object.
 
@@ -349,6 +348,8 @@ class FileParser(object):
         different types of Matlab constructs such as functions and classes.
 
         Args:
+            config: Configuration object controlling parser behavior. If None,
+                default configuration is used.
             **kwargs: Additional keyword arguments to pass to the parsing methods.
 
         Returns:
@@ -367,14 +368,17 @@ class FileParser(object):
                 raise ValueError(f"The file {self.filepath} could not be parsed.")
             captures = FILE_QUERY.captures(node)
 
+            if config is None:
+                config = ParserConfig()
+
             if TYPE_CHECKING:
                 object: Function | Class | Script | None = None
             if "function" in captures:
                 logger.debug(f"Parsing function in file: {self.filepath}")
-                object = self._parse_function(captures["function"][0], **kwargs)
+                object = self._parse_function(captures["function"][0], config, **kwargs)
             elif "type" in captures:
                 logger.debug(f"Parsing class in file: {self.filepath}")
-                object = self._parse_class(captures["type"][0], **kwargs)
+                object = self._parse_class(captures["type"][0], config, **kwargs)
             else:
                 logger.debug(f"Parsing script in file: {self.filepath}")
                 object = Script(self.filepath.stem, filepath=self.filepath, node=node, **kwargs)
@@ -401,7 +405,7 @@ class FileParser(object):
                 syntax_error.end_offset = self._node.end_point.column + 1
             raise syntax_error from ex
 
-    def _parse_class(self, node: Node, **kwargs: Any) -> Class:
+    def _parse_class(self, node: Node, config: ParserConfig, **kwargs: Any) -> Class:
         """
         Parse a class node and return a Class or Class object.
 
@@ -411,6 +415,7 @@ class FileParser(object):
 
         Args:
             node (Node): The class node to parse.
+            config: Configuration object controlling parser behavior.
             **kwargs: Additional keyword arguments to pass to the Class or Class object.
 
         Returns:
@@ -440,9 +445,9 @@ class FileParser(object):
             **kwargs,
         )
 
-        def add_enum(identifier, comment_nodes, value_nodes):
+        def add_enum(identifier, after_comments, value_nodes):
             docstring = (
-                self._comment_docstring(comment_nodes, parent=object) if comment_nodes else None
+                self._comment_docstring(after_comments, parent=object) if after_comments else None
             )
             value = Expr(value_nodes, self.encoding) if value_nodes else None
             enumeration = Enumeration(identifier, docstring=docstring, parent=object, value=value)
@@ -452,24 +457,32 @@ class FileParser(object):
             ENUMERATIONS_QUERY.captures(n) for n in _sort_nodes(captures.get("enumeration", []))
         ]:
             identifier: str = ""
-            comment_nodes: list[Node] = []
             value_nodes: list[Node] = []
+            after_comments: list[Node] = []
+            before_comments: list[Node] = []
 
             for n in _sort_nodes(enumeration_captures["content"]):
                 match n.type:
                     case "identifier":
                         if identifier:
-                            add_enum(identifier, comment_nodes, value_nodes)
+                            if config.docstring_before_enumerations:
+                                add_enum(identifier, before_comments, value_nodes)
+                            else:
+                                add_enum(identifier, after_comments, value_nodes)
                         identifier: str = self._decode(n)
-                        comment_nodes = []
+                        before_comments = [n for n in after_comments]
+                        after_comments = []
                         value_nodes = []
                     case "comment":
-                        comment_nodes.append(n)
+                        after_comments.append(n)
                     case _:
                         value_nodes.append(n)
             else:
                 if identifier:
-                    add_enum(identifier, comment_nodes, value_nodes)
+                    if config.docstring_before_enumerations:
+                        add_enum(identifier, before_comments, value_nodes)
+                    else:
+                        add_enum(identifier, after_comments, value_nodes)
 
         for property_captures in [
             PROPERTIES_QUERY.captures(n) for n in _sort_nodes(captures.get("properties", []))
@@ -498,15 +511,17 @@ class FileParser(object):
                     else:
                         property_kwargs[key] = AccessKind.private
 
-            property_documented = False
             prop = None
+            docstring = None
             properties_items = _sort_nodes(property_captures.get("properties_items", []))
             for properties_node in properties_items:
-                if properties_node.type == "comment" and not property_documented:
+                if properties_node.type == "comment":
                     docstring = self._comment_docstring(properties_node)
-                    if docstring and prop is not None:
+                    if not docstring:
+                        continue
+                    if not config.docstring_before_properties and prop is not None:
+                        # Attach docstring to previous property
                         prop.docstring = docstring
-                    property_documented = True
                     continue
 
                 property_captures = PROPERTY_QUERY.captures(properties_node)
@@ -525,16 +540,14 @@ class FileParser(object):
                     default=Expr(property_captures["default"], self.encoding)
                     if "default" in property_captures
                     else None,
-                    docstring=self._comment_docstring(
-                        property_captures.get("comment", None), parent=object
-                    ),
+                    docstring=docstring
+                    if docstring is not None and config.docstring_before_properties
+                    else None,
                     parent=object,
                     node=properties_node,
                     **property_kwargs,
                 )
                 object.members[prop.name] = prop
-                if not prop.docstring:
-                    property_documented = False
 
         for method_captures in [
             METHODS_QUERY.captures(n) for n in _sort_nodes(captures.get("methods", []))
@@ -558,7 +571,7 @@ class FileParser(object):
                         method_kwargs[key] = AccessKind.private
             for method_node in method_captures.get("methods", []):
                 method = self._parse_function(
-                    method_node, method=True, parent=object, **method_kwargs
+                    method_node, config, method=True, parent=object, **method_kwargs
                 )
                 if method.name != self.filepath.stem and not method.Static and method.arguments:
                     # Remove self from first method capture_argument
@@ -609,12 +622,15 @@ class FileParser(object):
 
         return (key, value)
 
-    def _parse_function(self, node: Node, method: bool = False, **kwargs: Any) -> Function:
+    def _parse_function(
+        self, node: Node, config: ParserConfig, method: bool = False, **kwargs: Any
+    ) -> Function:
         """
         Parse a function node and return a Function object.
 
         Args:
             node (Node): The node representing the function in the syntax tree.
+            config: Configuration object controlling parser behavior.
             method (bool, optional): Whether the function is a method. Defaults to False.
             **kwargs: Additional keyword arguments to pass to the Function object.
 
@@ -669,19 +685,21 @@ class FileParser(object):
             is_input = attributes is None or "Input" in attributes or "Output" not in attributes
 
             arguments_items = _sort_nodes(capture_arguments["arguments_items"])
-            argument_documented = False
+
             argument = None
+            docstring = None
             for arglist_node in arguments_items:
-                if arglist_node.type == "comment" and not argument_documented:
+                if arglist_node.type == "comment":
                     docstring = self._comment_docstring(arglist_node)
-                    if docstring and argument is not None:
+                    if not docstring:
+                        continue
+                    if not config.docstring_before_arguments and argument is not None:
+                        # Attach docstring to previous argument
                         argument.docstring = docstring
-                    argument_documented = True
                     continue
 
                 capture_argument = PROPERTY_QUERY.captures(arglist_node)
                 arg_name = self._first_from_capture(capture_argument, "name")
-                argument_documented = False
 
                 if "options" in capture_argument:
                     options_name = self._first_from_capture(capture_argument, "options")
@@ -699,6 +717,10 @@ class FileParser(object):
                         argument.kind = ArgumentKind.optional
                     else:
                         argument.kind = ArgumentKind.positional_only
+
+                # Attach pending docstring if in before mode
+                if docstring is not None and config.docstring_before_arguments:
+                    argument.docstring = docstring
 
                 if "dimensions" in capture_argument:
                     argument.dimensions = self._decode_from_capture(capture_argument, "dimensions")
