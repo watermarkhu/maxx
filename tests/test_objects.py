@@ -454,7 +454,7 @@ class TestObjectAdvanced:
     def test_has_docstring(self):
         """Test has_docstring property."""
         func_with_doc = Function(name="test", filepath=Path("/path/to/test.m"))
-        func_with_doc.docstring = type("obj", (object,), {"value": "Some docstring"})()  # type: ignore[assignment]
+        func_with_doc.docstring = type("obj", (object,), {"value": "Some docstring"})()  # ty: ignore[invalid-assignment]
         assert func_with_doc.has_docstring is True
 
         func_no_doc = Function(name="test2", filepath=Path("/path/to/test2.m"))
@@ -599,13 +599,13 @@ class TestEnumerationAdvanced:
         """Test enumeration with value."""
         enum = Enumeration(name="MyValue", filepath=Path("/path/to/MyEnum.m"))
         # Enumerations can have values
-        enum.value = "42"  # type: ignore[assignment]
+        enum.value = "42"  # ty: ignore[invalid-assignment]
         assert str(enum.value) == "42"
 
     def test_enumeration_str_representation(self):
         """Test string representation of enumeration."""
         enum = Enumeration(name="EnumValue", filepath=Path("/path/to/Enum.m"))
-        enum.value = "100"  # type: ignore[assignment]
+        enum.value = "100"  # ty: ignore[invalid-assignment]
         str_repr = str(enum)
         assert "EnumValue" in str_repr or str_repr is not None
 

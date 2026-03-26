@@ -4,8 +4,9 @@ from __future__ import annotations
 
 from collections import defaultdict, deque
 from pathlib import Path
-from typing import Any, ItemsView, KeysView, Sequence, TypeVar, ValuesView
+from typing import Any, ItemsView, KeysView, Sequence, TypeVar, ValuesView, cast
 
+from griffe._internal.models import Object as GriffeObject
 from loguru import logger
 
 from maxx.config import ParserConfig
@@ -290,7 +291,8 @@ class _PathResolver:
 
         with open(readme, "r") as file:
             content = file.read()
-        return Docstring(content, parent=parent)  # type: ignore[arg-type]
+
+        return Docstring(content, parent=cast(GriffeObject | None, parent))
 
 
 class LinesCollection:
