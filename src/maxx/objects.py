@@ -58,7 +58,7 @@ class Validatable:
 
         # Attach the docstring to this object.
         if self.docstring is not None:
-            self.docstring.parent = self  # type: ignore[assignment]
+            self.docstring.parent = self  # ty: ignore[invalid-assignment]
 
     @property
     def has_docstring(self) -> bool:
@@ -263,7 +263,7 @@ class Object(ObjectAliasMixin):
 
         # Attach the docstring to this object.
         if docstring:
-            docstring.parent = self  # type: ignore[assignment]
+            docstring.parent = self  # ty: ignore[invalid-assignment]
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({self.name!r}, {self.lineno!r}, {self.endlineno!r})"
