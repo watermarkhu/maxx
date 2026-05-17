@@ -78,3 +78,6 @@ indent-style = "space"
 
 [tool.pytest.ini_options]
 addopts = "--color=yes"
+
+[tool.ty.src]
+include = ["src", "tests"]
