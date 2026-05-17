@@ -1,7 +1,7 @@
 import json
 import os
 
-from bs4 import BeautifulSoup  # ty: ignore[unresolved-import]
+from bs4 import BeautifulSoup
 from playwright.sync_api import sync_playwright  # ty: ignore[unresolved-import]
 
 REFERENCE_LIST_URL = "https://mathworks.com/help/matlab/referencelist.html"
