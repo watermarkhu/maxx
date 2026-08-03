@@ -35,13 +35,13 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "ruff~=0.15.8",
+    "ruff~=0.16.1",
     "pytest~=9.1.0",
     "pytest-cov~=7.1.0",
-    "ty==0.0.51",
+    "ty==0.0.65",
     "prek~=0.4.0",
 ]
-reference = ["beautifulsoup4~=4.15.0", "playwright~=1.60.0"]
+reference = ["beautifulsoup4~=4.15.0", "playwright~=1.62.0"]
 
 [build-system]
 requires = ["hatchling"]
