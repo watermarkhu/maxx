@@ -104,6 +104,8 @@ class TestPathsCollection:
             "subdir_function",
             "nested_function",
             "TestDocstringBefore",
+            "analyzer_directives",
+            "analyzer_directive_only",
         }
         assert set(members.keys()) == expected_keys, (
             f"Missing: {expected_keys - set(members.keys())}, Extra: {set(members.keys()) - expected_keys}"

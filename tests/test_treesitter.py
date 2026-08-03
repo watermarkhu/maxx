@@ -496,6 +496,41 @@ def test_parse_pragma_comments(test_files_dir):
     assert "%#codegen" not in model.docstring.value or "#codegen" not in model.docstring.value
 
 
+def test_parse_analyzer_directives(test_files_dir):
+    """Test parsing Code Analyzer suppression directives (`%#ok<MSG-ID>`).
+
+    These inline directives must never end up in docstrings, whether they
+    appear on the signature line, in a function arguments block, or mixed in
+    with real documentation.
+    """
+    directive_file = test_files_dir / "analyzer_directives.m"
+    model = FileParser(directive_file).parse()
+
+    assert isinstance(model, Function)
+    assert model.name == "analyzer_directives"
+    assert model.docstring is not None
+    # The signature directive is filtered, the real docstring is preserved.
+    assert model.docstring.value == "Analyze the directives."
+    assert "#ok<" not in model.docstring.value
+    # Directives inside the arguments block are not attached as argument docstrings.
+    assert model.arguments is not None
+    for argument in model.arguments:
+        assert argument.docstring is None
+
+
+def test_parse_signature_directive_only(test_files_dir):
+    """Test that a function with only a `%#ok<MSG-ID>` directive gets no docstring."""
+    directive_file = test_files_dir / "analyzer_directive_only.m"
+    model = FileParser(directive_file).parse()
+
+    assert isinstance(model, Function)
+    assert model.name == "analyzer_directive_only"
+    assert model.docstring is None
+    assert model.arguments is not None
+    for argument in model.arguments:
+        assert argument.docstring is None
+
+
 def test_parse_multiline_docstring(test_files_dir):
     """Test parsing a function with multiline docstring."""
     multiline_file = test_files_dir / "multiline_docstring.m"

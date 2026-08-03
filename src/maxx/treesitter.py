@@ -839,16 +839,8 @@ class FileParser(object):
             except StopIteration:
                 break
 
-            # Exclude all pragma's
-            if line in [
-                "%#codegen",
-                "%#eml",
-                "%#external",
-                "%#exclude",
-                "%#function",
-                "%#ok",
-                "%#mex",
-            ]:
+            # Exclude all pragma's (e.g. `%#codegen`, `%#ok<MSG-ID>`)
+            if line.startswith("%#"):
                 continue
 
             if "--8<--" in line:
@@ -884,6 +876,9 @@ class FileParser(object):
 
         if uncommented:
             docstring += _dedent(uncommented)
+
+        if not docstring:
+            return None
 
         return Docstring(
             "\n".join(docstring),
