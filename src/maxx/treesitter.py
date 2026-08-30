@@ -337,7 +337,7 @@ class FileParser(object):
         Returns:
             str: The decoded content.
         """
-        return self._content.decode(self.encoding)
+        return self._content.decode(self.encoding, errors="replace")
 
     def parse(self, config: ParserConfig | None = None, **kwargs: Any) -> Function | Class | Script:
         """
@@ -398,7 +398,9 @@ class FileParser(object):
             if self._node is not None:
                 if self._node.text is not None:
                     indentation: str = " " * self._node.start_point.column
-                    syntax_error.text = indentation + self._node.text.decode(self.encoding)
+                    syntax_error.text = indentation + self._node.text.decode(
+                        self.encoding, errors="replace"
+                    )
                 syntax_error.lineno = self._node.start_point.row + 1
                 syntax_error.offset = self._node.start_point.column + 1
                 syntax_error.end_lineno = self._node.end_point.row + 1
@@ -750,7 +752,11 @@ class FileParser(object):
             The decoded text of the node. If the node or its text is None, returns an empty string.
         """
         self._node = node
-        return node.text.decode(self.encoding) if node is not None and node.text is not None else ""
+        return (
+            node.text.decode(self.encoding, errors="replace")
+            if node is not None and node.text is not None
+            else ""
+        )
 
     def _decode_from_capture(self, capture: dict[str, list[Node]], key: str) -> list[str]:
         """

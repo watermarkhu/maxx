@@ -18,7 +18,7 @@ def _load_matlab_builtins() -> dict:
         dict: A dictionary containing MATLAB builtin functions and their documentation URLs.
     """
     json_path: Path = Path(__file__).parent / "matlab_builtins.json"
-    with open(json_path, "r") as file:
+    with open(json_path, "r", encoding="utf-8", errors="replace") as file:
         return json.load(file)
 
 
@@ -35,7 +35,7 @@ class Expr:
         """Iterate over the values of the expression."""
         for node in self.nodes:
             if node.text:
-                yield node.text.decode(self.encoding)
+                yield node.text.decode(self.encoding, errors="replace")
 
     def __str__(self) -> str:
         """Return the string representation of the builtin expression."""
