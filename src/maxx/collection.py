@@ -289,7 +289,7 @@ class _PathResolver:
         else:
             return None
 
-        with open(readme, "r") as file:
+        with open(readme, "r", encoding="utf-8", errors="replace") as file:
             content = file.read()
 
         return Docstring(content, parent=cast(GriffeObject | None, parent))
