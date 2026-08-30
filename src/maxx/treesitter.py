@@ -103,6 +103,7 @@ ARGUMENTS_QUERY = QueryCursor(
     ("\\n")?
     [
         (property) @arguments_items
+        (class_property) @arguments_items
         (comment) @arguments_items
         ("\\n")
     ]+
@@ -298,6 +299,15 @@ def _sort_nodes(nodes: list[Node]) -> list[Node]:
         A new list of Node objects sorted by their start point.
     """
     return sorted(nodes, key=lambda node: node.start_point)
+
+
+class _TextNode:
+    """A minimal node-like wrapper to build an ``Expr`` from raw text."""
+
+    __slots__ = ("text",)
+
+    def __init__(self, text: bytes) -> None:
+        self.text = text
 
 
 class FileParser(object):
@@ -686,7 +696,9 @@ class FileParser(object):
             attributes = self._decode_from_capture(capture_arguments, "attributes")
             is_input = attributes is None or "Input" in attributes or "Output" not in attributes
 
-            arguments_items = _sort_nodes(capture_arguments["arguments_items"])
+            arguments_items = _sort_nodes(capture_arguments.get("arguments_items", []))
+            if not arguments_items:
+                continue
 
             argument = None
             docstring = None
@@ -697,6 +709,27 @@ class FileParser(object):
                         continue
                     if not config.docstring_before_arguments and argument is not None:
                         # Attach docstring to previous argument
+                        argument.docstring = docstring
+                    continue
+
+                # Name-value arguments from class properties: `opts.?Class.path`
+                # The class path is stored as a single-element Expr so that
+                # `str()` yields the dotted path while consumers can still
+                # cross-reference the class.
+                if arglist_node.type == "class_property":
+                    opts_name, _, class_path = self._decode(arglist_node).partition(".?")
+                    class_path = class_path.strip().rstrip(";").strip()
+                    if not class_path:
+                        continue
+                    arguments.pop(opts_name, None)
+                    argument = arguments[opts_name] = Argument(
+                        opts_name, kind=ArgumentKind.keyword_only, node=arglist_node
+                    )
+                    argument.type = Expr(
+                        [_TextNode(class_path.encode(self.encoding))],  # ty: ignore[invalid-argument-type]
+                        self.encoding,
+                    )
+                    if docstring is not None and config.docstring_before_arguments:
                         argument.docstring = docstring
                     continue
 
