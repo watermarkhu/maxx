@@ -282,6 +282,11 @@ class Object(ObjectAliasMixin):
         raise ValueError("Object does not have a module")
 
     @property
+    def is_private(self) -> bool:
+        """Whether this object is private."""
+        return False
+
+    @property
     def has_docstring(self) -> bool:
         """Whether this object has a docstring (empty or not)."""
         return bool(self.docstring)
@@ -629,6 +634,11 @@ class Alias(ObjectAliasMixin):
         self.target_path = value.path
         if self.parent is not None:
             self._target.aliases[self.path] = self
+
+    @property
+    def is_private(self) -> bool:
+        """Whether the target is private."""
+        return self.target.is_private
 
     def __getattr__(self, item):
         return getattr(self._actual, item)
