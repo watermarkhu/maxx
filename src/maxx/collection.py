@@ -10,6 +10,7 @@ from griffe._internal.models import Object as GriffeObject
 from loguru import logger
 
 from maxx.config import ParserConfig
+from maxx.mixins import PathMixin
 from maxx.objects import (
     Alias,
     Class,
@@ -418,6 +419,11 @@ class PathsCollection:
         # Stores which objects and subpaths are added from each added path. Allows for path element to be removed.
         self._folders: dict[Path, Alias] = {}
         # Stores mapping of each directory to a Folder object. Allows for auto-documenting folders.
+        self._merged_namespaces: dict[str, Namespace] = {}
+        # Cache of freshly-built merged namespaces, keyed by identifier. Each value
+        # is a new Namespace holding the union of its contributors; the contributor
+        # namespaces themselves are never mutated, so entries can be safely
+        # invalidated and rebuilt when the search path changes.
         self._local_collections: dict[Path, PathsCollection] = {}
         # The local or private paths collection on specific directories.
         self._local = _local
@@ -496,6 +502,104 @@ class PathsCollection:
         except KeyError:
             return False
 
+    def _resolve_merged(self, identifier: str) -> Any:
+        """Resolve an identifier from ``_mapping``, merging duplicate namespaces.
+
+        A MATLAB package (``+pkg``) may be split across several entries on the
+        search path; MATLAB treats it as a single package whose members are the
+        union of all contributing folders. ``_mapping`` records every
+        contributing path, but historically only the first was resolved, so
+        members defined solely in the other folders were dropped.
+
+        For namespaces contributed by more than one path this returns a single
+        ``Namespace`` whose members are the union of all contributors (recursing
+        into nested sub-namespaces). All other object kinds keep the previous
+        first-wins behavior.
+        """
+        members = self._mapping[identifier]
+        first = self._objects[members[0]].target
+
+        if not isinstance(first, Namespace) or len(members) == 1:
+            return first
+
+        # Return the previously built merge if it is still current. The cache is
+        # invalidated by addpath/rmpath, so a hit here always reflects the
+        # current search path.
+        cached = self._merged_namespaces.get(identifier)
+        if cached is not None:
+            return cached
+
+        # Build a brand new Namespace holding the union of every contributor.
+        # Contributors are treated as immutable: their members are copied into
+        # the fresh namespace rather than folded into the first contributor.
+        # This keeps each root's namespace pristine so that adding or removing a
+        # root can be reflected simply by rebuilding this cache entry.
+        merged = Namespace(
+            first.name,
+            filepath=first.filepath if isinstance(first, PathMixin) else None,
+            paths_collection=self,
+        )
+        merged.parent = first.parent
+
+        # ``_mapping`` may list the same path many times (a namespace is
+        # re-registered on each subsequent addpath call); dedupe on the path so
+        # no redundant merging occurs.
+        seen_paths: set[Path] = set()
+        for extra_path in members:
+            if extra_path in seen_paths:
+                continue
+            seen_paths.add(extra_path)
+            extra = self._objects[extra_path].target
+            # Every entry under a namespace identifier is itself a namespace
+            # (only namespaces carry the ``+`` path prefix used as the mapping
+            # key), so this guard never fails; it exists purely to narrow the
+            # type for the merge call.
+            if isinstance(extra, Namespace):  # pragma: no branch
+                self._merge_namespace_into(merged, extra)
+
+        self._merged_namespaces[identifier] = merged
+        return merged
+
+    def _merge_namespace_into(self, target: Namespace, other: Namespace) -> None:
+        """Fold members of ``other`` into ``target`` (recursively for
+        sub-namespaces), keeping the existing definition on name clashes.
+
+        ``target`` is expected to be a freshly-built merge namespace, never one
+        of the immutable contributor namespaces. When two contributors provide
+        the same sub-namespace, a new merged sub-namespace is created so the
+        contributors are left untouched.
+
+        Mirrors MATLAB path precedence: a package split across paths is the
+        union of its members, and genuine same-name clashes resolve first-wins,
+        silently.
+        """
+        for name, member in other.members.items():
+            member_obj = member.target if isinstance(member, Alias) else member
+            if name not in target.members:
+                if isinstance(member_obj, Namespace):
+                    # Copy into a fresh sub-namespace so the contributor's own
+                    # namespace is never mutated by a later merge.
+                    sub = Namespace(
+                        member_obj.name,
+                        filepath=member_obj.filepath if isinstance(member_obj, PathMixin) else None,
+                        paths_collection=self,
+                    )
+                    sub.parent = target
+                    self._merge_namespace_into(sub, member_obj)
+                    target.members[name] = sub
+                else:
+                    target.members[name] = member
+                continue
+            existing = target.members[name]
+            existing_obj = existing.target if isinstance(existing, Alias) else existing
+            if (
+                isinstance(existing_obj, Namespace)
+                and isinstance(member_obj, Namespace)
+                and existing_obj is not member_obj
+            ):
+                self._merge_namespace_into(existing_obj, member_obj)
+            # else: real name clash -> keep first-wins silently.
+
     def __getitem__(self, identifier: str) -> Any:
         """
         Resolve an identifier to a Object object.
@@ -514,8 +618,7 @@ class PathsCollection:
 
         # Find in global database
         if identifier in self._mapping:
-            alias = self._objects[self._mapping[identifier][0]]
-            object = alias.target
+            object = self._resolve_merged(identifier)
 
         elif "/" in identifier:
             absolute_path = (self._working_directory / Path(identifier)).resolve()
@@ -585,13 +688,16 @@ class PathsCollection:
             self._path.appendleft(path)
             logger.info(f"Added path to start: {path}")
 
+        new_members: list[Path] = []
         for member in _PathGlobber(
             path, recursive=recursive, parse_live_scripts=self._parse_live_scripts
         ):
             object = Alias(member.stem, target=_PathResolver(member, self))
             self._objects[member] = object
+            new_members.append(member)
 
-        for member, object in self._objects.items():
+        for member in new_members:
+            object = self._objects[member]
             if (CLASSFOLDER_PREFIX + member.stem) == member.parent.name:
                 # skip class file in class folder, this member is added via the class folder
                 continue
@@ -600,7 +706,7 @@ class PathsCollection:
                 self._folders[member] = object
             else:
                 self._mapping[object.path].append(member)
-                self._members[path].append((object.name, member))
+                self._members[path].append((object.path, member))
 
             if not self._local and member.is_file():
                 if member.parent not in self._local_collections:
@@ -617,6 +723,11 @@ class PathsCollection:
                 for name, child in collection.members.items():
                     if name not in object.members:
                         object.members[name] = child
+
+        # A new root may add members to any namespace; drop cached merges so
+        # they are rebuilt from the current (immutable) contributors on next
+        # lookup, incorporating members contributed by this path.
+        self._merged_namespaces.clear()
 
     def rmpath(self, path: str | Path, recursive: bool = False):
         """
@@ -642,10 +753,17 @@ class PathsCollection:
 
         for name, member in self._members.pop(path):
             self._mapping[name].remove(member)
+            if not self._mapping[name]:
+                del self._mapping[name]
             self._objects.pop(member)
 
         if path in self._local_collections:
             self._local_collections.pop(path)
+
+        # Removing a root can strip members from a still-present namespace; drop
+        # cached merges so the next lookup rebuilds them from the remaining
+        # (immutable) contributors, without the removed root's members.
+        self._merged_namespaces.clear()
 
         if recursive:
             for subdir in [item for item in self._path if _is_subdirectory(path, item)]:

@@ -387,3 +387,163 @@ class TestPathsCollectionAdvanced:
         assert len(items) > 0
         # Items should be (key, value) tuples
         assert all(isinstance(item, tuple) and len(item) == 2 for item in items)
+
+
+class TestNamespaceMerging:
+    """A +package split across multiple search paths must merge, not shadow."""
+
+    @staticmethod
+    def _write(path: Path, text: str) -> None:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text)
+
+    def test_same_named_namespace_merges_across_paths(self, tmp_path):
+        """+pkg defined under two roots exposes the union of its members."""
+        self._write(tmp_path / "libA" / "+pkg" / "Alpha.m", "classdef Alpha\nend\n")
+        self._write(tmp_path / "libB" / "+pkg" / "Beta.m", "classdef Beta\nend\n")
+
+        collection = PathsCollection(
+            [tmp_path / "libA", tmp_path / "libB"],
+            recursive=True,
+            working_directory=tmp_path,
+        )
+
+        pkg = collection.get_member("+pkg")
+        assert set(pkg.members) == {"Alpha", "Beta"}
+        assert collection.get_member("+pkg.Alpha") is not None
+        assert collection.get_member("+pkg.Beta") is not None
+
+    def test_nested_namespace_merges_recursively(self, tmp_path):
+        """A shared nested +sub also merges members from both roots."""
+        self._write(tmp_path / "libA" / "+pkg" / "+sub" / "Deep1.m", "classdef Deep1\nend\n")
+        self._write(tmp_path / "libB" / "+pkg" / "+sub" / "Deep2.m", "classdef Deep2\nend\n")
+
+        collection = PathsCollection(
+            [tmp_path / "libA", tmp_path / "libB"],
+            recursive=True,
+            working_directory=tmp_path,
+        )
+
+        sub = collection.get_member("+pkg.sub")
+        assert set(sub.members) == {"Deep1", "Deep2"}
+        assert collection.get_member("+pkg.sub.Deep1") is not None
+        assert collection.get_member("+pkg.sub.Deep2") is not None
+
+    def test_nested_namespace_merges_via_parent_lookup(self, tmp_path):
+        """Resolving the parent package merges a shared sub-namespace by
+        building a fresh sub-namespace (not mutating either contributor)."""
+        self._write(tmp_path / "libA" / "+pkg" / "+sub" / "Deep1.m", "classdef Deep1\nend\n")
+        self._write(tmp_path / "libB" / "+pkg" / "+sub" / "Deep2.m", "classdef Deep2\nend\n")
+
+        collection = PathsCollection(
+            [tmp_path / "libA", tmp_path / "libB"],
+            recursive=True,
+            working_directory=tmp_path,
+        )
+
+        # Resolve the PARENT so the merge walks into the shared +sub member and
+        # unions it, rather than resolving +pkg.sub directly from the mapping.
+        pkg = collection.get_member("+pkg")
+        assert set(pkg.members["sub"].members) == {"Deep1", "Deep2"}
+
+    def test_duplicate_path_entries_merge_once(self, tmp_path):
+        """A namespace whose path is listed twice (same root re-added) is
+        deduplicated, so the merge stays the union of the distinct roots."""
+        self._write(tmp_path / "libA" / "+pkg" / "Alpha.m", "classdef Alpha\nend\n")
+        self._write(tmp_path / "libB" / "+pkg" / "Beta.m", "classdef Beta\nend\n")
+
+        collection = PathsCollection(
+            [tmp_path / "libA", tmp_path / "libB"],
+            recursive=True,
+            working_directory=tmp_path,
+        )
+
+        # Re-add libA: its +pkg path now appears twice in the mapping deque.
+        collection.addpath(tmp_path / "libA")
+        assert list(collection._mapping["+pkg"]).count(tmp_path / "libA" / "+pkg") == 2
+
+        pkg = collection.get_member("+pkg")
+        assert set(pkg.members) == {"Alpha", "Beta"}
+
+    def test_addpath_after_lookup_refreshes_merged_namespace(self, tmp_path):
+        """A merged namespace resolved before addpath picks up the new root."""
+        self._write(tmp_path / "libA" / "+pkg" / "Alpha.m", "classdef Alpha\nend\n")
+        self._write(tmp_path / "libB" / "+pkg" / "Beta.m", "classdef Beta\nend\n")
+        self._write(tmp_path / "libC" / "+pkg" / "Gamma.m", "classdef Gamma\nend\n")
+
+        collection = PathsCollection(
+            [tmp_path / "libA", tmp_path / "libB"],
+            recursive=True,
+            working_directory=tmp_path,
+        )
+
+        # Resolve (and cache) the merge *before* mutating the search path.
+        assert set(collection.get_member("+pkg").members) == {"Alpha", "Beta"}
+
+        collection.addpath(tmp_path / "libC", recursive=True)
+
+        pkg = collection.get_member("+pkg")
+        assert set(pkg.members) == {"Alpha", "Beta", "Gamma"}
+        assert collection.get_member("+pkg.Gamma") is not None
+
+    def test_rmpath_after_lookup_refreshes_merged_namespace(self, tmp_path):
+        """A merged namespace resolved before rmpath drops the removed root."""
+        self._write(tmp_path / "libA" / "+pkg" / "Alpha.m", "classdef Alpha\nend\n")
+        self._write(tmp_path / "libB" / "+pkg" / "Beta.m", "classdef Beta\nend\n")
+
+        collection = PathsCollection(
+            [tmp_path / "libA", tmp_path / "libB"],
+            recursive=True,
+            working_directory=tmp_path,
+        )
+
+        # Resolve (and cache) the merge *before* mutating the search path.
+        assert set(collection.get_member("+pkg").members) == {"Alpha", "Beta"}
+
+        collection.rmpath(tmp_path / "libB")
+
+        pkg = collection.get_member("+pkg")
+        assert set(pkg.members) == {"Alpha"}
+        assert collection.get_member("+pkg.Beta") is None
+
+    def test_rmpath_leaves_contributor_namespace_immutable(self, tmp_path):
+        """Removing one root must not strip members from the remaining root's
+        own namespace object (contributors are never mutated by merging)."""
+        self._write(tmp_path / "libA" / "+pkg" / "Alpha.m", "classdef Alpha\nend\n")
+        self._write(tmp_path / "libB" / "+pkg" / "Beta.m", "classdef Beta\nend\n")
+
+        collection = PathsCollection(
+            [tmp_path / "libA", tmp_path / "libB"],
+            recursive=True,
+            working_directory=tmp_path,
+        )
+
+        # Force the merge to be built and cached.
+        assert set(collection.get_member("+pkg").members) == {"Alpha", "Beta"}
+
+        collection.rmpath(tmp_path / "libA")
+
+        # libB is now the sole contributor; its pristine namespace should expose
+        # only its own member, proving the earlier merge did not pollute it.
+        pkg = collection.get_member("+pkg")
+        assert set(pkg.members) == {"Beta"}
+
+    def test_leaf_name_clash_resolves_first_wins(self, tmp_path):
+        """A non-namespace member defined under the same name in two roots keeps
+        the first (highest-precedence) definition; the union still exposes the
+        roots' distinct members."""
+        self._write(tmp_path / "libA" / "+pkg" / "Same.m", "classdef Same\nend\n")
+        self._write(tmp_path / "libA" / "+pkg" / "Alpha.m", "classdef Alpha\nend\n")
+        self._write(tmp_path / "libB" / "+pkg" / "Same.m", "classdef Same\nend\n")
+        self._write(tmp_path / "libB" / "+pkg" / "Beta.m", "classdef Beta\nend\n")
+
+        collection = PathsCollection(
+            [tmp_path / "libA", tmp_path / "libB"],
+            recursive=True,
+            working_directory=tmp_path,
+        )
+
+        pkg = collection.get_member("+pkg")
+        assert set(pkg.members) == {"Alpha", "Beta", "Same"}
+        # libA precedes libB on the search path, so its Same wins the clash.
+        assert pkg.members["Same"].filepath == tmp_path / "libA" / "+pkg" / "Same.m"
