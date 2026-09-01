@@ -38,7 +38,7 @@ dev = [
     "ruff~=0.16.1",
     "pytest~=9.1.0",
     "pytest-cov~=7.1.0",
-    "ty==0.0.76",
+    "ty==0.0.77",
     "prek~=0.5.0",
 ]
 reference = ["beautifulsoup4~=4.15.0", "playwright~=1.62.0"]
