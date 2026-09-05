@@ -330,37 +330,37 @@ wheels = [
 
 [[package]]
 name = "griffe"
-version = "2.1.0"
+version = "2.3.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "griffecli" },
     { name = "griffelib" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/00/44/63913c007814cab5ba9d36f25ad40dfc640c2e2931d195bd2d05f774a5d6/griffe-2.1.0.tar.gz", hash = "sha256:c58845df5a364feaabd05ee8c767b97b03e478da8aa18b9923553c812fb0d955", size = 244879, upload-time = "2026-06-19T12:05:41.262Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/d5/03/75ca4d08a7eff164292d42cf72c7c510423b3414e66205f0ba5b35ad3034/griffe-2.3.0.tar.gz", hash = "sha256:aa5634c0d7802583ecd29a7fe335c02d462ffdf5ce8f51426a3d326f374e6d93", size = 247493, upload-time = "2026-09-04T15:08:15.364Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/6b/fb/3c65d392feae6c36dc2b55a14dd8270b7b35a3171c93b71a4d2ee4abf241/griffe-2.1.0-py3-none-any.whl", hash = "sha256:2ccdab17fb9cd76f278d7b5611cfc8f68cbe846d8d48df63dff80b62ecfa6f65", size = 5140, upload-time = "2026-06-19T12:05:39.913Z" },
+    { url = "https://files.pythonhosted.org/packages/61/f9/8bfacdb992aed404a3a53694689759841635bce93b86ddb621c1d7f2558c/griffe-2.3.0-py3-none-any.whl", hash = "sha256:92a41ff72eb1eb316cdcb7248a608f1313f9fbc6e35d5cffa5cf7c813b7db70b", size = 5072, upload-time = "2026-09-04T15:08:14.074Z" },
 ]
 
 [[package]]
 name = "griffecli"
-version = "2.1.0"
+version = "2.3.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "colorama" },
     { name = "griffelib" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/8e/c6/90f85d47af96300d629b38c25b71aad9467a620cac964a39280e822efc8a/griffecli-2.1.0.tar.gz", hash = "sha256:2ff68dbee9395fdb668b10374c51683392d697b226ac60159798f4add1ee716c", size = 56913, upload-time = "2026-06-19T12:05:43.119Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/5c/15/f70539f7efb44f27d209b43e386b1a5397bd476879ff19a206b75454f58e/griffecli-2.3.0.tar.gz", hash = "sha256:916fdc851cf51d38e9b5ab82550305df45e5981d5dfe65d346544464abedb3ec", size = 59676, upload-time = "2026-09-04T15:08:16.426Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/80/2f/513232ec1d5f5da182e4ce45a11427e37dd210844a9e2bca451fc9661fb3/griffecli-2.1.0-py3-none-any.whl", hash = "sha256:6e22b1423d562ddc510997b4be1fe89de59e19dcff78831c0f4bfc3b8134a718", size = 9500, upload-time = "2026-06-19T12:05:37.517Z" },
+    { url = "https://files.pythonhosted.org/packages/06/8c/8ffa4272d6bf85a0abe8898ef74ef41d505317bb4103e14a11d45d799dce/griffecli-2.3.0-py3-none-any.whl", hash = "sha256:f94653edcb52ebcac21eaeb3b7121b065a636174eddf2bd558b5935e72a553e8", size = 11593, upload-time = "2026-09-04T15:08:11.739Z" },
 ]
 
 [[package]]
 name = "griffelib"
-version = "2.1.0"
+version = "2.3.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/33/e4/8d187ea29c2e30b3a09505c567513077d6117861bde1fbd997a167f262ec/griffelib-2.1.0.tar.gz", hash = "sha256:762a186d2c6fd6794d4ea20d428d597ffb857cb56b66421651cbba15bdd5e813", size = 216234, upload-time = "2026-06-19T12:05:42.278Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/27/af/018c10bc9edd42b6ef6db2e96b09542050d5253f9b195e74bc910b2d13ab/griffelib-2.3.0.tar.gz", hash = "sha256:7b0952caf5bca6afa4bb5ee8c6a2d183fe3f21b62efc5f6c7243cb2b26d2d115", size = 234534, upload-time = "2026-09-04T15:08:17.472Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/e4/d3/5268aeabf2ad82658c4e2ff3a060648d0f02f3926cb53247c0e4d0dab49e/griffelib-2.1.0-py3-none-any.whl", hash = "sha256:cc7b3d2d2865ad0b909fcc38086e3f554b5ea7acbaa7bbb7ecaa3f5dfb7d9f00", size = 142560, upload-time = "2026-06-19T12:05:38.742Z" },
+    { url = "https://files.pythonhosted.org/packages/41/63/e876e789525063c840ccfa8857febdabd6523bcef9ce7eb979b9305ea895/griffelib-2.3.0-py3-none-any.whl", hash = "sha256:1b8f9cd525681c26b1d6d574faa1371651e8459ca51d209684f50b8096ae06e0", size = 169423, upload-time = "2026-09-04T15:08:12.956Z" },
 ]
 
 [[package]]
@@ -416,10 +416,10 @@ reference = [
 requires-dist = [
     { name = "attrs", specifier = "~=26.1.0" },
     { name = "charset-normalizer", specifier = "~=3.4" },
-    { name = "griffe", specifier = "~=2.1.0" },
+    { name = "griffe", specifier = "~=2.3.0" },
     { name = "loguru", specifier = "~=0.7.3" },
     { name = "tree-sitter", specifier = "~=0.25.1,<0.26" },
-    { name = "tree-sitter-matlab", specifier = "==1.3.0" },
+    { name = "tree-sitter-matlab", specifier = "==1.3.1" },
     { name = "typing-extensions", marker = "python_full_version < '3.11'", specifier = "~=4.0" },
 ]
 
@@ -683,26 +683,26 @@ wheels = [
 
 [[package]]
 name = "tree-sitter-matlab"
-version = "1.3.0"
+version = "1.3.1"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/c4/8f/741f97fa6a33bea1e860610ddfe285cc54719b22874e579e00c82a3320ee/tree_sitter_matlab-1.3.0.tar.gz", hash = "sha256:a3c470dc7acfa996473496fa72917bff3c073121793c07af3a58123efe165bfb", size = 172095, upload-time = "2026-02-04T07:46:00.477Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c6/04/be954b2edb5b57648d91d4412e225e361e9c37ac22ce6c45d78713a9b744/tree_sitter_matlab-1.3.1.tar.gz", hash = "sha256:91a2ab61a6179b8aec0216f18f1c1eb4e1409b768641b9c661bab434648bb54d", size = 172140, upload-time = "2026-08-26T06:47:41.047Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/60/30/b4925490c25451da3c0f94f6a3ed1425bcfe6411bb8261b4af74c4b1898f/tree_sitter_matlab-1.3.0-cp310-abi3-macosx_11_0_arm64.whl", hash = "sha256:dd343dfa820c40b4eb52f62a7bfce9192510f11f932427d84ecf089228a6517c", size = 86529, upload-time = "2026-02-04T07:45:36.887Z" },
-    { url = "https://files.pythonhosted.org/packages/9c/ba/8b9bcb5b1452541f0b8a2181ddb8e3181bf42631155de9ed632d0f33930a/tree_sitter_matlab-1.3.0-cp310-abi3-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl", hash = "sha256:6b8515503f2966ee9030654cc14ddf9f66b3c9fe73d5830248a9a0e672d16664", size = 116266, upload-time = "2026-02-04T07:45:38.186Z" },
-    { url = "https://files.pythonhosted.org/packages/06/08/ad8e452c892a73e58249cbde708cd41e53e62a57ee51e2fdb61e56362191/tree_sitter_matlab-1.3.0-cp310-abi3-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:f84ecacbdc83b149d2b954d5fbd7101db4abf19f0cdd4c50d08022ed60c0b9b7", size = 123087, upload-time = "2026-02-04T07:45:39.399Z" },
-    { url = "https://files.pythonhosted.org/packages/9e/3c/db0b7a8f07125aec0172a7ed9688da7001fcd93a364478653275590acc1d/tree_sitter_matlab-1.3.0-cp310-abi3-musllinux_1_2_aarch64.whl", hash = "sha256:96913579ed39d4d8d6c8c56a2c320a588a50befbc8d3d441e9fe02a308c0b59b", size = 120656, upload-time = "2026-02-04T07:45:40.96Z" },
-    { url = "https://files.pythonhosted.org/packages/9b/c8/cb7479ef3eeb23975820668d37dfb9262f837bd40dbd9ec650d37af142c1/tree_sitter_matlab-1.3.0-cp310-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:68cc60df281b15c5d852f15bfddc3e8d120e1c9eb77dc46fcddc75e55ffe41e5", size = 114911, upload-time = "2026-02-04T07:45:42.163Z" },
-    { url = "https://files.pythonhosted.org/packages/93/70/12731db61d859211176dac6da4df993d7b69c998ad6f0e2839d8638b376e/tree_sitter_matlab-1.3.0-cp310-abi3-win32.whl", hash = "sha256:3e7044be254569d832268974cde313c5c094399325e5b597811276d4acf3a766", size = 81607, upload-time = "2026-02-04T07:45:43.852Z" },
-    { url = "https://files.pythonhosted.org/packages/e6/50/c09e2a9ff9ac3e3be0e1c2786a4ab179eb4aca06784c36f357e67ac7f563/tree_sitter_matlab-1.3.0-cp310-abi3-win_amd64.whl", hash = "sha256:7ca52f75fe09b68efc567c2e69e6a329c31e999946a25528942dffdc73686224", size = 82635, upload-time = "2026-02-04T07:45:45.435Z" },
-    { url = "https://files.pythonhosted.org/packages/7f/db/94778e6f58ba16de8807819316b0851ef0a999fa1c177a73756379598095/tree_sitter_matlab-1.3.0-cp310-abi3-win_arm64.whl", hash = "sha256:9064fb4d9494f9e8c183e56840aa34504056e856e8623939c7021764fc1de422", size = 80961, upload-time = "2026-02-04T07:45:47.109Z" },
-    { url = "https://files.pythonhosted.org/packages/5b/f5/da0ddb58a7537be3adfee2aa88dce597b4f8021e046f50767364cb000d65/tree_sitter_matlab-1.3.0-cp314-cp314t-macosx_11_0_arm64.whl", hash = "sha256:b9e17969162fd8bc130a1088b7502ad1c7f19e72cfd8d8091c4f0ef6100923ea", size = 86549, upload-time = "2026-02-04T07:45:48.688Z" },
-    { url = "https://files.pythonhosted.org/packages/fd/e2/aef2727d8a0334a53439073c9e259bfcb96b771146613ecb5ed85ff911e6/tree_sitter_matlab-1.3.0-cp314-cp314t-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl", hash = "sha256:96b54b44ff720e5da4f61fdf307bbf875fb6673659e39038f65cc5466e35fe28", size = 119090, upload-time = "2026-02-04T07:45:50.456Z" },
-    { url = "https://files.pythonhosted.org/packages/17/b4/f0d7e1b7a391d6c15d8dae4c64b70acc44d84b5dbc329e29525f6cebedce/tree_sitter_matlab-1.3.0-cp314-cp314t-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:8dd3ed28eb3531b0001d8d007142f18cd9fb9abc643e395b6938c2b4d59bf2f5", size = 125759, upload-time = "2026-02-04T07:45:51.69Z" },
-    { url = "https://files.pythonhosted.org/packages/f1/98/0b7ea7cc546a5d4f98ae9c06cd72555ffa88575dc0faf10da5a324bbbb3e/tree_sitter_matlab-1.3.0-cp314-cp314t-musllinux_1_2_aarch64.whl", hash = "sha256:3780544ffa1e952c66bcaa852af0090a3e83578a710a1bc0fd70bed468317b33", size = 123409, upload-time = "2026-02-04T07:45:53.625Z" },
-    { url = "https://files.pythonhosted.org/packages/49/02/1ccc465c00c04994dd12ca82c6cac45380c45798892fa68a357f254b8ba7/tree_sitter_matlab-1.3.0-cp314-cp314t-musllinux_1_2_x86_64.whl", hash = "sha256:7af56374457af40849552fa6f8804f409ddeb00e9df83f2a6f41215b769397a0", size = 117745, upload-time = "2026-02-04T07:45:54.881Z" },
-    { url = "https://files.pythonhosted.org/packages/20/70/677c17d14baa6070ea27d24b3f65763c8f17c0d41a0491ea9b21c1ad20b5/tree_sitter_matlab-1.3.0-cp314-cp314t-win32.whl", hash = "sha256:b415bd72381a3545a6381b5fd84a3cc0014205c917fba25a0d4263fbe07b091e", size = 84279, upload-time = "2026-02-04T07:45:56.502Z" },
-    { url = "https://files.pythonhosted.org/packages/29/93/c8502111da9c2cdab0da37e51bb9ce63abbba4314754b262ae4ea2eb7e9c/tree_sitter_matlab-1.3.0-cp314-cp314t-win_amd64.whl", hash = "sha256:101e6150555a788baef87b4d04e8790bd8aad9ba7dd6048c58d1d0f5d6b1e234", size = 84855, upload-time = "2026-02-04T07:45:57.457Z" },
-    { url = "https://files.pythonhosted.org/packages/20/6d/57fe704e91a893d310e589c2363bcfc1342edce5868d72b4bc060f04eeb2/tree_sitter_matlab-1.3.0-cp314-cp314t-win_arm64.whl", hash = "sha256:d9db720b63888eb250de13029cdea324042f92f5f2c2934fd5f0a2eaa5f03b90", size = 83493, upload-time = "2026-02-04T07:45:58.929Z" },
+    { url = "https://files.pythonhosted.org/packages/7f/ec/d7f27aa3dd0aed3a9bcdfd3f765d28ee4fba1b2473ca8d3e4c3f39eff78e/tree_sitter_matlab-1.3.1-cp310-abi3-macosx_11_0_arm64.whl", hash = "sha256:dd080613d88e184c389a8026ff176c3b5a30cd164000ae0f121d5086794afa89", size = 86528, upload-time = "2026-08-26T06:47:19.22Z" },
+    { url = "https://files.pythonhosted.org/packages/05/ce/5e8f5fb357426ec96762a3f063e053a8fefcfde7981f1f28016068f7f2e4/tree_sitter_matlab-1.3.1-cp310-abi3-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl", hash = "sha256:78f79557f6be5e98d3ba4aa76f655efaab1d5c21dea4127ccd7fe25e20415cf4", size = 116326, upload-time = "2026-08-26T06:47:20.768Z" },
+    { url = "https://files.pythonhosted.org/packages/d7/f6/0b44ab0452eec5a3d21c33009e58a3447e93a16545d1fa6f2ab491f6c163/tree_sitter_matlab-1.3.1-cp310-abi3-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:52ada1a896da00cc6e3c918e5548e0b22dd5dcc3cf2ecf061135af45de13d74a", size = 123180, upload-time = "2026-08-26T06:47:22.128Z" },
+    { url = "https://files.pythonhosted.org/packages/76/8a/35d394daf205c758a9a0cb375638e5945c290b4200f7b80479d27479acc6/tree_sitter_matlab-1.3.1-cp310-abi3-musllinux_1_2_aarch64.whl", hash = "sha256:14e4386c054507d55d0f5d7d88e53b990967a0ef29146fcc77af0ed5995b49e4", size = 120807, upload-time = "2026-08-26T06:47:23.46Z" },
+    { url = "https://files.pythonhosted.org/packages/7c/ea/bccd684fc87b7d4ae6b5375405c97a71518c3d1ab401cc7f29ca0b8d8cd6/tree_sitter_matlab-1.3.1-cp310-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:6a789cf1ed450965f28c476a305c407ff2f0692a336d72fd8ea86a9221b6701f", size = 115012, upload-time = "2026-08-26T06:47:24.79Z" },
+    { url = "https://files.pythonhosted.org/packages/77/6b/e0fc1b2ecd8e33c11ef82dacaa8e4f48c768bff29b987dce16206166b726/tree_sitter_matlab-1.3.1-cp310-abi3-win32.whl", hash = "sha256:bf2f24efcceb670828d4a8d82c5a551bd77e4752b0f2913d72145fc2b5380de9", size = 81100, upload-time = "2026-08-26T06:47:25.987Z" },
+    { url = "https://files.pythonhosted.org/packages/52/5b/f3151a2c407c0776a8c6d22d06bc727c813d755e3dc7cda3819f7f8ae2e9/tree_sitter_matlab-1.3.1-cp310-abi3-win_amd64.whl", hash = "sha256:505d5efdcbd1d76b7134eb7e79727265135c92f2cadbe119930604b5c65fdb46", size = 81914, upload-time = "2026-08-26T06:47:27.409Z" },
+    { url = "https://files.pythonhosted.org/packages/b3/94/55f785a562baf807fddffe4d0208138fb73351eee2a20fd0dc3f65a795bc/tree_sitter_matlab-1.3.1-cp310-abi3-win_arm64.whl", hash = "sha256:325b4af0332ed2e13158d866245974f9f61ad817be159d5245692abaff3bb34e", size = 80980, upload-time = "2026-08-26T06:47:28.728Z" },
+    { url = "https://files.pythonhosted.org/packages/b3/d3/330d3500e0323d56367375fb07b41182ab86fc1f45be0f086250fca23b59/tree_sitter_matlab-1.3.1-cp314-cp314t-macosx_11_0_arm64.whl", hash = "sha256:a4c06388d5334ef98d2f7cb40f93d578f3eb66cd8316a5305a59757c256d9060", size = 86587, upload-time = "2026-08-26T06:47:30.205Z" },
+    { url = "https://files.pythonhosted.org/packages/2f/b4/23fccc18ca1c8640476795223e49fe95cfe557f07bde10fd4b82e3dc043a/tree_sitter_matlab-1.3.1-cp314-cp314t-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl", hash = "sha256:5bd17ef2ad965867d70af8e6be245e6886e5e8d115f66a2aa155380884a65252", size = 119143, upload-time = "2026-08-26T06:47:31.565Z" },
+    { url = "https://files.pythonhosted.org/packages/1b/43/2d5eb367db854e41417c2dfc1ca549e00f0d6de14dbbcd2221b572831136/tree_sitter_matlab-1.3.1-cp314-cp314t-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:bde730be2a387afc3308ae2aa720ba8d11f91c5c8183acadf149bc427c63bcf8", size = 125836, upload-time = "2026-08-26T06:47:32.819Z" },
+    { url = "https://files.pythonhosted.org/packages/a6/6a/e7def13d2f86ba6ae735dd3ea76d62ebc726d8d7dd626e3db1691fb322fb/tree_sitter_matlab-1.3.1-cp314-cp314t-musllinux_1_2_aarch64.whl", hash = "sha256:955acf4ad3e7b9a4ec84e14dd8d6c42596a45d36d5f6d1a8fd9fdc68b2970dc3", size = 123558, upload-time = "2026-08-26T06:47:34.073Z" },
+    { url = "https://files.pythonhosted.org/packages/2b/b3/69bde9098b0fb3b605e975b4cc9144202fe45a8617e704bf9bff45b17e87/tree_sitter_matlab-1.3.1-cp314-cp314t-musllinux_1_2_x86_64.whl", hash = "sha256:3173e14a34e82f13304cd4ae066aad7250bc73b0c855e2be96e889673b8e1f5c", size = 117824, upload-time = "2026-08-26T06:47:35.384Z" },
+    { url = "https://files.pythonhosted.org/packages/91/df/24297ff094dbf66e4aebd53a877302b793412748c291481c409c616bdd44/tree_sitter_matlab-1.3.1-cp314-cp314t-win32.whl", hash = "sha256:5afe8ee1ecf3314bb7e111b34ae70bd53289b417059866c145c6e11193a594c3", size = 83702, upload-time = "2026-08-26T06:47:36.8Z" },
+    { url = "https://files.pythonhosted.org/packages/04/b4/c02832e71e806bff22d872d168f454d95e38da97d9516f284f662c7f6e27/tree_sitter_matlab-1.3.1-cp314-cp314t-win_amd64.whl", hash = "sha256:b678a165ea792dc3a731580d7edeb838d29c5c95b475fe8bc840752afdc2e9b8", size = 84173, upload-time = "2026-08-26T06:47:38.156Z" },
+    { url = "https://files.pythonhosted.org/packages/99/91/71d6470bbe5433c1320b0060b66a30e4b100eb64f4c034bed97790966283/tree_sitter_matlab-1.3.1-cp314-cp314t-win_arm64.whl", hash = "sha256:d13490be96978603f03d9decbb3e2216108b97b3ab434a7709c00278a5afacfd", size = 83503, upload-time = "2026-08-26T06:47:39.579Z" },
 ]
 
 [[package]]
