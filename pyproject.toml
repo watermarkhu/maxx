@@ -41,7 +41,7 @@ dev = [
     "ty==0.0.81",
     "prek~=0.5.0",
 ]
-reference = ["beautifulsoup4~=4.15.0", "playwright~=1.62.0"]
+reference = ["beautifulsoup4~=4.15.0", "playwright~=1.63.0"]
 
 [build-system]
 requires = ["hatchling"]
