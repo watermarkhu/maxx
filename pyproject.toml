@@ -35,10 +35,10 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "ruff~=0.16.1",
+    "ruff~=0.17.0",
     "pytest~=9.1.0",
     "pytest-cov~=7.1.0",
-    "ty==0.0.85",
+    "ty==0.0.86",
     "prek~=0.5.0",
 ]
 reference = ["beautifulsoup4~=4.15.0", "playwright~=1.63.0"]
