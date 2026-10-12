@@ -547,3 +547,42 @@ class TestNamespaceMerging:
         assert set(pkg.members) == {"Alpha", "Beta", "Same"}
         # libA precedes libB on the search path, so its Same wins the clash.
         assert pkg.members["Same"].filepath == tmp_path / "libA" / "+pkg" / "Same.m"
+
+
+class TestNamespaceAtRelativeRoot:
+    """A +namespace folder directly under a relative '.' root must not crash.
+
+    Regression test for IndexError in _PathResolver.is_in_namespace (and
+    siblings is_folder/is_class_folder/is_namespace): Path(".").name == "",
+    so indexing [0] on the empty name raised "IndexError: string index out
+    of range".
+    """
+
+    def test_namespace_folder_at_dot_root_does_not_crash(self, tmp_path, monkeypatch):
+        """PathsCollection(["."], recursive=True) must not raise IndexError."""
+        ns_dir = tmp_path / "+NsAtRoot"
+        ns_dir.mkdir()
+        (ns_dir / "foo.m").write_text("function foo()\nend\n", encoding="utf-8")
+
+        monkeypatch.chdir(tmp_path)
+        collection = PathsCollection(["."], recursive=True)
+
+        namespace = collection.get_member("+NsAtRoot")
+        assert namespace is not None
+        func = collection.get_member("NsAtRoot.foo")
+        assert isinstance(func, Function)
+        assert func.name == "foo"
+
+    def test_is_in_namespace_false_for_root_level_namespace(self, tmp_path):
+        """A +namespace sitting at the collected root is not itself 'in' a namespace."""
+        from maxx.collection import _PathResolver
+
+        ns_dir = tmp_path / "+NsAtRoot"
+        ns_dir.mkdir()
+        (ns_dir / "foo.m").write_text("function foo()\nend\n", encoding="utf-8")
+
+        collection = PathsCollection([tmp_path], recursive=True)
+        resolver = _PathResolver(ns_dir, collection)
+        # Must not raise, and the namespace folder's parent is the (non-namespace) root.
+        assert resolver.is_in_namespace is False
+        assert resolver.is_namespace is True
