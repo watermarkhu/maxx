@@ -115,19 +115,33 @@ class _PathResolver:
 
     @property
     def is_folder(self) -> bool:
-        return self._path.is_dir() and self._path.name[0] not in FOLDER_PREFIXES
+        return (
+            self._path.is_dir()
+            and bool(self._path.name)
+            and self._path.name[0] not in FOLDER_PREFIXES
+        )
 
     @property
     def is_class_folder(self) -> bool:
-        return self._path.is_dir() and self._path.name[0] == CLASSFOLDER_PREFIX
+        return (
+            self._path.is_dir()
+            and bool(self._path.name)
+            and self._path.name[0] == CLASSFOLDER_PREFIX
+        )
 
     @property
     def is_namespace(self) -> bool:
-        return self._path.is_dir() and self._path.name[0] == NAMESPACE_PREFIX
+        return (
+            self._path.is_dir() and bool(self._path.name) and self._path.name[0] == NAMESPACE_PREFIX
+        )
 
     @property
     def is_in_namespace(self) -> bool:
-        return self._path.is_dir() and self._path.parent.name[0] == NAMESPACE_PREFIX
+        return (
+            self._path.is_dir()
+            and bool(self._path.parent.name)
+            and self._path.parent.name[0] == NAMESPACE_PREFIX
+        )
 
     @property
     def name(self):
