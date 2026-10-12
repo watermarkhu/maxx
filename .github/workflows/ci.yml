@@ -14,7 +14,7 @@ on:
       - labeled
       - unlabeled
       - edited
-    branches: [main, development]
+    branches: [main, dev]
 
 permissions:
   contents: write

@@ -48,4 +48,4 @@ Commits should follow the [Conventional Commits](https://www.conventionalcommits
 
 ## Pull requests
 
-Pull request should be targetting `main` directly. If commits in the pull request did not follow [Conventional Commits](https://www.conventionalcommits.org), make sure that the pull request title does. 
+Pull requests should be created against the `dev` branch. If commits in the pull request did not follow [Conventional Commits](https://www.conventionalcommits.org), make sure that the pull request title does. 
