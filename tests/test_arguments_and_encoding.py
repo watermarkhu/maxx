@@ -102,3 +102,56 @@ def test_fileparser_non_utf8_content_replace(tmp_path: Path):
     mock.text = b"\xff\xfehello"
     expr = Expr(nodes=[mock], encoding="utf-8")
     assert "�" in str(expr)
+
+
+def test_semicolon_terminated_entries(tmp_path: Path):
+    """`;` after entries must not end `properties` / `arguments` parsing early."""
+    code = """classdef Demo
+    properties
+        a (1,1) double = 1;
+        b (1,1) string = "x";
+        c (1,:) char;
+    end
+    methods
+        function out = run(this, N, opts)
+            arguments
+                this;
+                N (1,1) uint64;
+                opts.scale (1,1) double = 2;
+            end
+            out = N;
+        end
+    end
+end
+"""
+    (tmp_path / "Demo.m").write_text(code, encoding="utf-8")
+    cls = PathsCollection([tmp_path], recursive=True).get_member("Demo")
+    props = [n for n, m in cls.members.items() if m.kind.value == "property"]
+    assert props == ["a", "b", "c"]
+    args = {a.name: a for a in cls.members["run"].arguments}
+    assert list(args) == ["N", "scale"]
+    assert str(args["N"].type) == "uint64"
+    assert args["scale"].kind is ArgumentKind.keyword_only
+    assert str(args["scale"].type) == "double"
+    assert str(args["scale"].default) == "2"
+
+
+def test_semicolon_terminated_enumerations_and_methods(tmp_path: Path):
+    """`;` after enum entries / `end` of methods must not end parsing early."""
+    code = """classdef E
+    enumeration
+        A (1);
+        B (2);
+        C (3)
+    end
+    methods
+        function a(this)
+        end;
+        function b(this)
+        end
+    end
+end
+"""
+    (tmp_path / "E.m").write_text(code, encoding="utf-8")
+    cls = PathsCollection([tmp_path], recursive=True).get_member("E")
+    assert list(cls.members) == ["A", "B", "C", "a", "b"]

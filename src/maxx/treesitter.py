@@ -106,6 +106,7 @@ ARGUMENTS_QUERY = QueryCursor(
         (class_property) @arguments_items
         (comment) @arguments_items
         ("\\n")
+        (";")
     ]+
 )""",
     )
@@ -206,6 +207,7 @@ METHODS_QUERY = QueryCursor(
         [
             (function_definition) @methods
             ("\\n")
+            (";")
         ]*
     )*
 )""",
@@ -228,6 +230,7 @@ PROPERTIES_QUERY = QueryCursor(
             (property) @properties_items
             (comment) @properties_items
             ("\\n")
+            (";")
         ]*
     )*
 )""",
@@ -251,6 +254,7 @@ ENUMERATIONS_QUERY = QueryCursor(
         )
         (comment) @content
         ("\\n")
+        (";")
     ]*
 )""",
     )
