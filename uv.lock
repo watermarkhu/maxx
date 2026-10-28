@@ -1,3 +1,4 @@
+successfully downloaded text file (SHA: ae6df7d178e979b765f973d33a3c7a0013356bf3)
 version = 1
 revision = 5
 requires-python = ">=3.10"
@@ -429,7 +430,7 @@ dev = [
     { name = "pytest", specifier = "~=9.2.0" },
     { name = "pytest-cov", specifier = "~=7.1.0" },
     { name = "ruff", specifier = "~=0.17.0" },
-    { name = "ty", specifier = "==0.0.93" },
+    { name = "ty", specifier = "~=0.0.93" },
 ]
 reference = [
     { name = "beautifulsoup4", specifier = "~=4.15.0" },
