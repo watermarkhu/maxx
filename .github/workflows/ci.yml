@@ -61,7 +61,7 @@ jobs:
           submodules: true
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@v10.3.2
+        uses: astral-sh/setup-uv@v10.3.3
         with:
           version: "latest"
 
@@ -150,7 +150,7 @@ jobs:
           cache: true
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@v10.3.2
+        uses: astral-sh/setup-uv@v10.3.3
         with:
           version: "latest"
 
@@ -192,7 +192,7 @@ jobs:
           submodules: true
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@v10.3.2
+        uses: astral-sh/setup-uv@v10.3.3
         with:
           version: "latest"
 
