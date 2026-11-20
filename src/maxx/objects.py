@@ -68,7 +68,7 @@ class Validatable:
     def __str__(self) -> str:
         arg = f"{self.name}: {self.type} = {self.default}"
         if hasattr(self, "kind") and self.kind is not None:
-            return f"[{self.kind.value}] {arg}"  # ty: ignore[unresolved-attribute]
+            return f"[{self.kind.value}] {arg}"  # ty: ignore[missing-attribute]
         return arg
 
 

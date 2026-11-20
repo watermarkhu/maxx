@@ -54,11 +54,11 @@ class DelMembersMixin:
         if len(parts) == 1:
             name = parts[0]
             try:
-                del self.members[name]  # ty:ignore[unresolved-attribute]
+                del self.members[name]  # ty:ignore[missing-attribute]
             except KeyError:
-                del self.inherited_members[name]  # ty:ignore[unresolved-attribute]
+                del self.inherited_members[name]  # ty:ignore[missing-attribute]
         else:
-            del self.all_members[parts[0]][parts[1:]]  # ty:ignore[unresolved-attribute]
+            del self.all_members[parts[0]][parts[1:]]  # ty:ignore[missing-attribute]
 
     def del_member(self, key: str | Sequence[str]) -> None:
         """Delete a member with its name or path.
@@ -71,9 +71,9 @@ class DelMembersMixin:
         parts = _get_parts(key)
         if len(parts) == 1:
             name = parts[0]
-            del self.members[name]  # ty:ignore[unresolved-attribute]
+            del self.members[name]  # ty:ignore[missing-attribute]
         else:
-            self.members[parts[0]].del_member(parts[1:])  # ty:ignore[unresolved-attribute]
+            self.members[parts[0]].del_member(parts[1:])  # ty:ignore[missing-attribute]
 
 
 class GetMembersMixin:
@@ -95,8 +95,8 @@ class GetMembersMixin:
         """
         parts = _get_parts(key)
         if len(parts) == 1:
-            return self.all_members[parts[0]]  # ty:ignore[unresolved-attribute]
-        return self.all_members[parts[0]][parts[1:]]  # ty:ignore[unresolved-attribute]
+            return self.all_members[parts[0]]  # ty:ignore[missing-attribute]
+        return self.all_members[parts[0]][parts[1:]]  # ty:ignore[missing-attribute]
 
     def get_member(self, key: str | Sequence[str]) -> Any:
         """Get a member with its name or path.
@@ -108,8 +108,8 @@ class GetMembersMixin:
         """
         parts = _get_parts(key)
         if len(parts) == 1:
-            return self.members[parts[0]]  # ty:ignore[unresolved-attribute]
-        return self.members[parts[0]].get_member(parts[1:])  # ty:ignore[unresolved-attribute]
+            return self.members[parts[0]]  # ty:ignore[missing-attribute]
+        return self.members[parts[0]].get_member(parts[1:])  # ty:ignore[missing-attribute]
 
 
 class SetMembersMixin:
@@ -130,10 +130,10 @@ class SetMembersMixin:
         parts = _get_parts(key)
         if len(parts) == 1:
             name = parts[0]
-            self.members[name] = value  # ty:ignore[unresolved-attribute]
-            value.parent = self  # ty:ignore[unresolved-attribute]
+            self.members[name] = value  # ty:ignore[missing-attribute]
+            value.parent = self  # ty:ignore[missing-attribute]
         else:
-            self.members[parts[0]][parts[1:]] = value  # ty:ignore[unresolved-attribute]
+            self.members[parts[0]][parts[1:]] = value  # ty:ignore[missing-attribute]
 
     def set_member(self, key: str | Sequence[str], value: ObjectAliasMixin) -> None:
         """Set a member with its name or path.
@@ -154,10 +154,10 @@ class SetMembersMixin:
         parts = _get_parts(key)
         if len(parts) == 1:
             name = parts[0]
-            self.members[name] = value  # ty:ignore[unresolved-attribute]
-            value.parent = self  # ty:ignore[unresolved-attribute]
+            self.members[name] = value  # ty:ignore[missing-attribute]
+            value.parent = self  # ty:ignore[missing-attribute]
         else:
-            self.members[parts[0]].set_member(parts[1:], value)  # ty:ignore[unresolved-attribute]
+            self.members[parts[0]].set_member(parts[1:], value)  # ty:ignore[missing-attribute]
 
 
 class PathMixin:
@@ -225,9 +225,9 @@ class ObjectAliasMixin(GetMembersMixin, SetMembersMixin, DelMembersMixin):
     @property
     def all_members(self) -> dict[str, Object | Alias]:
         """All members (declared and inherited)."""
-        if self.is_class:  # ty:ignore[unresolved-attribute]
-            return {**self.inherited_members, **self.members}  # ty:ignore[unresolved-attribute]
-        return self.members  # ty:ignore[unresolved-attribute]
+        if self.is_class:  # ty:ignore[missing-attribute]
+            return {**self.inherited_members, **self.members}  # ty:ignore[missing-attribute]
+        return self.members  # ty:ignore[missing-attribute]
 
     @property
     def folders(self) -> "dict[str, Folder]":
@@ -258,7 +258,7 @@ class ObjectAliasMixin(GetMembersMixin, SetMembersMixin, DelMembersMixin):
         """The script members."""
         return cast(
             "dict[str, Script]",
-            {name: member for name, member in self.members.items() if member.kind is Kind.SCRIPT},  # ty:ignore[unresolved-attribute]
+            {name: member for name, member in self.members.items() if member.kind is Kind.SCRIPT},  # ty:ignore[missing-attribute]
         )
 
     @property
